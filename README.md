@@ -54,15 +54,15 @@ All configurations are stored in `config.json`.
 |Name|Values|Description|
 |----|------|-----------|
 |demoMode|true or false|If it's True, the arbitrager analyzes spreads but doesn't send any trade.|
-|priceMergeSize|integer|Merges small quotes into the specified price ladder before analyzing arbitrage opportunity.|
-|maxSize|decimal|Maximum BTC size to be sent to a broker.|
-|minSize|decimal|Minimum BTC size to be sent to a broker.|
-|minTargetProfit|Integer|Minimum JPY size to try to arbitrage.|
+|priceMergeSize|number|Merges small quotes into the specified price ladder before analyzing arbitrage opportunity.|
+|maxSize|number|Maximum BTC size to be sent to a broker.|
+|minSize|number|Minimum BTC size to be sent to a broker.|
+|minTargetProfit|number|Minimum JPY size to try to arbitrage.|
 |iterationInterval|Millisecond|Time lapse in milliseconds of an iteration. When it's set to 3000, the quotes fetch and the spreads analysis for all the brokers are done every 3 seconds|
 |positionRefreshInterval|Millisecond|Time lapse in milliseconds of position data refresh. Position data is used to check max exposure and long/short availability for each broker.|
 |sleepAfterSend|Millisecond|Time lapse in milliseconds after one arbitrage is done.|
-|maxNetExposure|decimal|Maximum total net exposure. If net exposure qty is larger than this value, Arbitrager stops.| 
-|maxRetryCount|integer|Maximum retry count to check if arbitrage orders are filled or not. If the orders are not filled after the retries, Arbitrager tries to cancel the orders and continues.|
+|maxNetExposure|number|Maximum total net exposure. If net exposure qty is larger than this value, Arbitrager stops.| 
+|maxRetryCount|number|Maximum retry count to check if arbitrage orders are filled or not. If the orders are not filled after the retries, Arbitrager tries to cancel the orders and continues.|
 |orderStatusCheckInterval|Millisecond|Time lapse in milliseconds to check if arbitrage orders are filled or not.|
 
 ### Broker config
@@ -72,8 +72,8 @@ All configurations are stored in `config.json`.
 |enabled|true or false|Enable the broker for arbitrage|
 |key|string|Broker API Key or Token|
 |secret|string|BrokerAPI Secret|
-|maxLongPosition|decimal|Maximum long position allowed for the broker.|
-|maxShortPosition|decimal|Maximum short position allowed for the broker|
+|maxLongPosition|number|Maximum long position allowed for the broker.|
+|maxShortPosition|number|Maximum short position allowed for the broker|
 |cashMarginType|Cash, MarginOpen, MarginClose, NetOut|Arbitrage order type. Currently, this option is not fully supported. Please do not change from the default values.|
 
 ### Log files
