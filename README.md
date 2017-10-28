@@ -18,9 +18,9 @@ npm install
 ```
 4. Rename `config_default.json` in src folder to `config.json`
 5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. 
-6. Start the application by `npm run start` or `yarn start`.
+6. Start the application by `npm start` or `yarn start`.
 ```bash
-npm run start
+npm start
 ```
 
 ### Prerequisites
@@ -89,7 +89,7 @@ All log files are saved under `logs` directory.
 `test` script runs [ts-jest](https://github.com/kulshekhar/ts-jest).
 
 ```
-yarn test
+npm test
 ```
 
 ## License
