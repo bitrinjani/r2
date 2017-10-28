@@ -1,10 +1,13 @@
 import * as i18next from 'i18next';
 import { en, ja } from './stringResources';
 
-const config = require('./config.json');
+let lng = 'en';
+try { 
+  lng = require('./config.json').language; 
+} catch (err) { /* For unit tests */}
 
 i18next.init({
-  lng: config.language,
+  lng,
   fallbackLng: 'en',
   resources: {
     en: {
