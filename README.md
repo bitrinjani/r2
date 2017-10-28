@@ -6,7 +6,7 @@ This application is implemented with Node.js/TypeScript. The previous version wa
 
 ## Getting Started
 
-1. Install [Node.js](https://nodejs.org).
+1. Install [Node.js](https://nodejs.org) 8.5 or newer.
 2. Clone this repository.
   ```bash
   git clone https://github.com/bitrinjani/r2.git
