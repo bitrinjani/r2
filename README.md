@@ -4,8 +4,6 @@ R2 Bitcoin Arbitrager is an automatic arbitrage trading application targeting Bi
 
 This application is implemented with Node.js/TypeScript. The previous version was implemented by C# on .NET Framework in [Rinjani repository](https://github.com/bitrinjani/rinjani). To get more extensibility, expecially for Web UI, it was ported to Node.js.
 
-![Screenshot](rinjani.gif)
-
 ## Getting Started
 
 1. Install [Node.js](https://nodejs.org).
