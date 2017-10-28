@@ -1,0 +1,52 @@
+{
+  "name": "r2",
+  "version": "2.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "./node_modules/.bin/ts-node ./src/index.ts",
+    "test": "jest --maxWorkers=1 --coverage"
+  },
+  "dependencies": {
+    "@types/i18next": "^8.4.2",
+    "@types/jsonwebtoken": "^7.2.3",
+    "date-fns": "^1.28.5",
+    "i18next": "^10.0.1",
+    "inversify": "^4.3.0",
+    "jsonwebtoken": "^8.1.0",
+    "lodash": "^4.17.4",
+    "node-fetch": "^1.7.3",
+    "reflect-metadata": "^0.1.10",
+    "typescript": "^2.5.2",
+    "uuid": "^3.1.0",
+    "winston": "^3.0.0-rc1"
+  },
+  "devDependencies": {
+    "@types/date-fns": "^2.6.0",
+    "@types/jest": "^21.1.4",
+    "@types/lodash": "^4.14.77",
+    "@types/nock": "^8.2.1",
+    "@types/node": "^8.0.30",
+    "@types/node-fetch": "^1.6.7",
+    "@types/uuid": "^3.4.2",
+    "jest": "^21.2.1",
+    "nock": "^9.0.24",
+    "ts-jest": "^21.1.2",
+    "ts-node": "^3.3.0",
+    "tslint-config-airbnb": "^5.3.0"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "/__tests__/.*\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ],
+    "mapCoverage": true
+  }
+}

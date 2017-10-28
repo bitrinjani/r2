@@ -1,0 +1,44 @@
+{
+  "language": "en", 
+	"demoMode": true,
+	"priceMergeSize": 100,
+	"maxSize": 0.01,
+	"minSize": 0.01,
+	"minTargetProfit": 1,
+	"iterationInterval": 3000,
+	"positionRefreshInterval": 5000,
+	"sleepAfterSend": 5000,
+	"maxNetExposure": 0.1,
+	"maxRetryCount": 10,
+	"orderStatusCheckInterval": 3000,
+	"brokers": [
+			{
+				"broker": "Coincheck",
+				"enabled": true,
+				"key": "xxxxxx",
+				"secret": "xxxxxx",
+				"maxLongPosition": 0.15,
+				"maxShortPosition": 0.15,
+				"cashMarginType": "MarginOpen"
+			},
+			{
+				"broker": "Bitflyer",
+				"enabled": true,
+        "key": "xxxxxx",
+        "secret": "xxxxxx",
+				"maxLongPosition": 0.03,
+				"maxShortPosition": 0,
+				"cashMarginType": "Cash"
+			},
+			{
+				"broker": "Quoine",
+				"enabled": true,
+        "key": "xxxxxx",
+        "secret": "xxxxxx",
+				"maxLongPosition": 0.15,
+				"maxShortPosition": 0.15,
+				"cashMarginType": "NetOut",
+				"leverageLevel": 10
+			}
+	]
+}
