@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules
-build
+dist
 
 # misc
 .DS_Store

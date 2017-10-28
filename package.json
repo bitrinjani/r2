@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "./node_modules/.bin/ts-node ./src/index.ts",
+    "prestart": "rimraf dist && tsc -p tsconfig.json && cpy src/config.json dist ",
+    "start": "node ./dist/index.js ",
     "test": "jest --maxWorkers=1 --coverage"
   },
   "dependencies": {
@@ -17,7 +18,6 @@
     "lodash": "^4.17.4",
     "node-fetch": "^1.7.3",
     "reflect-metadata": "^0.1.10",
-    "typescript": "^2.5.2",
     "uuid": "^3.1.0",
     "winston": "^3.0.0-rc1"
   },
@@ -28,12 +28,14 @@
     "@types/node": "^8.0.30",
     "@types/node-fetch": "^1.6.7",
     "@types/uuid": "^3.4.2",
+    "cpy-cli": "^1.0.1",
     "jest": "^21.2.1",
     "nock": "^9.0.24",
+    "rimraf": "^2.6.2",
     "ts-jest": "^21.1.2",
-    "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
-    "tslint-config-airbnb": "^5.3.0"
+    "tslint-config-airbnb": "^5.3.0",
+    "typescript": "^2.5.3"
   },
   "jest": {
     "transform": {
