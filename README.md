@@ -53,6 +53,7 @@ All configurations are stored in `config.json`.
 ### Global Config
 |Name|Values|Description|
 |----|------|-----------|
+|language|"ja" or "en"|UI language. Japanese or English.|
 |demoMode|true or false|If it's True, the arbitrager analyzes spreads but doesn't send any trade.|
 |priceMergeSize|number|Merges small quotes into the specified price ladder before analyzing arbitrage opportunity.|
 |maxSize|number|Maximum BTC size to be sent to a broker.|
