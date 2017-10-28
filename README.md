@@ -4,9 +4,26 @@ R2 Bitcoin Arbitrager is an automatic arbitrage trading application targeting Bi
 
 This application is implemented with Node.js/TypeScript. The previous version was implemented by C# on .NET Framework in [Rinjani repository](https://github.com/bitrinjani/rinjani). To get more extensibility, expecially for Web UI, it was ported to Node.js.
 
+![Screenshot](screnshot.gif)
+
 ## Getting Started
 
-TBD
+1. Install [Node.js](https://nodejs.org) 8.5 or newer.
+2. Clone this repository.
+  ```bash
+  git clone https://github.com/bitrinjani/r2.git
+  ```
+3. Run `npm install`. (or `yarn`)
+```bash
+cd r2
+npm install
+```
+4. Rename `config_default.json` in src folder to `config.json`
+5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. 
+6. Start the application by `npm start` or `yarn start`.
+```bash
+npm start
+```
 
 ### Prerequisites
 The application should work on any OS that supports Node.js, such as:
