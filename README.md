@@ -6,22 +6,7 @@ This application is implemented with Node.js/TypeScript. The previous version wa
 
 ## Getting Started
 
-1. Install [Node.js](https://nodejs.org).
-2. Clone this repository.
-  ```bash
-  git clone https://github.com/bitrinjani/r2.git
-  ```
-3. Run `npm install`. (or `yarn`)
-```bash
-cd r2
-npm install
-```
-4. Rename `config_default.json` in src folder to `config.json`
-5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. 
-6. Start the application by `npm run start` or `yarn start`.
-```bash
-npm run start
-```
+TBD
 
 ### Prerequisites
 The application should work on any OS that supports Node.js, such as:
@@ -53,6 +38,7 @@ All configurations are stored in `config.json`.
 ### Global Config
 |Name|Values|Description|
 |----|------|-----------|
+|language|"ja" or "en"|UI language. Japanese or English.|
 |demoMode|true or false|If it's True, the arbitrager analyzes spreads but doesn't send any trade.|
 |priceMergeSize|number|Merges small quotes into the specified price ladder before analyzing arbitrage opportunity.|
 |maxSize|number|Maximum BTC size to be sent to a broker.|
@@ -88,7 +74,7 @@ All log files are saved under `logs` directory.
 `test` script runs [ts-jest](https://github.com/kulshekhar/ts-jest).
 
 ```
-yarn test
+npm test
 ```
 
 ## License
