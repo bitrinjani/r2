@@ -33,6 +33,7 @@ export default class ArbitragerImpl implements Arbitrager {
     this.status = 'Starting';
     this.log.info(t('StartingArbitrager'));
     this.quoteAggregator.onQuoteUpdated = async (quotes: Quote[]) => await this.quoteUpdated(quotes);
+    await this.quoteAggregator.start();
     await this.positionService.start();
     this.status = 'Started';
     this.log.info(t('StartedArbitrager'));
@@ -41,7 +42,10 @@ export default class ArbitragerImpl implements Arbitrager {
   async stop(): Promise<void> {
     this.status = 'Stopping';
     if (this.positionService) {
-      await this.positionService.stop();
+      await this.positionService.stop();      
+    }
+    if (this.quoteAggregator) {
+      await this.quoteAggregator.stop();
     }
     if (this.quoteAggregator.onQuoteUpdated) {
       this.quoteAggregator.onQuoteUpdated = undefined;

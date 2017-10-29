@@ -20,11 +20,24 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
     @inject(symbols.BrokerAdapterRouter) readonly brokerAdapterRouter: BrokerAdapterRouter
   ) {
     this.config = configStore.config;
-    this.enabledBrokers = this.getEnabledBrokers(configStore);
-    this.log.debug(`Enabled brokers: ${this.enabledBrokers}`);   
+    this.enabledBrokers = this.getEnabledBrokers(configStore); 
+  }
+
+  async start(): Promise<void> {
+    this.log.debug('Starting Quote Aggregator...');
+    this.log.debug(`Enabled brokers: ${this.enabledBrokers}`);  
     this.timer = setInterval(() => this.aggregate(), this.config.iterationInterval);
     this.log.debug(`Iteration interval is set to ${this.config.iterationInterval}`);
-    this.aggregate();
+    await this.aggregate();
+    this.log.debug('Started Quote Aggregator.');
+  }
+
+  async stop(): Promise<void> {
+    this.log.debug('Stopping Quote Aggregator...');
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+    this.log.debug('Stopped Quote Aggregator.');
   }
 
   onQuoteUpdated: (quotes: Quote[]) => Promise<void>;

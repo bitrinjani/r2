@@ -10,7 +10,10 @@ let quoteAggregator,
   baRouter, spreadAnalyzer, quotes;
 
 beforeEach(() => {
-  quoteAggregator = {} as QuoteAggregator;
+  quoteAggregator = { 
+    start: jest.fn(), 
+    stop: jest.fn() 
+  } as QuoteAggregator;
   config = {
     maxNetExposure: 10.0,
     brokers: [

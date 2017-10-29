@@ -51,7 +51,9 @@ test('Test QuoteAggregatorImpl folding', async () => {
   aggregator.onQuoteUpdated = async (quotes) => {
     expect(quotes.length).toBe(3);
   };
+  await aggregator.start();
   await delay(0);
+  await aggregator.stop();
 });
 
 test('Test QuoteAggregatorImpl folding when a broker is disabled', async () => {
@@ -81,7 +83,9 @@ test('Test QuoteAggregatorImpl folding when a broker is disabled', async () => {
   aggregator.onQuoteUpdated = async (quotes) => {
     expect(quotes.length).toBe(1);
   };
+  await aggregator.start();
   await delay(0);
+  await aggregator.stop();
 });
 
 test('Test QuoteAggregatorImpl onQuoteUpdated', async () => {
@@ -106,6 +110,8 @@ test('Test QuoteAggregatorImpl onQuoteUpdated', async () => {
   const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
   const fn = jest.fn();
   aggregator.onQuoteUpdated = fn;
+  await aggregator.start();
   await delay(0);
   expect(fn.mock.calls.length).toBeGreaterThan(0);   
+  await aggregator.stop();
 });

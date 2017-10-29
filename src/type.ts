@@ -21,6 +21,8 @@ export interface BrokerMap<T> {
 }
 
 export interface QuoteAggregator {
+  start(): Promise<void>;
+  stop(): Promise<void>;
   onQuoteUpdated?: (quotes: Quote[]) => Promise<void>;
 }
 
