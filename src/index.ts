@@ -5,18 +5,21 @@ process.title = 'r2app';
 const app = new AppRoot();
 app.start();
 
-function exit() {  
-  exec(`pkill ${process.title}`);
+function exit(code: number = 0) {  
+  exec(`pkill ${process.title}`);  
+  process.exit(code);
 }
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('SIGINT received. Stopping...');
-  app.stop();
+  await app.stop();
+  console.log('Stopped app.');
   exit();
 });
 
-process.on('unhandledRejection', (reason, p) => {
+process.on('unhandledRejection', async (reason, p) => {
   console.error(reason);
-  app.stop();
-  exit();
+  await app.stop();
+  console.log('Stopped app.');  
+  exit(1);
 });

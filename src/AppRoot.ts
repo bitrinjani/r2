@@ -21,11 +21,11 @@ export default class AppRoot {
     }
   }
   
-  stop(): void {
+  async stop(): Promise<void> {
     try {
       this.log.info(intl.t('StoppingTheService'));
       if (this.arbitrager) {
-        this.arbitrager.stop();
+        await this.arbitrager.stop();
       }
       this.log.info(intl.t('SuccessfullyStoppedTheService'));
     } catch (ex) {
