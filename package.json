@@ -49,6 +49,7 @@
       "jsx",
       "json"
     ],
-    "mapCoverage": true
+    "mapCoverage": true,
+    "collectCoverageFrom" : ["**/*.{ts,tsx}", "!**/__test__/**", "!**/node_modules/**", "!**/vendor/**"]
   }
 }
