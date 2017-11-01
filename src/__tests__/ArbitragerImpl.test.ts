@@ -219,6 +219,27 @@ test('Test ArbitragerImpl Send and not filled', async () => {
   expect(arbitrager.status).toBe('MaxRetryCount breached');
 });
 
+test('Send and refresh throws', async () => {
+  config.maxRetryCount = 3;
+  spreadAnalyzer.analyze.mockImplementation(() => {
+    return {
+      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      invertedSpread: 100,
+      availableVolume: 1,
+      targetVolume: 1,
+      targetProfit: 100
+    };
+  });
+  baRouter.refresh = () => { throw new Error('Mock refresh error.'); };
+  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+    positionService, baRouter, spreadAnalyzer);
+  positionService.isStarted = true;
+  await arbitrager.start();
+  await quoteAggregator.onQuoteUpdated([]);
+  expect(arbitrager.status).toBe('MaxRetryCount breached');
+});
+
 
 test('Test ArbitragerImpl Send and filled', async () => {
   baRouter.refresh.mockImplementation((order) => order.status = OrderStatus.Filled);
