@@ -1,9 +1,9 @@
 import { format as formatDate } from 'date-fns';
-import * as fs from 'fs';
 import * as path from 'path';
 import { createLogger, format, transports } from 'winston';
 const { combine, timestamp, label, printf } = format;
 import * as util from 'util';
+import { mkdir } from './util';
 
 const mysplat = format((info) => {
   if (info.splat) {
@@ -37,16 +37,6 @@ export function getLogger(name: string): Logger {
       new transports.File({ filename: path.join(logdir, 'debug.log'), level: 'debug' })
     ]
   });
-}
-
-function mkdir(dir: string) {
-  try {
-    fs.mkdirSync(dir);
-  } catch (err) {
-    if (err.code !== 'EEXIST') {
-      throw err;
-    }
-  }
 }
 
 interface Logger {

@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
+import * as fs from 'fs';
 
 interface ToStringable {
   toString(): string;
@@ -37,6 +38,12 @@ export function timestampToDate(n: number) {
   return new Date(n * 1000);
 }
 
-export function isTrue(s: ToStringable) {
-  return s.toString() === 'true';
+export function mkdir(dir: string) {
+  try {
+    fs.mkdirSync(dir);
+  } catch (err) {
+    if (err.code !== 'EEXIST') {
+      throw err;
+    }
+  }
 }
