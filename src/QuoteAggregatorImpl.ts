@@ -26,7 +26,7 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
   async start(): Promise<void> {
     this.log.debug('Starting Quote Aggregator...');
     this.log.debug(`Enabled brokers: ${this.enabledBrokers}`);  
-    this.timer = setInterval(() => this.aggregate(), this.config.iterationInterval);
+    this.timer = setInterval(this.aggregate.bind(this), this.config.iterationInterval);
     this.log.debug(`Iteration interval is set to ${this.config.iterationInterval}`);
     await this.aggregate();
     this.log.debug('Started Quote Aggregator.');
