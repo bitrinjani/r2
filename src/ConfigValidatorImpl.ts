@@ -6,7 +6,8 @@ import { injectable } from 'inversify';
 @injectable()
 export default class ConfigValidatorImpl implements ConfigValidator {
   validate(config: ConfigRoot): void {
-    this.throwIf(config.brokers.length < 2, intl.t('AtLeastTwoBrokersMustBeEnabled'));
+    const enabledBrokers = config.brokers.filter(b => b.enabled);
+    this.throwIf(enabledBrokers.length < 2, intl.t('AtLeastTwoBrokersMustBeEnabled'));
     this.mustBePositive(config.iterationInterval, 'iterationInterval');
     this.mustBePositive(config.maxNetExposure, 'maxNetExposure');
     this.mustBePositive(config.maxRetryCount, 'maxRetryCount');
