@@ -38,7 +38,7 @@ namespace Coincheck {
       const positions = await this.brokerApi.getAllOpenLeveragePositions();
       const longPosition = _.sumBy(positions.filter(p => p.side === 'buy'), p => p.amount);
       const shortPosition = _.sumBy(positions.filter(p => p.side === 'sell'), p => p.amount);
-      return longPosition - shortPosition;
+      return eRound(longPosition - shortPosition);
     }
 
     async fetchQuotes(): Promise<Quote[]> {
