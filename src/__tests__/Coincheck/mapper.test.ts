@@ -1,5 +1,5 @@
-import { getBrokerOrderType } from '../Coincheck/mapper';
-import { CashMarginType, OrderSide, OrderType } from '../type';
+import { getBrokerOrderType } from '../../Coincheck/mapper';
+import { CashMarginType, OrderSide, OrderType } from '../../type';
 
 describe('getBrokerOrderType', () => {
   test('cash market buy', () => {
@@ -130,8 +130,8 @@ describe('getBrokerOrderType', () => {
   test('invalid CashMarginType', () => {
     const order = {
       cashMarginType: 'Invalid',
-      side: OrderSide.Buy
-    type: OrderType.Limit
+      side: OrderSide.Buy,
+      type: OrderType.Limit
     };
     expect(() => getBrokerOrderType(order)).toThrow();
   });
