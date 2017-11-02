@@ -50,6 +50,6 @@
       "json"
     ],
     "mapCoverage": true,
-    "collectCoverageFrom" : ["**/*.{ts,tsx}", "!**/__test__/**", "!**/node_modules/**", "!**/vendor/**"]
+    "collectCoverageFrom" : ["**/*.{ts,tsx}", "!src/index.ts", "!**/__tests__/**", "!**/node_modules/**", "!**/vendor/**"]
   }
 }
