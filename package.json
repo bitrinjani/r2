@@ -6,7 +6,9 @@
   "scripts": {
     "prestart": "rimraf dist && tsc -p tsconfig.json && cpy src/config.json dist ",
     "start": "node ./dist/index.js ",
-    "test": "jest --maxWorkers=1 --coverage && cat ./coverage/lcov.info | coveralls"
+    "test": "jest --maxWorkers=1 --coverage && cat ./coverage/lcov.info | coveralls",
+    "testfast": "jest",
+    "coverage": "jest --coverage"
   },
   "dependencies": {
     "@types/i18next": "^8.4.2",
@@ -42,7 +44,7 @@
     "transform": {
       "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "/__tests__/.*\\.(jsx?|tsx?)$",
+    "testRegex": "/__tests__/.*\\.test\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
