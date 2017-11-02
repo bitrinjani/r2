@@ -18,7 +18,7 @@ export function hr(width: number): string {
   return _.join(_.times(width, _.constant('-')), '');
 }
 
-export function round(n: number): number {
+export function eRound(n: number): number {
   return _.round(n, 10);
 }
 

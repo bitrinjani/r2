@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { OrderSide, CashMarginType, OrderType, 
   TimeInForce, OrderStatus, Broker } from './type';
 import Execution from './Execution';
+import { eRound } from './util';
 
 export default class Order {
   constructor(broker: Broker, side: OrderSide, size: number, price: number, 
@@ -28,12 +29,12 @@ export default class Order {
   id: string = uuid();
   brokerOrderId: string;
   status: OrderStatus = OrderStatus.PendingNew;
-  get pendingSize(): number { return this.size - this.filledSize; }
+  get pendingSize(): number { return eRound(this.size - this.filledSize); }
   filledSize: number;
   get averageFilledPrice(): number {
     return _.isEmpty(this.executions)
       ? 0
-      : _.sumBy(this.executions, x => x.size * x.price) / _.sumBy(this.executions, x => x.size);
+      : eRound(_.sumBy(this.executions, x => x.size * x.price) / _.sumBy(this.executions, x => x.size));
   }
   creationTime: Date = new Date();
   sentTime: Date;

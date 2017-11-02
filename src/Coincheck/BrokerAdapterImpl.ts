@@ -13,6 +13,7 @@ import {
 } from '../type';
 import { OrderBooksResponse, NewOrderRequest, Transaction, TransactionsResponse, Pagination } from './type';
 import { getBrokerOrderType } from './mapper';
+import { eRound } from '../util';
 
 namespace Coincheck {
   @injectable()
@@ -103,7 +104,7 @@ namespace Coincheck {
         if (brokerOrder.pending_amount === undefined || brokerOrder.pending_amount === 0) {
           throw new Error('Unexpected reply returned.');
         }
-        order.filledSize = order.size - brokerOrder.pending_amount;
+        order.filledSize = eRound(order.size - brokerOrder.pending_amount);
         if (order.filledSize > 0) {
           order.status = OrderStatus.PartiallyFilled;
         }
@@ -123,7 +124,7 @@ namespace Coincheck {
         execution.size = Math.abs(x.funds.btc);
         return execution;
       });
-      order.filledSize = _.sumBy(order.executions, x => x.size);
+      order.filledSize = eRound(_.sumBy(order.executions, x => x.size));
       order.status = order.filledSize === order.size ? OrderStatus.Filled : OrderStatus.Canceled;
       order.lastUpdated = new Date();
     }

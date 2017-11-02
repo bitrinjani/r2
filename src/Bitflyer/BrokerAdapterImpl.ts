@@ -11,6 +11,7 @@ import BrokerApi from './BrokerApi';
 import { SendChildOrderResponse, ChildOrdersParam, SendChildOrderRequest, 
   ChildOrder, BoardResponse } from './type';
 import Execution from '../Execution';
+import { eRound } from '../util';
 
 namespace Bitflyer {
   @injectable()
@@ -150,7 +151,7 @@ namespace Bitflyer {
     }
 
     private setOrderFields(childOrder: ChildOrder, order: Order): void {
-      order.filledSize = childOrder.executed_size;
+      order.filledSize = eRound(childOrder.executed_size);
       if (childOrder.child_order_state === 'CANCELED') {
         order.status = OrderStatus.Canceled;
       } else if (childOrder.child_order_state === 'EXPIRED') {

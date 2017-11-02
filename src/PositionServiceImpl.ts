@@ -6,7 +6,7 @@ import {
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import BrokerPosition from './BrokerPosition';
-import { hr, round } from './util';
+import { hr, eRound } from './util';
 import symbols from './symbols';
 
 @injectable()
@@ -51,7 +51,7 @@ export default class PositionServiceImpl implements PositionService {
   isStarted: boolean = false;
 
   get netExposure() {
-    return round(_.sumBy(_.values(this.positionMap), (p: BrokerPosition) => p.btc));
+    return eRound(_.sumBy(_.values(this.positionMap), (p: BrokerPosition) => p.btc));
   }
 
   get positionMap() {
@@ -75,9 +75,9 @@ export default class PositionServiceImpl implements PositionService {
           const allowedShortSize = _.max([0, currentBtc + brokerConfig.maxShortPosition]) as number;
           const pos = new BrokerPosition();
           pos.broker = brokerConfig.broker;
-          pos.btc = round(currentBtc);
-          pos.allowedLongSize = round(allowedLongSize);
-          pos.allowedShortSize = round(allowedShortSize);   
+          pos.btc = eRound(currentBtc);
+          pos.allowedLongSize = eRound(allowedLongSize);
+          pos.allowedShortSize = eRound(allowedShortSize);   
           return pos;
         });
       this._positionMap = _(await Promise.all(promises)).map(p => [p.broker, p]).fromPairs().value();
