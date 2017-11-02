@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import JsonConfigStore from '../JsonConfigStore';
 import { ConfigStore, ConfigRoot, Broker } from '../type';
 
-test('Test JsonConfigStore', () => {
+test('JsonConfigStore', () => {
   const path = './__tests__/config_test.json';
   const validator = { validate: (config: ConfigRoot) => true };
   const store = new JsonConfigStore(validator, path) as ConfigStore;

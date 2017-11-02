@@ -1,6 +1,8 @@
 // tslint:disable
-import { QuoteAggregator, Broker, QuoteSide, ConfigRoot, ConfigStore, 
-  PositionService, BrokerAdapterRouter, CashMarginType, OrderStatus } from '../type';
+import {
+  QuoteAggregator, Broker, QuoteSide, ConfigRoot, ConfigStore,
+  PositionService, BrokerAdapterRouter, CashMarginType, OrderStatus
+} from '../type';
 import ArbitragerImpl from '../ArbitragerImpl';
 import Quote from '../Quote';
 
@@ -10,9 +12,9 @@ let quoteAggregator,
   baRouter, spreadAnalyzer, quotes;
 
 beforeEach(() => {
-  quoteAggregator = { 
-    start: jest.fn(), 
-    stop: jest.fn() 
+  quoteAggregator = {
+    start: jest.fn(),
+    stop: jest.fn()
   } as QuoteAggregator;
   config = {
     maxNetExposure: 10.0,
@@ -68,196 +70,198 @@ beforeEach(() => {
   ];
 });
 
-test('Test ArbitragerImpl start/stop', async () => {
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  await arbitrager.start();
-  expect(positionService.start).toBeCalled();
-  expect(quoteAggregator.onQuoteUpdated).not.toBeUndefined();
-  expect(arbitrager.status).toBe('Started');
-  await arbitrager.stop();
-  expect(positionService.stop).toBeCalled();
-  expect(arbitrager.status).toBe('Stopped');
-});
-
-test('Test ArbitragerImpl positionService is not ready', async () => {
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  await arbitrager.start();
-  positionService.isStarted = false;
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(spreadAnalyzer.analyze).not.toBeCalled();
-  expect(baRouter.send).not.toBeCalled();
-  expect(arbitrager.status).toBe('Waiting Position Service');
-});
-
-test('Test ArbitragerImpl violate maxNetExposure', async () => {
-  config.maxNetExposure = 0.1;
-  positionService.netExposure = 0.2;
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(spreadAnalyzer.analyze).not.toBeCalled();
-  expect(baRouter.send).not.toBeCalled();
-  expect(arbitrager.status).toBe('Max exposure breached');
-});
-
-test('Test ArbitragerImpl SpreadAnalyzer throws', async () => {
-  config.maxNetExposure = 10;
-  spreadAnalyzer.analyze.mockImplementation(() => { throw new Error(); });
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(spreadAnalyzer.analyze).toBeCalled();
-  expect(baRouter.send).not.toBeCalled();
-  expect(arbitrager.status).toBe('Spread analysis failed');
-});
-
-test('Test ArbitragerImpl Spread not inverted', async () => {
-  spreadAnalyzer.analyze.mockImplementation(() => {
-    return {
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 400, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      invertedSpread: -100,
-      targetVolume: 1,
-      targetProfit: -100
-    };
+describe('Arbitrager', () => {
+  test('start/stop', async () => {
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    await arbitrager.start();
+    expect(positionService.start).toBeCalled();
+    expect(quoteAggregator.onQuoteUpdated).not.toBeUndefined();
+    expect(arbitrager.status).toBe('Started');
+    await arbitrager.stop();
+    expect(positionService.stop).toBeCalled();
+    expect(arbitrager.status).toBe('Stopped');
   });
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(spreadAnalyzer.analyze).toBeCalled();
-  expect(baRouter.send).not.toBeCalled();
-  expect(arbitrager.status).toBe('Spread not inverted');
-});
 
-test('Test ArbitragerImpl Too small volume', async () => {
-  config.minSize = 2;
-  spreadAnalyzer.analyze.mockImplementation(() => {
-    return {
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      invertedSpread: 100,
-      availableVolume: 1,
-      targetVolume: 1,
-      targetProfit: 100
-    };
+  test('positionService is not ready', async () => {
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    await arbitrager.start();
+    positionService.isStarted = false;
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(spreadAnalyzer.analyze).not.toBeCalled();
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Waiting Position Service');
   });
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(baRouter.send).not.toBeCalled();
-  expect(arbitrager.status).toBe('Too small volume');
-});
 
-test('Test ArbitragerImpl Too small profit', async () => {
-  config.minTargetProfit = 1000;
-  spreadAnalyzer.analyze.mockImplementation(() => {
-    return {
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      invertedSpread: 100,
-      availableVolume: 1,
-      targetVolume: 1,
-      targetProfit: 100
-    };
+  test('violate maxNetExposure', async () => {
+    config.maxNetExposure = 0.1;
+    positionService.netExposure = 0.2;
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(spreadAnalyzer.analyze).not.toBeCalled();
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Max exposure breached');
   });
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(baRouter.send).not.toBeCalled();
-  expect(arbitrager.status).toBe('Too small profit');
-});
 
-test('Test ArbitragerImpl Demo mode', async () => {
-  config.demoMode = true;
-  spreadAnalyzer.analyze.mockImplementation(() => {
-    return {
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      invertedSpread: 100,
-      availableVolume: 1,
-      targetVolume: 1,
-      targetProfit: 100
-    };
+  test('SpreadAnalyzer throws', async () => {
+    config.maxNetExposure = 10;
+    spreadAnalyzer.analyze.mockImplementation(() => { throw new Error(); });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(spreadAnalyzer.analyze).toBeCalled();
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Spread analysis failed');
   });
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(baRouter.send).not.toBeCalled();
-  expect(arbitrager.status).toBe('Demo mode');
-});
 
-test('Test ArbitragerImpl Send and not filled', async () => {
-  config.maxRetryCount = 3;
-  spreadAnalyzer.analyze.mockImplementation(() => {
-    return {
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      invertedSpread: 100,
-      availableVolume: 1,
-      targetVolume: 1,
-      targetProfit: 100
-    };
+  test('Spread not inverted', async () => {
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 400, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: -100,
+        targetVolume: 1,
+        targetProfit: -100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(spreadAnalyzer.analyze).toBeCalled();
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Spread not inverted');
   });
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(arbitrager.status).toBe('MaxRetryCount breached');
-});
 
-test('Send and refresh throws', async () => {
-  config.maxRetryCount = 3;
-  spreadAnalyzer.analyze.mockImplementation(() => {
-    return {
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      invertedSpread: 100,
-      availableVolume: 1,
-      targetVolume: 1,
-      targetProfit: 100
-    };
+  test('Too small volume', async () => {
+    config.minSize = 2;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Too small volume');
   });
-  baRouter.refresh = () => { throw new Error('Mock refresh error.'); };
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(arbitrager.status).toBe('MaxRetryCount breached');
-});
+
+  test('Too small profit', async () => {
+    config.minTargetProfit = 1000;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Too small profit');
+  });
+
+  test('Demo mode', async () => {
+    config.demoMode = true;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Demo mode');
+  });
+
+  test('Send and not filled', async () => {
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+  });
+
+  test('Send and refresh throws', async () => {
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    baRouter.refresh = () => { throw new Error('Mock refresh error.'); };
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+  });
 
 
-test('Test ArbitragerImpl Send and filled', async () => {
-  baRouter.refresh.mockImplementation((order) => order.status = OrderStatus.Filled);
-  config.maxRetryCount = 3;
-  spreadAnalyzer.analyze.mockImplementation(() => {
-    return {
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      invertedSpread: 100,
-      availableVolume: 1,
-      targetVolume: 1,
-      targetProfit: 100
-    };
-  });  
-  const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-    positionService, baRouter, spreadAnalyzer);
-  positionService.isStarted = true;
-  await arbitrager.start();
-  await quoteAggregator.onQuoteUpdated([]);
-  expect(arbitrager.status).toBe('Filled');
+  test('Send and filled', async () => {
+    baRouter.refresh.mockImplementation((order) => order.status = OrderStatus.Filled);
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('Filled');
+  });
 });
