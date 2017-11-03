@@ -22,7 +22,7 @@ describe('Coincheck BrokerAdapter', () => {
     expect(order.status).toBe(OrderStatus.Filled);
   });
 
-  test('getBtcPosition MarginOpen', async () => {
+  test('getBtcPosition Margin', async () => {
     const target = new Coincheck.BrokerAdapterImpl({ config });
     const result = await target.getBtcPosition();
     expect(result).toBe(-0.14007);
