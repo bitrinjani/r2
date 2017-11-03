@@ -15,13 +15,16 @@ export default class WebClient {
     const res = await fetch(url, init);
     let logText = `Response from ${res.url}. ` +
       `Status Code: ${res.status} (${res.statusText}) `;
-    this.log.debug(logText);
+    this.log.debug(logText);    
+    const content = await res.text();
     if (!res.ok) {      
-      const content = await res.text();
       logText += `Content: ${content}`;
       throw new Error(`HTTP request failed. ${logText}`);
+    }    
+    if (!content) {
+      return {} as T;
     }
-    const t = await res.json() as T;
+    const t = JSON.parse(content) as T;
     if (verbose) {
       this.log.debug(`Response content from ${res.url}: ${JSON.stringify(t)}`);
     }
