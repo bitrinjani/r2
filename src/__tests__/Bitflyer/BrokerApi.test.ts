@@ -18,8 +18,7 @@ describe('BrokerApi', async () => {
       "side": "BUY",
       "price": 30000,
       "size": 0.1,
-      "minute_to_expire": 10000,
-      "time_in_force": "GTC"
+      "time_in_force": ""
     };
     const reply = await target.sendChildOrder(req);
     expect(reply.child_order_acceptance_id).toBe('JRF20150707-050237-639234');
