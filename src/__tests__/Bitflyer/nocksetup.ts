@@ -38,6 +38,8 @@ function nocksetup() {
       "total_commission": 0
     }
   ]);
+  api.get('/v1/me/getchildorders?child_order_acceptance_id=JRF20171103-092007-284294').reply(200, [{"id":149550970,"child_order_id":"JOR20171103-092009-823736","product_code":"BTC_JPY","side":"SELL","child_order_type":"LIMIT","price":846700,"average_price":846700,"size":0.01,"child_order_state":"COMPLETED","expire_date":"2017-12-03T09:20:07","child_order_date":"2017-11-03T09:20:07","child_order_acceptance_id":"JRF20171103-092007-284294","outstanding_size":0,"cancel_size":0,"executed_size":0.01,"total_commission":0.000015}]);
+  api.get('/v1/me/getexecutions?child_order_acceptance_id=JRF20171103-092007-284294').reply(200, [{"id":64923644,"side":"SELL","price":846700,"size":0.01,"exec_date":"2017-11-03T09:20:09.12","child_order_id":"JOR20171103-092009-823736","commission":0.000015,"child_order_acceptance_id":"JRF20171103-092007-284294"}]);
   api.get('/v1/board').reply(200, {
     "mid_price": 33320,
     "bids": [

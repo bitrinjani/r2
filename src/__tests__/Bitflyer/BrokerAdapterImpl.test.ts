@@ -61,5 +61,12 @@ describe('Coincheck BrokerAdapter', () => {
     await target.send(order);
     expect(order.status).toBe(OrderStatus.New);
     expect(order.brokerOrderId).toBe('JRF20150707-050237-639234');
+  });  
+
+  test('refresh', async () => {
+    const target = new Bitflyer.BrokerAdapterImpl({ config });
+    const order = {"symbol":"BTCJPY","type":"Limit","timeInForce":"None","id":"438f7c7b-ed72-4719-935f-477ea043e2b0","status":"New","creationTime":"2017-11-03T09:20:06.687Z","executions":[],"broker":"Bitflyer","size":0.01,"side":"Sell","price":846700,"cashMarginType":"Cash","brokerOrderId":"JRF20171103-092007-284294","sentTime":"2017-11-03T09:20:07.292Z","lastUpdated":"2017-11-03T09:20:07.292Z"};
+    await target.refresh(order);
+    expect(order.status).toBe(OrderStatus.Filled);
   });
 });
