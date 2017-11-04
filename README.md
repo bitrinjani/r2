@@ -79,6 +79,7 @@ All configurations are stored in `config.json`.
 |maxLongPosition|number|Maximum long position allowed for the broker.|
 |maxShortPosition|number|Maximum short position allowed for the broker|
 |cashMarginType|Cash, MarginOpen, MarginClose, NetOut|Arbitrage order type. Not all options are supported for each exchange. See the table below.|
+|commissionPercent|number|Comission percentage for each trade. Commission JPY amount is calculated by `target price * target volume * (commissionPercent / 100)`. Arbitrager calculates expected profit by `inversed spread * volume - commission JPY amount`.|  
 
 #### Supported cashMarginType 
 
