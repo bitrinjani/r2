@@ -37,7 +37,7 @@ Currently, the Arbitrager supports three exchanges operated in Japan.
 
 - Bitflyer (Cash)
 - Quoine (Leverage)
-- Coincheck (Leverage)
+- Coincheck (Cash, Leverage)
 
 ## How it works
 1. Every 3 seconds, the Arbitrager fetches quotes from exchanges.
@@ -78,7 +78,15 @@ All configurations are stored in `config.json`.
 |secret|string|BrokerAPI Secret|
 |maxLongPosition|number|Maximum long position allowed for the broker.|
 |maxShortPosition|number|Maximum short position allowed for the broker|
-|cashMarginType|Cash, MarginOpen, MarginClose, NetOut|Arbitrage order type. Currently, this option is not fully supported. Please do not change from the default values.|
+|cashMarginType|Cash, MarginOpen, MarginClose, NetOut|Arbitrage order type. Not all options are supported for each exchange. See the table below.|
+
+#### Supported cashMarginType 
+
+|Exchange|Supported option|
+|--------|----------------|
+|Bitflyer|Cash|
+|Quoine|Netout|
+|Coincheck|Cash, MarginOpen|
 
 ### Log files
 All log files are saved under `logs` directory.
