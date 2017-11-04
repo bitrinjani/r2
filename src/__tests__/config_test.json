@@ -19,8 +19,7 @@
 				"secret": "xxxxx",
 				"maxLongPosition": "0.30",
 				"maxShortPosition": "0.30",
-        "cashMarginType": "MarginOpen",
-        "commissionPercent": 0
+        "cashMarginType": "MarginOpen"
 			},
 			{
 				"broker": "Bitflyer",
