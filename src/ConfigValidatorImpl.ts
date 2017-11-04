@@ -29,8 +29,9 @@ export default class ConfigValidatorImpl implements ConfigValidator {
 
     const coincheck = _.find(config.brokers, b => b.broker === Broker.Coincheck) as BrokerConfig;
     if (this.isEnabled(coincheck)) {
-      this.throwIf(coincheck.cashMarginType !== CashMarginType.MarginOpen,
-        'CashMarginType must be MarginOpen for Coincheck.');
+      const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.MarginOpen];
+      this.throwIf(!_.includes(allowedCashMarginType, coincheck.cashMarginType),
+        'CashMarginType must be Cash or MarginOpen for Coincheck.');
       this.validateBrokerConfigCommon(coincheck);
     }
 
