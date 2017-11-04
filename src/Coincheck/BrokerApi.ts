@@ -5,7 +5,7 @@ import * as querystring from 'querystring';
 import {
   AccountsBalanceResponse, LeveragePositionsRequest, LeveragePositionsResponse,
   LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse, 
-  CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination
+  CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination, Transaction
 } from './type';
 
 export default class BrokerApi {
@@ -70,6 +70,23 @@ export default class BrokerApi {
     return new TransactionsResponse(
       await this.get<TransactionsResponse, Partial<Pagination>>(path, pagination)
     );
+  }
+
+  async getTransactionsWithStartDate(from: Date): Promise<Transaction[]> {
+    let transactions: Transaction[] = [];
+    const pagination = { order: 'desc', limit: 20 } as Partial<Pagination>;
+    let res: TransactionsResponse = await this.getTransactions(pagination);
+    while (res.data.length > 0) {
+      const last = _.last(res.data) as Transaction;
+      transactions = _.concat(transactions, res.data.filter(x => from < x.created_at));
+      if (from > last.created_at ||
+        res.pagination.limit > res.data.length) {
+        break;
+      }
+      const lastId = last.id;
+      res = await this.getTransactions({ ...pagination, starting_after: lastId });
+    }
+    return transactions;
   }
 
   private call<R>(path: string, method: string, body: string = ''): Promise<R> {

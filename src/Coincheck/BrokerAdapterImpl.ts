@@ -11,7 +11,7 @@ import {
   CashMarginType, ConfigStore, BrokerConfig, Broker,
   BrokerAdapter, QuoteSide, OrderStatus
 } from '../type';
-import { OrderBooksResponse, NewOrderRequest, Transaction, TransactionsResponse, Pagination } from './type';
+import { OrderBooksResponse, NewOrderRequest } from './type';
 import { getBrokerOrderType } from './mapper';
 import { eRound } from '../util';
 
@@ -111,8 +111,9 @@ namespace Coincheck {
         order.lastUpdated = new Date();
         return;
       }
-      const searchAfter = addMinutes(order.creationTime, -1);
-      const transactions = (await this.getTransactions(searchAfter)).filter(x => x.order_id === order.brokerOrderId);
+      const from = addMinutes(order.creationTime, -1);
+      const transactions = (await this.brokerApi.getTransactionsWithStartDate(from))
+        .filter(x => x.order_id === order.brokerOrderId);
       if (transactions.length === 0) {
         this.log.warn('The order is not found in pending orders and historical orders.');
         return;
@@ -127,23 +128,6 @@ namespace Coincheck {
       order.filledSize = eRound(_.sumBy(order.executions, x => x.size));
       order.status = order.filledSize === order.size ? OrderStatus.Filled : OrderStatus.Canceled;
       order.lastUpdated = new Date();
-    }
-
-    private async getTransactions(from: Date): Promise<Transaction[]> {
-      let transactions: Transaction[] = [];
-      const pagination = { order: 'desc', limit: 20 } as Partial<Pagination>;
-      let res: TransactionsResponse = await this.brokerApi.getTransactions(pagination);
-      while (res.data.length > 0) {
-        const last = _.last(res.data) as Transaction;
-        transactions = _.concat(transactions, res.data.filter(x => from < x.created_at));
-        if (from > last.created_at ||
-          res.pagination.limit > res.data.length) {
-          break;
-        }
-        const lastId = last.id;
-        res = await this.brokerApi.getTransactions({ ...pagination, starting_after: lastId });
-      }
-      return transactions;
     }
   }
 }
