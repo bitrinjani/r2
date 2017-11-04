@@ -19,7 +19,8 @@
       "secret": "xxxxxx",
       "maxLongPosition": 0.15,
       "maxShortPosition": 0.15,
-      "cashMarginType": "MarginOpen"
+      "cashMarginType": "MarginOpen",
+      "commissionPercent": 0
     },
     {
       "broker": "Bitflyer",
@@ -28,7 +29,8 @@
       "secret": "xxxxxx",
       "maxLongPosition": 0.03,
       "maxShortPosition": 0,
-      "cashMarginType": "Cash"
+      "cashMarginType": "Cash",
+      "commissionPercent": 0
     },
     {
       "broker": "Quoine",
@@ -38,7 +40,8 @@
       "maxLongPosition": 0.15,
       "maxShortPosition": 0.15,
       "cashMarginType": "NetOut",
-      "leverageLevel": 10
+      "leverageLevel": 10,
+      "commissionPercent": 0
     }
   ]
 }

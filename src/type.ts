@@ -127,6 +127,7 @@ export class BrokerConfig extends TypeConverter {
   @cast maxShortPosition: number;
   @cast cashMarginType: CashMarginType;
   @cast leverageLevel: number;
+  @cast commissionPercent: number;
 }
 
 export class ConfigRoot extends TypeConverter {

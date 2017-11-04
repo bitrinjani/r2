@@ -1,6 +1,7 @@
 ﻿import { injectable, inject } from 'inversify';
-import { SpreadAnalyzer, ConfigStore, QuoteSide, SpreadAnalysisResult, BrokerMap
-  } from './type';
+import {
+  SpreadAnalyzer, ConfigStore, QuoteSide, SpreadAnalysisResult, BrokerMap, BrokerConfig
+} from './type';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Quote from './Quote';
@@ -44,7 +45,8 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     this.log.debug(`allowedLongSize: ${allowedLongSize}`);
     let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]) as number;
     targetVolume = _.floor(targetVolume, 2);
-    const targetProfit = _.round(invertedSpread * targetVolume);
+    const commission = this.calculateCommission([bestBid, bestAsk], targetVolume);
+    const targetProfit = _.round(invertedSpread * targetVolume - commission);
     const spreadAnalysisResult = {
       bestBid,
       bestAsk,
@@ -55,6 +57,20 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     };
     this.log.debug(`Analysis done. Result: ${JSON.stringify(spreadAnalysisResult)}`);
     return spreadAnalysisResult;
+  }
+
+  private calculateCommission(quotes: Quote[], targetVolume: number): number {
+    const config = this.configStore.config;
+    const commissions = _(quotes).map((q) => {
+      const brokerConfig = config.brokers.find(x => x.broker === q.broker) as BrokerConfig;
+      if (brokerConfig.commissionPercent !== undefined) {
+        const commissionRate = brokerConfig.commissionPercent / 100;
+        return q.price * targetVolume * commissionRate;
+      } else {
+        return 0;
+      }
+    });
+    return commissions.sum();
   }
 
   private isAllowed(q: Quote, pos: BrokerPosition): boolean {
