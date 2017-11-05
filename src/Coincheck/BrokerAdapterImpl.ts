@@ -9,9 +9,9 @@ import BrokerApi from './BrokerApi';
 import Execution from '../Execution';
 import {
   CashMarginType, ConfigStore, BrokerConfig, Broker,
-  BrokerAdapter, QuoteSide, OrderStatus
+  BrokerAdapter, QuoteSide, OrderStatus, OrderSide
 } from '../type';
-import { OrderBooksResponse, NewOrderRequest } from './type';
+import { OrderBooksResponse, NewOrderRequest, LeveragePosition } from './type';
 import { getBrokerOrderType } from './mapper';
 import { eRound } from '../util';
 
@@ -68,23 +68,51 @@ namespace Coincheck {
       if (order.broker !== this.broker) {
         throw new Error();
       }
-
-      const orderType = getBrokerOrderType(order);
-      const request: NewOrderRequest = {
-        pair: 'btc_jpy',
-        order_type: orderType,
-        amount: order.size,
-        rate: order.price
-      };
+      let request: NewOrderRequest;
+      if (order.cashMarginType === CashMarginType.NetOut) {
+        request = await this.getNetOutRequest(order);
+      } else {
+        const orderType = getBrokerOrderType(order);
+        request = {
+          pair: 'btc_jpy',
+          order_type: orderType,
+          amount: order.size,
+          rate: order.price
+        };
+      }
       const reply = await this.brokerApi.newOrder(request);
       if (!reply.success) {
         throw new Error('Send failed.');
       }
-
       order.sentTime = reply.created_at;
       order.status = OrderStatus.New;
       order.brokerOrderId = reply.id;
       order.lastUpdated = new Date();
+    }
+
+    private async getNetOutRequest(order: Order): Promise<NewOrderRequest> {
+      const openPositions = await this.brokerApi.getAllOpenLeveragePositions();
+      const targetSide = order.side === OrderSide.Buy ? 'sell' : 'buy';
+      const candidates = _(openPositions)
+        .filter(p => p.side === targetSide)
+        .filter(p => Math.abs(p.amount - order.size) < order.size * 0.01)
+        .value();
+      const request = { pair: 'btc_jpy', rate: order.price };
+      if (candidates.length === 0) {
+        return {
+          ...request,
+          order_type: order.side === OrderSide.Buy ? 'leverage_buy' : 'leverage_sell',
+          amount: order.size
+        };
+      } else {
+        const targetPosition = _.last(candidates) as LeveragePosition;
+        return {
+          ...request,
+          order_type: order.side === OrderSide.Buy ? 'close_short' : 'close_long',
+          amount: targetPosition.amount,
+          position_id: Number(targetPosition.id)
+        };
+      }
     }
 
     async cancel(order: Order): Promise<void> {

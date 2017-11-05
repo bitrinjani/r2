@@ -5,6 +5,7 @@ import Coincheck from '../../Coincheck/BrokerAdapterImpl';
 import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType } from '../../type';
 import nocksetup from './nocksetup';
 import Order from '../../Order';
+import { NewOrderRequest } from '../../Coincheck/type';
 
 nocksetup();
 
@@ -75,6 +76,30 @@ describe('Coincheck BrokerAdapter', () => {
     const order = { brokerOrderId: '340809935' };
     await target.cancel(order);
     expect(order.status).toBe(OrderStatus.Canceled);
+  });
+
+  test('netout close_short', async () => {
+    const ba = new Coincheck.BrokerAdapterImpl({ config });
+    const order = new Order(Broker.Coincheck, OrderSide.Buy, 0.01, 840000, CashMarginType.NetOut, OrderType.Limit, undefined);
+    const request: NewOrderRequest = await ba.getNetOutRequest(order); //! testing private method
+    expect(request.order_type).toBe('close_short');
+    expect(request.amount).toBe(0.010005);
+    expect(request.position_id).toBe(2389078);
+    await ba.send(order);    
+    expect(order.status).toBe(OrderStatus.New);
+    expect(order.brokerOrderId).toBe('391699747');
+  });
+
+  test('netout when no closable position', async () => {
+    const ba = new Coincheck.BrokerAdapterImpl({ config });
+    const order = new Order(Broker.Coincheck, OrderSide.Sell, 0.01, 830000, CashMarginType.NetOut, OrderType.Limit, undefined);
+    const request: NewOrderRequest = await ba.getNetOutRequest(order); //! testing private method
+    expect(request.order_type).toBe('leverage_sell');
+    expect(request.amount).toBe(0.01);
+    expect(request.position_id).toBeUndefined();
+    await ba.send(order);    
+    expect(order.status).toBe(OrderStatus.New);
+    expect(order.brokerOrderId).toBe('391697892');
   });
 });
 

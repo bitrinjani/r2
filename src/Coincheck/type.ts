@@ -154,7 +154,7 @@ export interface NewOrderRequest {
   rate?: number;
   amount?: number;
   market_buy_amount?: number;
-  position_id?: string;
+  position_id?: number;
   stop_loss_rate?: number;
 }
 
