@@ -86,8 +86,18 @@ All configurations are stored in `config.json`.
 |Exchange|Supported option|
 |--------|----------------|
 |Bitflyer|Cash|
-|Quoine|Netout|
-|Coincheck|Cash, MarginOpen|
+|Quoine|NetOut|
+|Coincheck|Cash, MarginOpen, NetOut|
+
+Quoine's NetOut is handled by Exchange API. Quoine can close multiple positions by one order.
+Coincheck's NetOut is handled by R2 because the exchange doesn't support netout operation. Coincheck's NetOut works as below.
+1. The arbitrager finds leverage positions with the following conditions.
+  - The opposite side of the sending order
+  - Almost same amount as the sending order. 'Almost same' here means within 1% difference
+2. If the positions are found, the arbitrager closes the oldest one.
+3. If not found, the arbitrager opens a new position.
+
+Please note this implementation doesn't close multiple positions by one order.
 
 ### Log files
 All log files are saved under `logs` directory.
