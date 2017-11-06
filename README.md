@@ -62,7 +62,7 @@ All configurations are stored in `config.json`.
 |maxSize|number|Maximum BTC size to be sent to a broker.|
 |minSize|number|Minimum BTC size to be sent to a broker.|
 |minTargetProfit|number|Minimum profit in JPY to try to arbitrage.|
-|minTargetProfitPercent|number|Minimum profit percentage against notional to try to abitrage. Profit percentage against notional is calculated by `100 * profit / (MID price * volume)`. |
+|minTargetProfitPercent|number|Minimum profit percentage against notional to try to abitrage. Profit percentage against notional is calculated by `100 * profit / (MID price * volume)`. When both minTargetProfit and minTargetProfitPercent is greater than zero, both are evaluated, meaning larger one will be effective.|
 |iterationInterval|Millisecond|Time lapse in milliseconds of an iteration. When it's set to 3000, the quotes fetch and the spreads analysis for all the brokers are done every 3 seconds|
 |positionRefreshInterval|Millisecond|Time lapse in milliseconds of position data refresh. Position data is used to check max exposure and long/short availability for each broker.|
 |sleepAfterSend|Millisecond|Time lapse in milliseconds after one arbitrage is done.|
