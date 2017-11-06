@@ -61,7 +61,8 @@ All configurations are stored in `config.json`.
 |priceMergeSize|number|Merges small quotes into the specified price ladder before analyzing arbitrage opportunity.|
 |maxSize|number|Maximum BTC size to be sent to a broker.|
 |minSize|number|Minimum BTC size to be sent to a broker.|
-|minTargetProfit|number|Minimum JPY size to try to arbitrage.|
+|minTargetProfit|number|Minimum profit in JPY to try to arbitrage.|
+|minTargetProfitPercent|number|Minimum profit percentage against notional to try to abitrage. Profit percentage against notional is calculated by `100 * profit / (MID price * volume)`. |
 |iterationInterval|Millisecond|Time lapse in milliseconds of an iteration. When it's set to 3000, the quotes fetch and the spreads analysis for all the brokers are done every 3 seconds|
 |positionRefreshInterval|Millisecond|Time lapse in milliseconds of position data refresh. Position data is used to check max exposure and long/short availability for each broker.|
 |sleepAfterSend|Millisecond|Time lapse in milliseconds after one arbitrage is done.|
