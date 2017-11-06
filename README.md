@@ -1,9 +1,11 @@
-[![Build Status](https://travis-ci.org/bitrinjani/r2.svg?branch=master)](https://travis-ci.org/bitrinjani/r2) [![Coverage Status](https://coveralls.io/repos/github/bitrinjani/r2/badge.svg?branch=master&i=2)](https://coveralls.io/github/bitrinjani/r2?branch=master)
+[日本語はこちら](http://qiita.com/bitrinjani/items/3ed756da9baf7d171306)
+
+[![Build Status](https://travis-ci.org/bitrinjani/r2.svg?branch=master)](https://travis-ci.org/bitrinjani/r2) [![Coverage Status](https://coveralls.io/repos/github/bitrinjani/r2/badge.svg?branch=master&i=3)](https://coveralls.io/github/bitrinjani/r2?branch=master)
 # R2 Bitcoin Arbitrager
 
 R2 Bitcoin Arbitrager is an automatic arbitrage trading application targeting Bitcoin exchanges operated in Japan.
 
-This application is implemented with Node.js/TypeScript. The previous version was implemented by C# on .NET Framework in [Rinjani repository](https://github.com/bitrinjani/rinjani). To get more extensibility, expecially for Web UI, it was ported to Node.js.
+This application is implemented with Node.js/TypeScript. The previous version was implemented by C# on .NET Framework in [Rinjani repository](https://github.com/bitrinjani/rinjani).
 
 ![Screenshot](screenshot.gif)
 
@@ -42,8 +44,8 @@ Currently, the Arbitrager supports three exchanges operated in Japan.
 ## How it works
 1. Every 3 seconds, the Arbitrager fetches quotes from exchanges.
 1. Verifies if the max net exposure (`maxNetExposure` config) is not breached.
-1. Filters out quotes that are not usable for arbitrage. For example, if `maxShortPosition` config is 0 and the current position is 0 for a broker, ask quotes for the broker are filtered out.
-1. Calculates best ask and best bid. If the spread is not inverted, there is no arbitrage opportunity, so the arbitrager waits for the next iteration.
+1. Filters out quotes that are not usable for arbitrage. For example, if `maxShortPosition` config is 0 and the current position is 0 for a broker, the ask quotes for the broker are filtered out.
+1. Calculates the best ask and the best bid from the filtered quotes. If the spread is not inverted, there is no arbitrage opportunity, so the arbitrager waits for the next iteration.
 1. Verifies if there is enough expected profit. If the expected profit is smaller than `minTargetProfit` config, the Arbitrager waits for the next iteration.
 1. Arbitrage the spread by sending a buy leg and a sell leg to each broker.
 1. With 3 seconds interval, the Arbitrager checks if the legs are filled or not.
