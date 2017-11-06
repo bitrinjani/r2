@@ -5,6 +5,8 @@ import {
 } from './type';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
+// tslint:disable-next-line:import-name
+import Decimal from 'decimal.js';
 import BrokerPosition from './BrokerPosition';
 import { hr, eRound } from './util';
 import symbols from './symbols';
@@ -71,13 +73,17 @@ export default class PositionServiceImpl implements PositionService {
       const promises = brokerConfigs
         .map(async (brokerConfig: BrokerConfig): Promise<BrokerPosition> => {
           const currentBtc = await this.brokerAdapterRouter.getBtcPosition(brokerConfig.broker);
-          const allowedLongSize = _.max([0, brokerConfig.maxLongPosition - currentBtc]) as number;
-          const allowedShortSize = _.max([0, currentBtc + brokerConfig.maxShortPosition]) as number;
+          const allowedLongSize = 
+            _.max([0, new Decimal(brokerConfig.maxLongPosition).minus(currentBtc).toNumber()]) as number;
+          const allowedShortSize = 
+            _.max([0, new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()]) as number;
           const pos = new BrokerPosition();
           pos.broker = brokerConfig.broker;
-          pos.btc = eRound(currentBtc);
-          pos.allowedLongSize = eRound(allowedLongSize);
-          pos.allowedShortSize = eRound(allowedShortSize);   
+          pos.btc = currentBtc;
+          pos.allowedLongSize = allowedLongSize;
+          pos.allowedShortSize = allowedShortSize;   
+          pos.longAllowed = new Decimal(allowedLongSize).gte(config.minSize);
+          pos.shortAllowed = new Decimal(allowedShortSize).gte(config.minSize);
           return pos;
         });
       this._positionMap = _(await Promise.all(promises)).map(p => [p.broker, p]).fromPairs().value();

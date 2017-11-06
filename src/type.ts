@@ -137,6 +137,7 @@ export class ConfigRoot extends TypeConverter {
   @cast maxSize: number;
   @cast minSize: number;
   @cast minTargetProfit: number;
+  @cast minTargetProfitPercent: number;
   @cast iterationInterval: number;
   @cast positionRefreshInterval: number;
   @cast sleepAfterSend: number;

@@ -12,6 +12,8 @@ import Quote from '../Quote';
 import { PriceLevelsResponse, SendOrderRequest, OrdersResponse } from './type';
 import Execution from '../Execution';
 import { timestampToDate } from '../util';
+// tslint:disable-next-line:import-name
+import Decimal from 'decimal.js';
 
 namespace Quoine {
   @injectable()
@@ -124,7 +126,7 @@ namespace Quoine {
       order.brokerOrderId = ordersResponse.id.toString();
       order.filledSize = Number(ordersResponse.filled_quantity);
       order.creationTime = timestampToDate(ordersResponse.created_at);
-      if (order.filledSize === order.size) {
+      if (new Decimal(order.filledSize).eq(order.size)) {
         order.status = OrderStatus.Filled;
       } else if (order.filledSize > 0) {
         order.status = OrderStatus.PartiallyFilled;

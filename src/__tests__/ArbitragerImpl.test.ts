@@ -83,6 +83,12 @@ describe('Arbitrager', () => {
     expect(arbitrager.status).toBe('Stopped');
   });
 
+  test('stop without start', async () => {
+    const arbitrager = new ArbitragerImpl();
+    await arbitrager.stop();
+    expect(arbitrager.status).toBe('Stopped');
+  });
+
   test('positionService is not ready', async () => {
     const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
       positionService, baRouter, spreadAnalyzer);
@@ -138,9 +144,9 @@ describe('Arbitrager', () => {
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Spread not inverted');
   });
-
-  test('Too small volume', async () => {
-    config.minSize = 2;
+  
+  test('Too small profit', async () => {
+    config.minTargetProfit = 1000;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
         bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
@@ -157,11 +163,34 @@ describe('Arbitrager', () => {
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
     expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Too small volume');
+    expect(arbitrager.status).toBe('Too small profit');
   });
 
-  test('Too small profit', async () => {
-    config.minTargetProfit = 1000;
+  test('Too small profit by minTargetProfitPercent', async () => {
+    config.minTargetProfit = 0;
+    config.minTargetProfitPercent = 18.4;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Too small profit');
+  });
+
+  test('Too small profit by minTargetProfit', async () => {
+    config.minTargetProfit = 101;
+    config.minTargetProfitPercent = 10;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
         bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),

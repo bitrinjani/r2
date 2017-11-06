@@ -5,8 +5,8 @@ import { padStart, padEnd } from './util';
 
 export default class BrokerPosition {
   broker: Broker;
-  get longAllowed(): boolean { return this.allowedLongSize > 0; }
-  get shortAllowed(): boolean { return this.allowedShortSize > 0; }
+  longAllowed: boolean;
+  shortAllowed: boolean;
   btc: number;
   allowedLongSize: number;
   allowedShortSize: number;

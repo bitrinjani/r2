@@ -42,12 +42,10 @@ export default class ArbitragerImpl implements Arbitrager {
   async stop(): Promise<void> {
     this.status = 'Stopping';
     if (this.positionService) {
-      await this.positionService.stop();      
+      await this.positionService.stop();
     }
     if (this.quoteAggregator) {
       await this.quoteAggregator.stop();
-    }
-    if (this.quoteAggregator.onQuoteUpdated) {
       this.quoteAggregator.onQuoteUpdated = undefined;
     }
     this.status = 'Stopped';
@@ -85,12 +83,13 @@ export default class ArbitragerImpl implements Arbitrager {
       this.log.info(t('NoArbitrageOpportunitySpreadIsNotInverted'));
       return;
     }
-    if (targetVolume < config.minSize) {
-      this.status = 'Too small volume';
-      this.log.info(t('TargetVolumeIsSmallerThanMinSize'));
-      return;
-    }
-    if (targetProfit < config.minTargetProfit) {
+    const minTargetProfit = _.max([
+      config.minTargetProfit,
+      config.minTargetProfitPercent !== undefined ?
+        _.round((config.minTargetProfitPercent / 100) * _.mean([bestAsk.price, bestBid.price]) * targetVolume) :
+        0
+    ]) as number;
+    if (targetProfit < minTargetProfit) {
       this.status = 'Too small profit';
       this.log.info(t('TargetProfitIsSmallerThanMinProfit'));
       return;
@@ -114,12 +113,14 @@ export default class ArbitragerImpl implements Arbitrager {
   }
 
   private printSnapshot(result: SpreadAnalysisResult) {
-    this.log.info('%s: %s', padEnd(t('BestAsk'), 17), result.bestAsk); // TODO: fix double printing
+    this.log.info('%s: %s', padEnd(t('BestAsk'), 17), result.bestAsk);
     this.log.info('%s: %s', padEnd(t('BestBid'), 17), result.bestBid);
     this.log.info('%s: %s', padEnd(t('Spread'), 17), -result.invertedSpread);
     this.log.info('%s: %s', padEnd(t('AvailableVolume'), 17), result.availableVolume);
     this.log.info('%s: %s', padEnd(t('TargetVolume'), 17), result.targetVolume);
-    this.log.info('%s: %s', padEnd(t('ExpectedProfit'), 17), result.targetProfit);
+    const midNotional = _.mean([result.bestAsk.price, result.bestBid.price]) * result.targetVolume;
+    const profitPercentAgainstNotional = _.round((result.targetProfit / midNotional) * 100, 2);
+    this.log.info('%s: %s (%s%%)', padEnd(t('ExpectedProfit'), 17), result.targetProfit, profitPercentAgainstNotional);
   }
 
   private isMaxExposureBreached(): boolean {
@@ -144,20 +145,20 @@ export default class ArbitragerImpl implements Arbitrager {
         this.log.debug(ex.stack);
       }
 
-      if (buyOrder.status !== OrderStatus.Filled) {
-        this.log.warn(t('BuyLegIsNotFilledYetPendingSizeIs'), sellOrder.pendingSize);
+      if (!this.isFilled(buyOrder)) {
+        this.log.warn(t('BuyLegIsNotFilledYetPendingSizeIs'), buyOrder.pendingSize);
       }
-      if (sellOrder.status !== OrderStatus.Filled) {
+      if (!this.isFilled(sellOrder)) {
         this.log.warn(t('SellLegIsNotFilledYetPendingSizeIs'), sellOrder.pendingSize);
       }
 
-      if (buyOrder.status === OrderStatus.Filled && sellOrder.status === OrderStatus.Filled) {
+      if (this.isFilled(buyOrder) && this.isFilled(sellOrder)) {
         this.status = 'Filled';
         const profit = _.round(sellOrder.filledSize * sellOrder.averageFilledPrice -
           buyOrder.filledSize * buyOrder.averageFilledPrice);
         this.log.info(t('BothLegsAreSuccessfullyFilled'));
-        this.log.info(t('BuyFillPriceIs'), buyOrder.averageFilledPrice);
-        this.log.info(t('SellFillPriceIs'), sellOrder.averageFilledPrice);
+        this.log.info(t('BuyFillPriceIs'), _.round(buyOrder.averageFilledPrice));
+        this.log.info(t('SellFillPriceIs'), _.round(sellOrder.averageFilledPrice));
         this.log.info(t('ProfitIs'), profit);
         break;
       }
@@ -165,15 +166,19 @@ export default class ArbitragerImpl implements Arbitrager {
       if (i === config.maxRetryCount) {
         this.status = 'MaxRetryCount breached';
         this.log.warn(t('MaxRetryCountReachedCancellingThePendingOrders'));
-        if (buyOrder.status !== OrderStatus.Filled) {
+        if (!this.isFilled(buyOrder)) {
           await this.brokerAdapterRouter.cancel(buyOrder);
         }
-        if (sellOrder.status !== OrderStatus.Filled) {
+        if (!this.isFilled(sellOrder)) {
           await this.brokerAdapterRouter.cancel(sellOrder);
         }
         break;
       }
     }
+  }
+
+  private isFilled(order: Order): boolean {
+    return order.status === OrderStatus.Filled;
   }
 
   private async quoteUpdated(quotes: Quote[]): Promise<void> {

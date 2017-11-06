@@ -117,6 +117,32 @@ describe('Quote Aggregator', () => {
     await aggregator.stop();
   });
 
+  test('onQuoteUpdated without event handler', async () => {
+    configStore.config.iterationInterval = 12;
+    const bitflyerBa = {
+      broker: Broker.Bitflyer,
+      fetchQuotes: () => Promise.resolve([
+        { broker: Broker.Bitflyer, side: QuoteSide.Ask, price: 500000, volume: 0.1 },
+        { broker: Broker.Bitflyer, side: QuoteSide.Ask, price: 500001, volume: 0.01 }
+      ])
+    };
+    const quoineBa = {
+      broker: Broker.Quoine,
+      fetchQuotes: () => Promise.resolve([])
+    };
+    const coincheckBa = {
+      broker: Broker.Coincheck,
+      fetchQuotes: () => Promise.resolve([])
+    };
+    const baList = [bitflyerBa, quoineBa, coincheckBa];
+    const baRouter = new BrokerAdapterRouterImpl(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
+    aggregator.onQuoteUpdated = undefined;
+    await aggregator.start();
+    await delay(0);
+    await aggregator.stop();
+  });
+
   test('when already running', async () => {
     configStore.config.iterationInterval = 12;
     const bitflyerBa = {

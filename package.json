@@ -11,9 +11,11 @@
     "coverage": "jest --coverage"
   },
   "dependencies": {
+    "@types/decimal.js": "^0.0.31",
     "@types/i18next": "^8.4.2",
     "@types/jsonwebtoken": "^7.2.3",
     "date-fns": "^1.28.5",
+    "decimal.js": "^7.3.0",
     "i18next": "^10.0.1",
     "inversify": "^4.3.0",
     "jsonwebtoken": "^8.1.0",

@@ -8,6 +8,8 @@ import Quote from './Quote';
 import intl from './intl';
 import BrokerPosition from './BrokerPosition';
 import symbols from './symbols';
+// tslint:disable-next-line:import-name
+import Decimal from 'decimal.js';
 
 const t = s => intl.t(s);
 @injectable()
@@ -24,13 +26,13 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     if (_.values(positionMap).length === 0) {
       throw new Error('Position map is empty.');
     }
-
-    const bestAsk = _(quotes).filter(q => q.side === QuoteSide.Ask)
-      .filter(q => this.isAllowed(q, positionMap[q.broker]))
-      .orderBy(['price']).first();
-    const bestBid = _(quotes).filter(q => q.side === QuoteSide.Bid)
-      .filter(q => this.isAllowed(q, positionMap[q.broker]))
-      .orderBy(['price'], ['desc']).first();
+    const filteredQuotes = _(quotes)
+      .filter(q => this.isAllowedByCurrentPosition(q, positionMap[q.broker]))
+      .filter(q => new Decimal(q.volume).gte(config.minSize))
+      .orderBy(['price'])
+      .value();
+    const bestAsk = _(filteredQuotes).filter(q => q.side === QuoteSide.Ask).first();
+    const bestBid = _(filteredQuotes).filter(q => q.side === QuoteSide.Bid).last();
     if (bestBid === undefined) {
       throw new Error(t('NoBestBidWasFound'));
     } else if (bestAsk === undefined) {
@@ -73,7 +75,7 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     return commissions.sum();
   }
 
-  private isAllowed(q: Quote, pos: BrokerPosition): boolean {
+  private isAllowedByCurrentPosition(q: Quote, pos: BrokerPosition): boolean {
     return q.side === QuoteSide.Bid ? pos.shortAllowed : pos.longAllowed;
   }
 }

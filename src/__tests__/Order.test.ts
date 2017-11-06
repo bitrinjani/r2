@@ -13,6 +13,6 @@ describe('Order', () => {
     ex2.size = 0.006;
     target.executions.push(ex1);
     target.executions.push(ex2);
-    expect(target.averageFilledPrice).toBeCloseTo(1160);
+    expect(target.averageFilledPrice).toBe(1160);
   });
 });
