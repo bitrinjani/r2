@@ -20,7 +20,7 @@
       "secret": "xxxxxx",
       "maxLongPosition": 0.15,
       "maxShortPosition": 0.15,
-      "cashMarginType": "MarginOpen",
+      "cashMarginType": "NetOut",
       "commissionPercent": 0
     },
     {
