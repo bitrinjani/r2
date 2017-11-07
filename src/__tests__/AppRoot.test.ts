@@ -45,4 +45,8 @@ describe('AppRoot', () => {
     const target = new AppRoot(container);
     await target.stop();
   });
+
+  test('instantiate with default param', () => {
+    const target = new AppRoot();
+  });
 });

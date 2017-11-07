@@ -17,3 +17,10 @@ test('JsonConfigStore', () => {
   expect(store.config.brokers[1].enabled).toBe(true);
   expect(store.config.brokers[1].maxLongPosition).toBe(0.20);
 });
+
+test('JsonConfigStore default path', () => {
+  const validator = { validate: (config: ConfigRoot) => true };
+  try {
+    const store = new JsonConfigStore(validator) as ConfigStore;
+  } catch (ex) {}
+});

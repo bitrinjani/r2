@@ -1,7 +1,7 @@
 // tslint:disable
 import {
   QuoteAggregator, Broker, QuoteSide, ConfigRoot, ConfigStore,
-  PositionService, BrokerAdapterRouter, CashMarginType, OrderStatus
+  PositionService, BrokerAdapterRouter, CashMarginType, OrderStatus, OrderSide
 } from '../type';
 import ArbitragerImpl from '../ArbitragerImpl';
 import Quote from '../Quote';
@@ -229,6 +229,58 @@ describe('Arbitrager', () => {
     await quoteAggregator.onQuoteUpdated([]);
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Demo mode');
+  });
+
+  test('Send and only buy order filled', async () => {
+    let i = 1;
+    baRouter.refresh = (order) => {
+      if (order.side === OrderSide.Buy) {
+        order.status = OrderStatus.Filled;
+      }
+    }
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+  });
+
+  test('Send and only sell order filled', async () => {
+    let i = 1;
+    baRouter.refresh = (order) => {
+      if (order.side === OrderSide.Sell) {
+        order.status = OrderStatus.Filled;
+      }
+    }
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
   });
 
   test('Send and not filled', async () => {

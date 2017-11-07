@@ -1,6 +1,8 @@
 ﻿import { injectable, inject } from 'inversify';
-import { QuoteAggregator, ConfigRoot, ConfigStore, 
-  BrokerConfig, QuoteSide, BrokerAdapterRouter, Broker } from './type';
+import {
+  QuoteAggregator, ConfigStore, BrokerConfig,
+  QuoteSide, BrokerAdapterRouter, Broker
+} from './type';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Quote from './Quote';
@@ -9,25 +11,19 @@ import symbols from './symbols';
 @injectable()
 export default class QuoteAggregatorImpl implements QuoteAggregator {
   private log = getLogger('QuoteAggregator');
-  private enabledBrokers: Broker[];
-  private config: ConfigRoot;
   private timer;
   private isRunning: boolean;
   private _quotes: Quote[] = [];
 
   constructor(
-    @inject(symbols.ConfigStore) configStore: ConfigStore, 
+    @inject(symbols.ConfigStore) readonly configStore: ConfigStore,
     @inject(symbols.BrokerAdapterRouter) readonly brokerAdapterRouter: BrokerAdapterRouter
-  ) {
-    this.config = configStore.config;
-    this.enabledBrokers = this.getEnabledBrokers(configStore); 
-  }
+  ) { }
 
   async start(): Promise<void> {
     this.log.debug('Starting Quote Aggregator...');
-    this.log.debug(`Enabled brokers: ${this.enabledBrokers}`);  
-    this.timer = setInterval(this.aggregate.bind(this), this.config.iterationInterval);
-    this.log.debug(`Iteration interval is set to ${this.config.iterationInterval}`);
+    this.timer = setInterval(this.aggregate.bind(this), this.configStore.config.iterationInterval);
+    this.log.debug(`Iteration interval is set to ${this.configStore.config.iterationInterval}`);
     await this.aggregate();
     this.log.debug('Started Quote Aggregator.');
   }
@@ -50,10 +46,11 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
     try {
       this.isRunning = true;
       this.log.debug('Aggregating quotes...');
-      const quotesMap = 
-        await Promise.all(this.enabledBrokers.map(x => this.brokerAdapterRouter.fetchQuotes(x)));
+      const enabledBrokers = this.getEnabledBrokers();
+      const quotesMap =
+        await Promise.all(enabledBrokers.map(x => this.brokerAdapterRouter.fetchQuotes(x)));
       const allQuotes = _.flatten(quotesMap);
-      await this.setQuotes(this.fold(allQuotes, this.config.priceMergeSize));
+      await this.setQuotes(this.fold(allQuotes, this.configStore.config.priceMergeSize));
       this.log.debug('Aggregated.');
     } catch (ex) {
       this.log.error(ex.message);
@@ -73,8 +70,8 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
     }
   }
 
-  private getEnabledBrokers(configStore: ConfigStore): Broker[] {
-    return _(configStore.config.brokers)
+  private getEnabledBrokers(): Broker[] {
+    return _(this.configStore.config.brokers)
       .filter((b: BrokerConfig) => b.enabled)
       .map(b => b.broker)
       .value();
@@ -95,6 +92,7 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
           Number(key.substring(0, key.indexOf('#'))),
           _.sumBy(value, q => q.volume)
         )
-      ).value();
+      )
+      .value();
   }
 }

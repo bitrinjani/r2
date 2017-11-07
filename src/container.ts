@@ -10,9 +10,9 @@ import BrokerAdapterRouterImpl from './BrokerAdapterRouterImpl';
 import SpreadAnalyzerImpl from './SpreadAnalyzerImpl';
 import ConfigValidatorImpl from './ConfigValidatorImpl';
 // tslint:disable:import-name
-import Bitflyer from './Bitflyer/BrokerAdapterImpl';
-import Quoine from './Quoine/BrokerAdapterImpl';
-import Coincheck from './Coincheck/BrokerAdapterImpl';
+import BitflyerBrokerAdapterImpl from './Bitflyer/BrokerAdapterImpl';
+import QuoineBrokerAdapterImpl from './Quoine/BrokerAdapterImpl';
+import CoincheckBrokerAdapterImpl from './Coincheck/BrokerAdapterImpl';
 
 const container = new Container();
 container.bind<Arbitrager>(symbols.Arbitrager).to(ArbitragerImpl);
@@ -21,8 +21,8 @@ container.bind<QuoteAggregator>(symbols.QuoteAggregator).to(QuoteAggregatorImpl)
 container.bind<PositionService>(symbols.PositionService).to(PositionServiceImpl).inSingletonScope();
 container.bind<BrokerAdapterRouter>(symbols.BrokerAdapterRouter).to(BrokerAdapterRouterImpl);
 container.bind<SpreadAnalyzer>(symbols.SpreadAnalyzer).to(SpreadAnalyzerImpl);
-container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(Bitflyer.BrokerAdapterImpl);
-container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(Coincheck.BrokerAdapterImpl);
-container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(Quoine.BrokerAdapterImpl);
+container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(BitflyerBrokerAdapterImpl);
+container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(CoincheckBrokerAdapterImpl);
+container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(QuoineBrokerAdapterImpl);
 container.bind<ConfigValidator>(symbols.ConfigValidator).to(ConfigValidatorImpl);
 export default container;

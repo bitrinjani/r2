@@ -1,13 +1,11 @@
 import { injectable, inject } from 'inversify';
-import {
-  ConfigStore, ConfigRoot, ConfigValidator
-} from './type';
+import { ConfigStore, ConfigRoot, ConfigValidator } from './type';
 import symbols from './symbols';
 
 @injectable()
 export default class JsonConfigStore implements ConfigStore {
   private _config: ConfigRoot;
-
+  
   constructor(
     @inject(symbols.ConfigValidator) configValidator: ConfigValidator,
     path: string = './config.json'
