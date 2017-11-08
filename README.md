@@ -51,6 +51,10 @@ Currently, the Arbitrager supports three exchanges operated in Japan.
 1. With 3 seconds interval, the Arbitrager checks if the legs are filled or not.
 1. If the both legs are filled, shows the profit. 
 
+## Architecture Overview
+
+![diagram](diagram.png)
+
 ## Configuration
 
 All configurations are stored in `config.json`.
