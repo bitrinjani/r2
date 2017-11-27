@@ -1,3 +1,4 @@
+// tslint:disable:max-line-length
 export const en = {
   ArbitragerThreadHasBeenStopped: 'Arbitrager thread has been stopped. Please hit Enter to close this window.',
   AtLeastTwoBrokersMustBeEnabled: 'At least two brokers must be enabled.',
@@ -10,7 +11,7 @@ export const en = {
   BuyLegIsNotFilledYetPendingSizeIs: '>>Buy leg is not filled yet. Pending size is %s.',
   CheckingIfBothLegsAreDoneOrNot: '>>Checking if both legs are done or not...',
   ExpectedProfit: 'Expected profit',
-  FailedToGetASpreadAnalysisResult: 'Failed to get a spread analysis result. %s',
+  FailedToGetASpreadAnalysisResult: 'Failed to get a spread analysis result. Check maxLongPosition and maxShortPosition in the broker configs. %s',
   FoundArbitrageOppotunity: '>>Found arbitrage oppotunity.',
   FoundInvertedQuotes: 'Found inverted quotes.',
   LongAllowed: 'LongAllowed',
@@ -53,7 +54,7 @@ export const ja = {
   BuyLegIsNotFilledYetPendingSizeIs: '>>買いオーダー未約定。残り数量%s',
   CheckingIfBothLegsAreDoneOrNot: '>>両方のオーダーが約定したか確認中...',
   ExpectedProfit: '予想収益　　',
-  FailedToGetASpreadAnalysisResult: 'スプレッド解析結果の取得に失敗しました。 %s',
+  FailedToGetASpreadAnalysisResult: 'スプレッド解析結果の取得に失敗しました。取引所設定のmaxLongPosition, maxShortPositionが十分に大きいか確認してください。 %s',
   FoundArbitrageOppotunity: '>>裁定機会を発見。',
   FoundInvertedQuotes: 'スプレッドの逆転を発見。',
   LongAllowed: '買い試行許可',

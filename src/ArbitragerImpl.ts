@@ -101,12 +101,16 @@ export default class ArbitragerImpl implements Arbitrager {
     }
 
     this.log.info(t('FoundArbitrageOppotunity'));
-    this.log.info(t('SendingOrderTargettingQuote'), bestAsk);
-    await this.sendOrder(bestAsk, targetVolume, OrderType.Limit);
-    this.log.info(t('SendingOrderTargettingQuote'), bestBid);
-    await this.sendOrder(bestBid, targetVolume, OrderType.Limit);
-    this.status = 'Sent';
-    await this.checkOrderState();
+    try {
+      await this.sendOrder(bestAsk, targetVolume, OrderType.Limit);
+      await this.sendOrder(bestBid, targetVolume, OrderType.Limit);
+      this.status = 'Sent';
+      await this.checkOrderState();
+    } catch (ex) {
+      this.log.error(ex.message);
+      this.log.debug(ex.stack);
+      this.status = 'Order send/refresh failed';
+    }
     this.log.info(t('SleepingAfterSend'), config.sleepAfterSend);
     this.activeOrders = [];
     await delay(config.sleepAfterSend);
@@ -189,6 +193,7 @@ export default class ArbitragerImpl implements Arbitrager {
   }
 
   private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<void> {
+    this.log.info(t('SendingOrderTargettingQuote'), quote);
     const brokerConfig = _.find(this.configStore.config.brokers,
       x => x.broker === quote.broker) as BrokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;

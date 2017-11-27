@@ -50,6 +50,16 @@ describe('Position Service', () => {
     expect(qPos.allowedShortSize).toBe(0.2);
   });
 
+  test('positions throws', async () => {
+    const baRouterThrows = { getBtcPosition: async () => { throw new Error('Mock refresh error.'); } };
+    const ps = new PositionServiceImpl(configStore, baRouterThrows);
+    ps.print();
+    await ps.start();
+    expect(ps.positionMap).toBeUndefined();
+    expect(ps.netExposure).toBe(0);
+    await ps.stop();
+  });
+
   test('positions smaller than minSize', async () => {
     const baRouter = {
       getBtcPosition: broker => broker === Broker.Quoine ? 0.000002 : -0.3

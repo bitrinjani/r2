@@ -87,6 +87,9 @@ export default class PositionServiceImpl implements PositionService {
           return pos;
         });
       this._positionMap = _(await Promise.all(promises)).map(p => [p.broker, p]).fromPairs().value();
+    } catch (ex) {
+      this.log.error(ex.message);
+      this.log.debug(ex.stack);
     } finally {
       this.isRefreshing = false;
       this.log.debug('Finished refresh.');
