@@ -32,7 +32,7 @@ export default class ArbitragerImpl implements Arbitrager {
   async start(): Promise<void> {
     this.status = 'Starting';
     this.log.info(t('StartingArbitrager'));
-    this.quoteAggregator.onQuoteUpdated = async (quotes: Quote[]) => await this.quoteUpdated(quotes);
+    this.quoteAggregator.onQuoteUpdated = (quotes: Quote[]) => this.quoteUpdated(quotes);
     await this.quoteAggregator.start();
     await this.positionService.start();
     this.status = 'Started';
