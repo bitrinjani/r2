@@ -10,6 +10,7 @@ import BrokerPosition from './BrokerPosition';
 import symbols from './symbols';
 // tslint:disable-next-line:import-name
 import Decimal from 'decimal.js';
+import { calculateCommission } from './util';
 
 const t = s => intl.t(s);
 @injectable()
@@ -47,7 +48,7 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     this.log.debug(`allowedLongSize: ${allowedLongSize}`);
     let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]) as number;
     targetVolume = _.floor(targetVolume, 2);
-    const commission = this.calculateCommission([bestBid, bestAsk], targetVolume);
+    const commission = this.calculateTotalCommission([bestBid, bestAsk], targetVolume);
     const targetProfit = _.round(invertedSpread * targetVolume - commission);
     const spreadAnalysisResult = {
       bestBid,
@@ -61,16 +62,11 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     return spreadAnalysisResult;
   }
 
-  private calculateCommission(quotes: Quote[], targetVolume: number): number {
+  private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {
     const config = this.configStore.config;
     const commissions = _(quotes).map((q) => {
       const brokerConfig = config.brokers.find(x => x.broker === q.broker) as BrokerConfig;
-      if (brokerConfig.commissionPercent !== undefined) {
-        const commissionRate = brokerConfig.commissionPercent / 100;
-        return q.price * targetVolume * commissionRate;
-      } else {
-        return 0;
-      }
+      return calculateCommission(q.price, targetVolume, brokerConfig.commissionPercent);
     });
     return commissions.sum();
   }

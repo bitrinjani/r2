@@ -8,7 +8,7 @@ import {
   OrderType, QuoteSide, OrderSide, OrderStatus, BrokerConfig
 } from './type';
 import intl from './intl';
-import { padEnd, hr, delay } from './util';
+import { padEnd, hr, delay, calculateCommission } from './util';
 import Quote from './Quote';
 import symbols from './symbols';
 
@@ -158,12 +158,16 @@ export default class ArbitragerImpl implements Arbitrager {
 
       if (this.isFilled(buyOrder) && this.isFilled(sellOrder)) {
         this.status = 'Filled';
+        const commission = _([buyOrder, sellOrder]).sumBy(o => this.calculateFilledOrderCommission(o));
         const profit = _.round(sellOrder.filledSize * sellOrder.averageFilledPrice -
-          buyOrder.filledSize * buyOrder.averageFilledPrice);
+          buyOrder.filledSize * buyOrder.averageFilledPrice - commission);
         this.log.info(t('BothLegsAreSuccessfullyFilled'));
         this.log.info(t('BuyFillPriceIs'), _.round(buyOrder.averageFilledPrice));
         this.log.info(t('SellFillPriceIs'), _.round(sellOrder.averageFilledPrice));
         this.log.info(t('ProfitIs'), profit);
+        if (commission !== 0) {
+          this.log.info(t('CommissionIs'), _.round(commission));
+        }
         break;
       }
 
@@ -179,6 +183,11 @@ export default class ArbitragerImpl implements Arbitrager {
         break;
       }
     }
+  }
+
+  private calculateFilledOrderCommission(order: Order): number {
+    const brokerConfig = _.find(this.configStore.config.brokers, b => b.broker === order.broker) as BrokerConfig;
+    return calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
   }
 
   private isFilled(order: Order): boolean {

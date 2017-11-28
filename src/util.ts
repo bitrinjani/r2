@@ -22,6 +22,10 @@ export function eRound(n: number): number {
   return _.round(n, 10);
 }
 
+export function almostEqual(a: number, b: number, tolerancePercent: number): boolean {
+  return Math.sign(a) === Math.sign(b) && Math.abs(a - b) <= Math.abs(b) * (tolerancePercent / 100);
+}
+
 export function delay(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
 }
@@ -55,4 +59,9 @@ export function mkdir(dir: string) {
       throw err;
     }
   }
+}
+
+export function calculateCommission(price: number, volume: number, commissionPercent: number): number {
+  return commissionPercent !== undefined ? 
+    price * volume * (commissionPercent / 100) : 0;
 }

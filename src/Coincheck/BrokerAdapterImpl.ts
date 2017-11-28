@@ -13,7 +13,7 @@ import {
 } from '../type';
 import { OrderBooksResponse, NewOrderRequest, LeveragePosition } from './type';
 import { getBrokerOrderType } from './mapper';
-import { eRound } from '../util';
+import { eRound, almostEqual } from '../util';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
@@ -94,7 +94,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     const targetSide = order.side === OrderSide.Buy ? 'sell' : 'buy';
     const candidates = _(openPositions)
       .filter(p => p.side === targetSide)
-      .filter(p => Math.abs(p.amount - order.size) < order.size * 0.01)
+      .filter(p => almostEqual(p.amount, order.size, 1))
       .value();
     const request = { pair: 'btc_jpy', rate: order.price };
     if (candidates.length === 0) {
@@ -153,7 +153,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       return execution;
     });
     order.filledSize = eRound(_.sumBy(order.executions, x => x.size));
-    order.status = order.filledSize === order.size ? OrderStatus.Filled : OrderStatus.Canceled;
+    order.status = almostEqual(order.filledSize, order.size, 1) ? OrderStatus.Filled : OrderStatus.Canceled;
     order.lastUpdated = new Date();
   }
 }
