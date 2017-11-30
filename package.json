@@ -27,9 +27,9 @@
   },
   "devDependencies": {
     "@types/jest": "^21.1.4",
-    "@types/lodash": "^4.14.77",
+    "@types/lodash": "^4.14.86",
     "@types/nock": "^8.2.1",
-    "@types/node": "^8.0.30",
+    "@types/node": "^8.0.53",
     "@types/node-fetch": "^1.6.7",
     "@types/uuid": "^3.4.2",
     "coveralls": "^3.0.0",
@@ -40,7 +40,7 @@
     "ts-jest": "^21.1.2",
     "tslint": "^5.8.0",
     "tslint-config-airbnb": "^5.3.0",
-    "typescript": "^2.5.3"
+    "typescript": "2.6.2"
   },
   "jest": {
     "transform": {

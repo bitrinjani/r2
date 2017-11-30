@@ -21,3 +21,4 @@ logs
 coverage
 
 config.json
+.vscode
