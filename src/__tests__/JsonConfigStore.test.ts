@@ -3,7 +3,7 @@ import JsonConfigStore from '../JsonConfigStore';
 import { ConfigStore, ConfigRoot, Broker } from '../type';
 
 test('JsonConfigStore', () => {
-  const path = './__tests__/config_test.json';
+  const path = `${__dirname}/config_test.json`;
   const validator = { validate: (config: ConfigRoot) => true };
   const store = new JsonConfigStore(validator, path) as ConfigStore;
   expect(store.config.language).toBe('en');

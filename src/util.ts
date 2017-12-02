@@ -65,3 +65,7 @@ export function calculateCommission(price: number, volume: number, commissionPer
   return commissionPercent !== undefined ? 
     price * volume * (commissionPercent / 100) : 0;
 }
+
+export function readJsonFileSync(filepath: string): any {
+  return JSON.parse(fs.readFileSync(filepath, 'utf-8'));
+}

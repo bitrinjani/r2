@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { ConfigStore, ConfigRoot, ConfigValidator } from './type';
 import symbols from './symbols';
+import { readJsonFileSync } from './util';
 
 @injectable()
 export default class JsonConfigStore implements ConfigStore {
@@ -8,9 +9,9 @@ export default class JsonConfigStore implements ConfigStore {
   
   constructor(
     @inject(symbols.ConfigValidator) configValidator: ConfigValidator,
-    path: string = './config.json'
+    path: string = `${__dirname}/config.json`
   ) {
-    this._config = new ConfigRoot(require(path));
+    this._config = new ConfigRoot(readJsonFileSync(path));
     configValidator.validate(this._config);
   }
 
