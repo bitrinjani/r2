@@ -13,7 +13,6 @@ export default class ConfigValidatorImpl implements ConfigValidator {
     this.mustBePositive(config.maxRetryCount, 'maxRetryCount');
     this.mustBeGreaterThanZero(config.maxSize, 'maxSize');
     this.mustBeGreaterThanZero(config.minSize, 'minSize');
-    this.throwIf(config.minSize < 0.01, 'minSize must be greater than 0.01.');
     this.mustBeGreaterThanZero(config.minTargetProfit, 'minTargetProfit');
     this.mustBePositive(config.orderStatusCheckInterval, 'orderStatusCheckInterval');
     this.mustBePositive(config.positionRefreshInterval, 'positionRefreshInterval');
