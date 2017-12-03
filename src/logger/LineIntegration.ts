@@ -31,6 +31,6 @@ export default class LineIntegration {
       },      
       timeout: LineIntegration.fetchTimeout
     };
-    fetch(LineIntegration.apiUrl, init); 
+    fetch(LineIntegration.apiUrl, init).catch(ex => console.log(ex)); 
   }
 }

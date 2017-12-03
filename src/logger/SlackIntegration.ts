@@ -28,6 +28,6 @@ export default class SlackIntegration {
       headers: { 'Content-Type': 'application/json' },
       timeout: SlackIntegration.fetchTimeout
     };
-    fetch(this.config.url, init); 
+    fetch(this.config.url, init).catch(ex => console.log(ex)); 
   }
 }
