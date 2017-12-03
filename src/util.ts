@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { ConfigRoot } from './type';
 
 interface ToStringable {
   toString(): string;
@@ -68,4 +69,14 @@ export function calculateCommission(price: number, volume: number, commissionPer
 
 export function readJsonFileSync(filepath: string): any {
   return JSON.parse(fs.readFileSync(filepath, 'utf-8'));
+}
+
+export function getConfigRoot() {
+  try {
+    const configPath = process.env.NODE_ENV !== 'test' ? 
+      `${__dirname}/config.json` : `${__dirname}/__tests__/config_test.json`;
+    return readJsonFileSync(configPath) as ConfigRoot;
+  } catch {
+    return undefined;
+  }
 }

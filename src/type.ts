@@ -130,6 +130,25 @@ export class BrokerConfig extends TypeConverter {
   @cast commissionPercent: number;
 }
 
+export class SlackConfig extends TypeConverter {
+  @cast enabled: boolean;
+  @cast url: string;
+  @cast channel: string;
+  @cast username: string;
+  @cast @element(String) keywords: string[];
+}
+
+export class LineConfig extends TypeConverter {
+  @cast enabled: boolean;
+  @cast token: string;
+  @cast @element(String) keywords: string[];
+}
+
+export class LoggingConfig extends TypeConverter {
+  @cast slack: SlackConfig;
+  @cast line: LineConfig;
+}
+
 export class ConfigRoot extends TypeConverter {
   @cast language: string;
   @cast demoMode: boolean;
@@ -145,4 +164,5 @@ export class ConfigRoot extends TypeConverter {
   @cast maxRetryCount: number;
   @cast orderStatusCheckInterval: number;
   @cast @element(BrokerConfig) brokers: BrokerConfig[];
+  @cast logging: LoggingConfig;
 }

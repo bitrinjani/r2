@@ -44,5 +44,19 @@
       "leverageLevel": 10,
       "commissionPercent": 0
     }
-  ]
+  ],
+  "logging": {
+    "slack": {
+      "enabled": false,
+      "url": "https://hooks.slack.com/services/xxxxxx",
+      "channel": "#ch1",
+      "username": "abc",
+      "keywords": ["error", "profit"]
+    },
+    "line": {
+      "enabled": false,
+      "token": "TOKEN",
+      "keywords": ["error", "profit"]
+    }
+  }
 }
