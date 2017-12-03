@@ -19,8 +19,8 @@ export default class PositionServiceImpl implements PositionService {
   private _positionMap: BrokerMap<BrokerPosition>;
 
   constructor(
-    @inject(symbols.ConfigStore) readonly configStore: ConfigStore,
-    @inject(symbols.BrokerAdapterRouter) readonly brokerAdapterRouter: BrokerAdapterRouter
+    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
+    @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter
   ) { }
 
   async start(): Promise<void> {

@@ -20,11 +20,11 @@ export default class ArbitragerImpl implements Arbitrager {
   private activeOrders: Order[] = [];
 
   constructor(
-    @inject(symbols.QuoteAggregator) readonly quoteAggregator: QuoteAggregator,
-    @inject(symbols.ConfigStore) readonly configStore: ConfigStore,
-    @inject(symbols.PositionService) readonly positionService: PositionService,
-    @inject(symbols.BrokerAdapterRouter) readonly brokerAdapterRouter: BrokerAdapterRouter,
-    @inject(symbols.SpreadAnalyzer) readonly spreadAnalyzer: SpreadAnalyzer
+    @inject(symbols.QuoteAggregator) private readonly quoteAggregator: QuoteAggregator,
+    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
+    @inject(symbols.PositionService) private readonly positionService: PositionService,
+    @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter,
+    @inject(symbols.SpreadAnalyzer) private readonly spreadAnalyzer: SpreadAnalyzer
   ) { }
 
   status: string = 'Init';

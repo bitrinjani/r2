@@ -6,9 +6,7 @@ export default class WebClient {
   static fetchTimeout = 5000;
   private log = getLogger('WebClient');
 
-  constructor(public baseUrl: string) {
-    this.baseUrl = baseUrl;
-  }
+  constructor(public readonly baseUrl: string) { }
 
   async fetch<T>(
     path: string,

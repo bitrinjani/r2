@@ -10,7 +10,7 @@ export default class AppRoot {
   private log = getLogger('AppRoot');
   private arbitrager: Arbitrager;
 
-  constructor(readonly ioc: Container = container) { }
+  constructor(private readonly ioc: Container = container) { }
 
   async start(): Promise<void> {
     try {

@@ -16,8 +16,8 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
   private _quotes: Quote[] = [];
 
   constructor(
-    @inject(symbols.ConfigStore) readonly configStore: ConfigStore,
-    @inject(symbols.BrokerAdapterRouter) readonly brokerAdapterRouter: BrokerAdapterRouter
+    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
+    @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter
   ) { }
 
   async start(): Promise<void> {

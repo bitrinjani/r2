@@ -18,7 +18,7 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   private log = getLogger('SpreadAnalyzer');
 
   constructor(
-    @inject(symbols.ConfigStore) readonly configStore: ConfigStore
+    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
   ) { }
 
   async analyze(quotes: Quote[], positionMap: BrokerMap<BrokerPosition>): Promise<SpreadAnalysisResult> {
