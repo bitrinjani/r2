@@ -36,7 +36,8 @@ export default class LoggerFactory {
     const formatForConsole = winston.format.combine(
       lessSplat(),
       winston.format.colorize(),
-      winston.format.printf(info => `[${info.level}] ${info.message}`)
+      winston.format.timestamp({ format: localtime }),
+      winston.format.printf(info => `${info.timestamp} [${info.level}] ${info.message}`)
     );
     const formatForFile = winston.format.combine(
       lessSplat(),
