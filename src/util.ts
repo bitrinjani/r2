@@ -42,7 +42,7 @@ export const nonce: () => string = function () {
     if (n <= prev) {
       prev += 1;
       return prev.toString();
-    }     
+    }
     prev = n;
     return prev.toString();
   };
@@ -63,17 +63,22 @@ export function mkdir(dir: string) {
 }
 
 export function calculateCommission(price: number, volume: number, commissionPercent: number): number {
-  return commissionPercent !== undefined ? 
+  return commissionPercent !== undefined ?
     price * volume * (commissionPercent / 100) : 0;
 }
 
+function removeBom(s: string) {
+  return s.charCodeAt(0) === 0xFEFF ? s.slice(1) : s;
+}
+
 export function readJsonFileSync(filepath: string): any {
-  return JSON.parse(fs.readFileSync(filepath, 'utf-8'));
+  const content = fs.readFileSync(filepath, 'utf-8');
+  return JSON.parse(removeBom(content));
 }
 
 export function getConfigRoot() {
   try {
-    const configPath = process.env.NODE_ENV !== 'test' ? 
+    const configPath = process.env.NODE_ENV !== 'test' ?
       `${__dirname}/config.json` : `${__dirname}/__tests__/config_test.json`;
     return readJsonFileSync(configPath) as ConfigRoot;
   } catch {

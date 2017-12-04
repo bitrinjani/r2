@@ -34,4 +34,14 @@ test('almostEqual', () => {
   expect(util.almostEqual(1.00001, 0.99, 1)).toBe(false);
   expect(util.almostEqual(1, 0.99, 0.1)).toBe(false);
   expect(util.almostEqual(1.50001, 0.99, 20)).toBe(false);
-})
+});
+
+test('readJsonFileSync with BOM', () => {
+  const config = util.readJsonFileSync('./src/__tests__/config_test_bom.json');
+  expect(config.language).toBe('en');
+});
+
+test('readJsonFileSync with no BOM', () => {
+  const config = util.readJsonFileSync('./src/__tests__/config_test.json');
+  expect(config.language).toBe('en');
+});
