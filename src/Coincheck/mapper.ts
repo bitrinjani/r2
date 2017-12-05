@@ -1,5 +1,5 @@
 import Order from '../Order';
-import { CashMarginType, OrderSide, OrderType } from '../type';
+import { CashMarginType, OrderSide, OrderType } from '../types';
 
 export function getBrokerOrderType(order: Order): string {
   switch (order.cashMarginType) {

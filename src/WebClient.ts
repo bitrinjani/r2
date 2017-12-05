@@ -11,7 +11,8 @@ export default class WebClient {
   async fetch<T>(
     path: string,
     init: FetchRequestInit = { timeout: WebClient.fetchTimeout },
-    verbose: boolean = true): Promise<T> {
+    verbose: boolean = true
+  ): Promise<T> {
     const url = this.baseUrl + path;
     this.log.debug(`Sending HTTP request... URL: ${url} Request: ${JSON.stringify(init)}`);
     const res = await fetch(url, init);

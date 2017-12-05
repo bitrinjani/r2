@@ -2,10 +2,10 @@
 import * as nock from 'nock';
 import * as _ from 'lodash';
 import BrokerAdapterImpl from '../../Coincheck/BrokerAdapterImpl';
-import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType } from '../../type';
+import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType } from '../../types';
 import nocksetup from './nocksetup';
 import Order from '../../Order';
-import { NewOrderRequest } from '../../Coincheck/type';
+import { NewOrderRequest } from '../../Coincheck/types';
 
 nocksetup();
 

@@ -1,5 +1,5 @@
 import { getBrokerOrderType } from '../../Coincheck/mapper';
-import { CashMarginType, OrderSide, OrderType } from '../../type';
+import { CashMarginType, OrderSide, OrderType } from '../../types';
 
 describe('getBrokerOrderType', () => {
   test('cash market buy', () => {

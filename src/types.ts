@@ -39,6 +39,19 @@ export interface SpreadAnalysisResult {
   targetProfit: number;
 }
 
+export interface LimitChecker {
+  check(): LimitCheckResult;
+}
+
+export interface LimitCheckResult {
+  success: boolean;
+  reason?: string;
+}
+
+export interface LimitCheckerFactory {
+  create(spreadAnalysisResult: SpreadAnalysisResult): LimitChecker;
+}
+
 export enum OrderSide {
   Buy = 'Buy',
   Sell = 'Sell'
@@ -98,7 +111,6 @@ export interface PositionService {
   start(): Promise<void>;
   stop(): Promise<void>;
   print(): void;
-  isStarted: boolean;
   netExposure: number;
   positionMap: BrokerMap<BrokerPosition>;
 }

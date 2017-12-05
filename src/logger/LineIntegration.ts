@@ -1,6 +1,6 @@
 // tslint:disable:import-name
-import fetch from 'node-fetch';
-import { LineConfig } from '../type';
+import fetch, { RequestInit as FetchRequestInit } from 'node-fetch';
+import { LineConfig } from '../types';
 import * as querystring from 'querystring';
 
 export default class LineIntegration {
@@ -22,7 +22,7 @@ export default class LineIntegration {
     const payload = {
       message
     };
-    const init = {
+    const init: FetchRequestInit = {
       method: 'POST',
       body: querystring.stringify(payload),
       headers: {

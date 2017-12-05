@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
-import { Broker, QuoteSide, ConfigStore } from '../type';
+import { Broker, QuoteSide, ConfigStore } from '../types';
 import * as _ from 'lodash';
 import Quote from '../Quote';
 

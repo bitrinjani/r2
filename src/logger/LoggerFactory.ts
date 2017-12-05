@@ -6,7 +6,7 @@ import { mkdir, getConfigRoot } from '../util';
 import lessSplat from './lessSplat';
 import SlackIntegration from './SlackIntegration';
 import LineIntegration from './LineIntegration';
-import { SlackConfig, LineConfig, ConfigRoot } from '../type';
+import { SlackConfig, LineConfig, ConfigRoot } from '../types';
 
 interface LogFunc {
   (msg: any, ...args: any[]): void;
@@ -24,7 +24,7 @@ export default class LoggerFactory {
   private static dateFormat = 'YYYY-MM-DD HH:mm:ss.SSS';
   private loggerCache: Map<string, Logger> = new Map<string, Logger>();
 
-  constructor(private readonly config: ConfigRoot | undefined = getConfigRoot()) {    
+  constructor(private readonly config: ConfigRoot = getConfigRoot()) {
     mkdir(LoggerFactory.logdir);
   }
 
@@ -72,7 +72,8 @@ export default class LoggerFactory {
   private addIntegration(
     transport: { on: any },
     Integration: { new(config: any): SlackIntegration | LineIntegration },
-    config: SlackConfig | LineConfig | undefined) {
+    config: SlackConfig | LineConfig | undefined
+  ): void {
     if (config && config.enabled) {
       const integration = new Integration(config);
       transport.on('logged', info => integration.handler(info[Symbol.for('message')]));

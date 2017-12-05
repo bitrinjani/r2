@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import JsonConfigStore from '../JsonConfigStore';
-import { ConfigStore, ConfigRoot, Broker } from '../type';
+import { ConfigStore, ConfigRoot, Broker } from '../types';
 
 test('JsonConfigStore', () => {
   const path = `${__dirname}/config_test.json`;
