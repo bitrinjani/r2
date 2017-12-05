@@ -1,1 +1,1 @@
-export const LOT_MIN_DECIMAL_PLACE = 2;
+export const LOT_MIN_DECIMAL_PLACE = 3;
