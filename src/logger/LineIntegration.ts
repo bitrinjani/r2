@@ -31,6 +31,12 @@ export default class LineIntegration {
       },      
       timeout: LineIntegration.fetchTimeout
     };
-    fetch(LineIntegration.apiUrl, init).catch(ex => console.log(ex)); 
+    fetch(LineIntegration.apiUrl, init)
+      .then((res) => {
+        if (!res.ok) {
+          res.text().then(s => console.log(`LINE notify failed. ${res.statusText}: ${s}`));
+        }
+      })
+      .catch(ex => console.log(`LINE notify failed. ${ex}`)); 
   }
 }
