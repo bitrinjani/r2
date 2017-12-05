@@ -125,5 +125,9 @@ npm test
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
+## Disclaimer
+
+USE THE SOFTWARE AT YOUR OWN RISK. YOU ARE RESPONSIBLE FOR YOUR OWN MONEY. THE AUTHOR HAS NO RESPONSIBILITY FOR YOUR TRADING RESULTS.
+
 ## Inspirations
 [Blackbird](https://github.com/butor/blackbird), which targets US exchanges. 
