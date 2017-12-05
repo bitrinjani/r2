@@ -1,5 +1,5 @@
 import SlackIntegration from '../../logger/SlackIntegration';
-import { SlackConfig } from '../../types';
+import { SlackConfig } from '../../type';
 import * as nock from 'nock';
 
 const slackUrl = 'https://hooks.slack.com/services';

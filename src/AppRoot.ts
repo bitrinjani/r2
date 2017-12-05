@@ -3,13 +3,11 @@ import intl from './intl';
 import 'reflect-metadata';
 import container from './container';
 import symbols from './symbols';
-import { Arbitrager, QuoteAggregator, PositionService } from './types';
+import { Arbitrager } from './type';
 import { Container } from 'inversify';
 
 export default class AppRoot {
-  private log = getLogger(this.constructor.name);
-  private quoteAggregator: QuoteAggregator;
-  private positionService: PositionService;
+  private log = getLogger('AppRoot');
   private arbitrager: Arbitrager;
 
   constructor(private readonly ioc: Container = container) { }
@@ -17,10 +15,6 @@ export default class AppRoot {
   async start(): Promise<void> {
     try {
       this.log.info(intl.t('StartingTheService'));
-      this.quoteAggregator = this.ioc.get<QuoteAggregator>(symbols.QuoteAggregator);
-      await this.quoteAggregator.start();
-      this.positionService = this.ioc.get<PositionService>(symbols.PositionService);
-      await this.positionService.start();
       this.arbitrager = this.ioc.get<Arbitrager>(symbols.Arbitrager);
       await this.arbitrager.start();
       this.log.info(intl.t('SuccessfullyStartedTheService'));
@@ -35,12 +29,6 @@ export default class AppRoot {
       this.log.info(intl.t('StoppingTheService'));
       if (this.arbitrager) {
         await this.arbitrager.stop();
-      }
-      if (this.positionService) {
-        await this.positionService.stop();
-      }
-      if (this.quoteAggregator) {
-        await this.quoteAggregator.stop();
       }
       this.log.info(intl.t('SuccessfullyStoppedTheService'));
     } catch (ex) {

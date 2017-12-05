@@ -3,7 +3,7 @@ import WebClient from '../WebClient';
 import {
   SendOrderResponse, SendOrderRequest, CancelOrderResponse,
   OrdersResponse, TradingAccountsResponse, PriceLevelsResponse, TradingAccount
-} from './types';
+} from './type';
 import * as querystring from 'querystring';
 import * as jwt from 'jsonwebtoken';
 

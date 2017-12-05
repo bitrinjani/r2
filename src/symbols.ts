@@ -6,8 +6,7 @@ const symbols = {
   SpreadAnalyzer: Symbol('SpreadAnalyzer'),
   ConfigValidator: Symbol('ConfigValidator'),
   BrokerAdapterRouter: Symbol('BrokerAdapterRouter'),
-  BrokerAdapter: Symbol('BrokerAdapter'),
-  LimitCheckerFactory: Symbol('LimitCheckerFactory')
+  BrokerAdapter: Symbol('BrokerAdapter')
 };
 
 export default symbols;

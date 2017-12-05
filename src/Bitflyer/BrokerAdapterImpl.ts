@@ -1,7 +1,7 @@
 ﻿import {
   BrokerAdapter, BrokerConfig, ConfigStore, OrderStatus,
   OrderType, TimeInForce, OrderSide, CashMarginType, QuoteSide, Broker
-} from '../types';
+} from '../type';
 import { getLogger } from '../logger';
 import { injectable, inject } from 'inversify';
 import symbols from '../symbols';
@@ -12,9 +12,9 @@ import BrokerApi from './BrokerApi';
 import {
   SendChildOrderResponse, ChildOrdersParam, SendChildOrderRequest,
   ChildOrder, BoardResponse
-} from './types';
+} from './type';
 import Execution from '../Execution';
-import { eRound, findBrokerConfig } from '../util';
+import { eRound } from '../util';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
@@ -24,7 +24,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   broker = Broker.Bitflyer;
 
   constructor( @inject(symbols.ConfigStore) configStore: ConfigStore) {
-    this.config = findBrokerConfig(configStore.config, this.broker);
+    this.config = _.find(configStore.config.brokers,
+      (b: BrokerConfig) => b.broker === this.broker) as BrokerConfig;
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
   }
 

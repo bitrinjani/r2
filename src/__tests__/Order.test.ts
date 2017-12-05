@@ -1,5 +1,5 @@
 import Order from '../Order';
-import { Broker, OrderSide, OrderType, CashMarginType } from '../types';
+import { Broker, OrderSide, OrderType, CashMarginType } from '../type';
 import Execution from '../Execution';
 
 describe('Order', () => {

@@ -6,7 +6,7 @@ import {
   AccountsBalanceResponse, LeveragePositionsRequest, LeveragePositionsResponse,
   LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse, 
   CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination, Transaction
-} from './types';
+} from './type';
 
 export default class BrokerApi {
   key: string;

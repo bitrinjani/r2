@@ -10,10 +10,10 @@ import Execution from '../Execution';
 import {
   CashMarginType, ConfigStore, BrokerConfig, Broker,
   BrokerAdapter, QuoteSide, OrderStatus, OrderSide
-} from '../types';
-import { OrderBooksResponse, NewOrderRequest, LeveragePosition } from './types';
+} from '../type';
+import { OrderBooksResponse, NewOrderRequest, LeveragePosition } from './type';
 import { getBrokerOrderType } from './mapper';
-import { eRound, almostEqual, findBrokerConfig } from '../util';
+import { eRound, almostEqual } from '../util';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
@@ -25,7 +25,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   constructor(
     @inject(symbols.ConfigStore) configStore: ConfigStore
   ) {
-    this.config = findBrokerConfig(configStore.config, this.broker);
+    this.config = _.find(configStore.config.brokers,
+      (b: BrokerConfig) => b.broker === this.broker) as BrokerConfig;
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
   }
 

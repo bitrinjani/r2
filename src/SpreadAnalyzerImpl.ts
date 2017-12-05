@@ -1,7 +1,7 @@
 ﻿import { injectable, inject } from 'inversify';
 import {
-  SpreadAnalyzer, ConfigStore, QuoteSide, SpreadAnalysisResult, BrokerMap
-} from './types';
+  SpreadAnalyzer, ConfigStore, QuoteSide, SpreadAnalysisResult, BrokerMap, BrokerConfig
+} from './type';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Quote from './Quote';
@@ -10,13 +10,12 @@ import BrokerPosition from './BrokerPosition';
 import symbols from './symbols';
 // tslint:disable-next-line:import-name
 import Decimal from 'decimal.js';
-import { calculateCommission, findBrokerConfig } from './util';
-import { LOT_MIN_DECIMAL_PLACE } from './constants';
+import { calculateCommission } from './util';
 
 const t = s => intl.t(s);
 @injectable()
 export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
-  private log = getLogger(this.constructor.name);
+  private log = getLogger('SpreadAnalyzer');
 
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
@@ -42,11 +41,13 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     }
 
     const invertedSpread = bestBid.price - bestAsk.price;
-    const availableVolume = _.floor(_.min([bestBid.volume, bestAsk.volume]) as number, LOT_MIN_DECIMAL_PLACE);
+    const availableVolume = _.floor(_.min([bestBid.volume, bestAsk.volume]) as number, 2);
     const allowedShortSize = positionMap[bestBid.broker].allowedShortSize;
     const allowedLongSize = positionMap[bestAsk.broker].allowedLongSize;
+    this.log.debug(`allowedShortSize: ${allowedShortSize}`);
+    this.log.debug(`allowedLongSize: ${allowedLongSize}`);
     let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]) as number;
-    targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
+    targetVolume = _.floor(targetVolume, 2);
     const commission = this.calculateTotalCommission([bestBid, bestAsk], targetVolume);
     const targetProfit = _.round(invertedSpread * targetVolume - commission);
     const spreadAnalysisResult = {
@@ -62,10 +63,12 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   }
 
   private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {
-    return _(quotes).sumBy((q) => {
-      const brokerConfig = findBrokerConfig(this.configStore.config, q.broker);
+    const config = this.configStore.config;
+    const commissions = _(quotes).map((q) => {
+      const brokerConfig = config.brokers.find(x => x.broker === q.broker) as BrokerConfig;
       return calculateCommission(q.price, targetVolume, brokerConfig.commissionPercent);
     });
+    return commissions.sum();
   }
 
   private isAllowedByCurrentPosition(q: Quote, pos: BrokerPosition): boolean {

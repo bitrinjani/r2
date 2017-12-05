@@ -1,4 +1,4 @@
-import { Broker } from './types';
+import { Broker } from './type';
 import * as _ from 'lodash';
 import intl from './intl';
 import { padStart, padEnd } from './util';

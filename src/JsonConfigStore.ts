@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import { ConfigStore, ConfigRoot, ConfigValidator } from './types';
+import { ConfigStore, ConfigRoot, ConfigValidator } from './type';
 import symbols from './symbols';
 import { readJsonFileSync } from './util';
 

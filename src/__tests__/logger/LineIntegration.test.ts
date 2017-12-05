@@ -1,5 +1,5 @@
 import LineIntegration from '../../logger/LineIntegration';
-import { LineConfig } from '../../types';
+import { LineConfig } from '../../type';
 import * as nock from 'nock';
 
 const lineUrl = 'https://notify-api.line.me/api/notify';

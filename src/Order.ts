@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 import {
   OrderSide, CashMarginType, OrderType,
   TimeInForce, OrderStatus, Broker
-} from './types';
+} from './type';
 import Execution from './Execution';
 import { eRound } from './util';
 
@@ -34,10 +34,6 @@ export default class Order {
     return _.isEmpty(this.executions)
       ? 0
       : eRound(_.sumBy(this.executions, x => x.size * x.price) / _.sumBy(this.executions, x => x.size));
-  }
-
-  get filled(): boolean {
-    return this.status === OrderStatus.Filled;
   }
 
   toString(): string {

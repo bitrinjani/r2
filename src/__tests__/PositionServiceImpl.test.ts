@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import PositionServiceImpl from '../PositionServiceImpl';
-import { Broker } from '../types';
+import { Broker } from '../type';
 import * as _ from 'lodash';
 import { delay } from '../util';
 
@@ -28,6 +28,7 @@ const baRouter = {
 describe('Position Service', () => {
   test('positions', async () => {
     const ps = new PositionServiceImpl(configStore, baRouter);
+    ps.print();
     await ps.start();
     const positions = _.values(ps.positionMap);
     const exposure = ps.netExposure;
@@ -52,6 +53,7 @@ describe('Position Service', () => {
   test('positions throws', async () => {
     const baRouterThrows = { getBtcPosition: async () => { throw new Error('Mock refresh error.'); } };
     const ps = new PositionServiceImpl(configStore, baRouterThrows);
+    ps.print();
     await ps.start();
     expect(ps.positionMap).toBeUndefined();
     expect(ps.netExposure).toBe(0);
@@ -63,6 +65,7 @@ describe('Position Service', () => {
       getBtcPosition: broker => broker === Broker.Quoine ? 0.000002 : -0.3
     };
     const ps = new PositionServiceImpl(configStore, baRouter);
+    ps.print();
     await ps.start();
     const positions = _.values(ps.positionMap);
     const exposure = ps.netExposure;

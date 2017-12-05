@@ -1,7 +1,7 @@
 ﻿import {
   BrokerAdapter, BrokerConfig, ConfigStore, OrderStatus,
   OrderType, OrderSide, CashMarginType, QuoteSide, Broker
-} from '../types';
+} from '../type';
 import BrokerApi from './BrokerApi';
 import { getLogger } from '../logger';
 import { injectable, inject } from 'inversify';
@@ -9,9 +9,9 @@ import symbols from '../symbols';
 import * as _ from 'lodash';
 import Order from '../Order';
 import Quote from '../Quote';
-import { PriceLevelsResponse, SendOrderRequest, OrdersResponse } from './types';
+import { PriceLevelsResponse, SendOrderRequest, OrdersResponse } from './type';
 import Execution from '../Execution';
-import { timestampToDate, findBrokerConfig } from '../util';
+import { timestampToDate } from '../util';
 // tslint:disable-next-line:import-name
 import Decimal from 'decimal.js';
 
@@ -23,7 +23,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   broker = Broker.Quoine;
 
   constructor( @inject(symbols.ConfigStore) configStore: ConfigStore) {
-    this.config = findBrokerConfig(configStore.config, this.broker);
+    this.config = _.find(configStore.config.brokers,
+      (b: BrokerConfig) => b.broker === this.broker) as BrokerConfig;
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
   }
 

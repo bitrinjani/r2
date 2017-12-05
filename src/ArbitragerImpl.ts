@@ -5,19 +5,18 @@ import Order from './Order';
 import {
   BrokerAdapterRouter, ConfigStore, PositionService,
   QuoteAggregator, SpreadAnalyzer, Arbitrager, SpreadAnalysisResult,
-  OrderType, QuoteSide, OrderSide, LimitCheckerFactory
-} from './types';
+  OrderType, QuoteSide, OrderSide, OrderStatus, BrokerConfig
+} from './type';
 import intl from './intl';
-import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
+import { padEnd, hr, delay, calculateCommission } from './util';
 import Quote from './Quote';
 import symbols from './symbols';
-import { LOT_MIN_DECIMAL_PLACE } from './constants';
 
 const t = s => intl.t(s);
 
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {
-  private log = getLogger(this.constructor.name);
+  private log = getLogger('Arbitrager');
   private activeOrders: Order[] = [];
 
   constructor(
@@ -25,8 +24,7 @@ export default class ArbitragerImpl implements Arbitrager {
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     @inject(symbols.PositionService) private readonly positionService: PositionService,
     @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter,
-    @inject(symbols.SpreadAnalyzer) private readonly spreadAnalyzer: SpreadAnalyzer,
-    @inject(symbols.LimitCheckerFactory) private readonly limitCheckerFactory: LimitCheckerFactory
+    @inject(symbols.SpreadAnalyzer) private readonly spreadAnalyzer: SpreadAnalyzer
   ) { }
 
   status: string = 'Init';
@@ -35,49 +33,77 @@ export default class ArbitragerImpl implements Arbitrager {
     this.status = 'Starting';
     this.log.info(t('StartingArbitrager'));
     this.quoteAggregator.onQuoteUpdated = (quotes: Quote[]) => this.quoteUpdated(quotes);
+    await this.quoteAggregator.start();
+    await this.positionService.start();
     this.status = 'Started';
     this.log.info(t('StartedArbitrager'));
   }
 
   async stop(): Promise<void> {
     this.status = 'Stopping';
-    this.log.info('Stopping Arbitrager...');
+    if (this.positionService) {
+      await this.positionService.stop();
+    }
     if (this.quoteAggregator) {
+      await this.quoteAggregator.stop();
       this.quoteAggregator.onQuoteUpdated = undefined;
     }
-    this.log.info('Stopped Arbitrager.');
     this.status = 'Stopped';
   }
 
   private async arbitrage(quotes: Quote[]): Promise<void> {
     this.status = 'Arbitraging';
+    if (!this.positionService.isStarted) {
+      this.status = 'Waiting Position Service';
+      this.log.info(t('WaitingForPositionService'));
+      return;
+    }
     this.log.info(t('LookingForOpportunity'));
     const { config } = this.configStore;
-    let spreadAnalysisResult: SpreadAnalysisResult;
+    if (this.isMaxExposureBreached()) {
+      this.status = 'Max exposure breached';
+      this.log.error(t('NetExposureIsLargerThanMaxNetExposure'));
+      return;
+    }
+    let result: SpreadAnalysisResult;
     try {
-      spreadAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap);
+      result = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap);
     } catch (ex) {
       this.status = 'Spread analysis failed';
       this.log.warn(t('FailedToGetASpreadAnalysisResult'), ex.message);
       this.log.debug(ex.stack);
       return;
     }
-    this.printSnapshot(spreadAnalysisResult);
-    const limitChecker = this.limitCheckerFactory.create(spreadAnalysisResult);
-    const limitCheckResult = limitChecker.check();
-    if (!limitCheckResult.success) {
-      if (limitCheckResult.reason) {
-        this.status = limitCheckResult.reason;
-      }
+
+    this.printSnapshot(result);
+    const { bestBid, bestAsk, invertedSpread,
+      targetVolume, targetProfit } = result;
+    if (invertedSpread <= 0) {
+      this.status = 'Spread not inverted';
+      this.log.info(t('NoArbitrageOpportunitySpreadIsNotInverted'));
       return;
     }
+    const minTargetProfit = _.max([
+      config.minTargetProfit,
+      config.minTargetProfitPercent !== undefined ?
+        _.round((config.minTargetProfitPercent / 100) * _.mean([bestAsk.price, bestBid.price]) * targetVolume) :
+        0
+    ]) as number;
+    if (targetProfit < minTargetProfit) {
+      this.status = 'Too small profit';
+      this.log.info(t('TargetProfitIsSmallerThanMinProfit'));
+      return;
+    }
+    if (config.demoMode) {
+      this.status = 'Demo mode';
+      this.log.info(t('ThisIsDemoModeNotSendingOrders'));
+      return;
+    }
+
     this.log.info(t('FoundArbitrageOppotunity'));
     try {
-      const { bestBid, bestAsk, targetVolume } = spreadAnalysisResult;
-      await Promise.all([
-        this.sendOrder(bestAsk, targetVolume, OrderType.Limit),
-        this.sendOrder(bestBid, targetVolume, OrderType.Limit)
-      ]);
+      await this.sendOrder(bestAsk, targetVolume, OrderType.Limit);
+      await this.sendOrder(bestBid, targetVolume, OrderType.Limit);
       this.status = 'Sent';
       await this.checkOrderState();
     } catch (ex) {
@@ -91,16 +117,20 @@ export default class ArbitragerImpl implements Arbitrager {
   }
 
   private printSnapshot(result: SpreadAnalysisResult) {
-    const columnWidth = 17;
-    this.log.info('%s: %s', padEnd(t('BestAsk'), columnWidth), result.bestAsk);
-    this.log.info('%s: %s', padEnd(t('BestBid'), columnWidth), result.bestBid);
-    this.log.info('%s: %s', padEnd(t('Spread'), columnWidth), -result.invertedSpread);
-    this.log.info('%s: %s', padEnd(t('AvailableVolume'), columnWidth), result.availableVolume);
-    this.log.info('%s: %s', padEnd(t('TargetVolume'), columnWidth), result.targetVolume);
+    this.log.info('%s: %s', padEnd(t('BestAsk'), 17), result.bestAsk);
+    this.log.info('%s: %s', padEnd(t('BestBid'), 17), result.bestBid);
+    this.log.info('%s: %s', padEnd(t('Spread'), 17), -result.invertedSpread);
+    this.log.info('%s: %s', padEnd(t('AvailableVolume'), 17), result.availableVolume);
+    this.log.info('%s: %s', padEnd(t('TargetVolume'), 17), result.targetVolume);
     const midNotional = _.mean([result.bestAsk.price, result.bestBid.price]) * result.targetVolume;
-    const profitPercentAgainstNotional = _.round((result.targetProfit / midNotional) * 100, LOT_MIN_DECIMAL_PLACE);
-    this.log.info('%s: %s (%s%%)', padEnd(t('ExpectedProfit'), columnWidth),
-      result.targetProfit, profitPercentAgainstNotional);
+    const profitPercentAgainstNotional = _.round((result.targetProfit / midNotional) * 100, 2);
+    this.log.info('%s: %s (%s%%)', padEnd(t('ExpectedProfit'), 17), result.targetProfit, profitPercentAgainstNotional);
+  }
+
+  private isMaxExposureBreached(): boolean {
+    this.log.debug(`Net exposure ${this.positionService.netExposure}, ` +
+      `Max exposure ${this.configStore.config.maxNetExposure}`);
+    return Math.abs(this.positionService.netExposure) > this.configStore.config.maxNetExposure;
   }
 
   private async checkOrderState(): Promise<void> {
@@ -112,23 +142,21 @@ export default class ArbitragerImpl implements Arbitrager {
       this.log.info(t('OrderCheckAttempt'), i);
       this.log.info(t('CheckingIfBothLegsAreDoneOrNot'));
       try {
-        await Promise.all([
-          this.brokerAdapterRouter.refresh(buyOrder), 
-          this.brokerAdapterRouter.refresh(sellOrder)
-        ]);
+        await this.brokerAdapterRouter.refresh(buyOrder);
+        await this.brokerAdapterRouter.refresh(sellOrder);
       } catch (ex) {
         this.log.warn(ex.message);
         this.log.debug(ex.stack);
       }
 
-      if (!buyOrder.filled) {
+      if (!this.isFilled(buyOrder)) {
         this.log.warn(t('BuyLegIsNotFilledYetPendingSizeIs'), buyOrder.pendingSize);
       }
-      if (!sellOrder.filled) {
+      if (!this.isFilled(sellOrder)) {
         this.log.warn(t('SellLegIsNotFilledYetPendingSizeIs'), sellOrder.pendingSize);
       }
 
-      if (buyOrder.filled && sellOrder.filled) {
+      if (this.isFilled(buyOrder) && this.isFilled(sellOrder)) {
         this.status = 'Filled';
         const commission = _([buyOrder, sellOrder]).sumBy(o => this.calculateFilledOrderCommission(o));
         const profit = _.round(sellOrder.filledSize * sellOrder.averageFilledPrice -
@@ -146,22 +174,24 @@ export default class ArbitragerImpl implements Arbitrager {
       if (i === config.maxRetryCount) {
         this.status = 'MaxRetryCount breached';
         this.log.warn(t('MaxRetryCountReachedCancellingThePendingOrders'));
-        const promises: Promise<void>[] = [];
-        if (!buyOrder.filled) {
-          promises.push(this.brokerAdapterRouter.cancel(buyOrder));
+        if (!this.isFilled(buyOrder)) {
+          await this.brokerAdapterRouter.cancel(buyOrder);
         }
-        if (!sellOrder.filled) {
-          promises.push(this.brokerAdapterRouter.cancel(sellOrder));
+        if (!this.isFilled(sellOrder)) {
+          await this.brokerAdapterRouter.cancel(sellOrder);
         }
-        await Promise.all(promises);
         break;
       }
     }
   }
 
   private calculateFilledOrderCommission(order: Order): number {
-    const brokerConfig = findBrokerConfig(this.configStore.config, order.broker);
+    const brokerConfig = _.find(this.configStore.config.brokers, b => b.broker === order.broker) as BrokerConfig;
     return calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
+  }
+
+  private isFilled(order: Order): boolean {
+    return order.status === OrderStatus.Filled;
   }
 
   private async quoteUpdated(quotes: Quote[]): Promise<void> {
@@ -173,7 +203,8 @@ export default class ArbitragerImpl implements Arbitrager {
 
   private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<void> {
     this.log.info(t('SendingOrderTargettingQuote'), quote);
-    const brokerConfig = findBrokerConfig(this.configStore.config, quote.broker);
+    const brokerConfig = _.find(this.configStore.config.brokers,
+      x => x.broker === quote.broker) as BrokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
     const { cashMarginType, leverageLevel } = brokerConfig;
     const order = new Order(quote.broker, orderSide, targetVolume,

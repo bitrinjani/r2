@@ -2,7 +2,7 @@
 import {
   QuoteAggregator, ConfigStore, BrokerConfig,
   QuoteSide, BrokerAdapterRouter, Broker
-} from './types';
+} from './type';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Quote from './Quote';
@@ -10,7 +10,7 @@ import symbols from './symbols';
 
 @injectable()
 export default class QuoteAggregatorImpl implements QuoteAggregator {
-  private log = getLogger(this.constructor.name);
+  private log = getLogger('QuoteAggregator');
   private timer;
   private isRunning: boolean;
   private _quotes: Quote[] = [];

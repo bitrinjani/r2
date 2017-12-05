@@ -1,5 +1,4 @@
 import * as util from '../util';
-import { Broker } from '../types';
 
 test('timestampToDate', () => {
   const dt = util.timestampToDate(1509586252);
@@ -46,7 +45,3 @@ test('readJsonFileSync with no BOM', () => {
   const config = util.readJsonFileSync('./src/__tests__/config_test.json');
   expect(config.language).toBe('en');
 });
-
-test('findBrokerConfig with no config', () => {
-  expect(() => util.findBrokerConfig({brokers: []}, Broker.Bitflyer)).toThrow();
-})

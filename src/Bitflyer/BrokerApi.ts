@@ -5,7 +5,7 @@ import {
   CancelChildOrderRequest, CancelChildOrderResponse, ChildOrdersParam,
   ChildOrdersResponse, ExecutionsResponse, ExecutionsParam, Execution, BalanceResponse,
   BoardResponse, ChildOrder, Balance
-} from './types';
+} from './type';
 import * as querystring from 'querystring';
 
 export default class BrokerApi {
