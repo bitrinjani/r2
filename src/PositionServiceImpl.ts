@@ -2,7 +2,7 @@ import { injectable, inject } from 'inversify';
 import {
   PositionService, BrokerAdapterRouter,
   ConfigStore, BrokerConfig, BrokerMap
-} from './type';
+} from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 // tslint:disable-next-line:import-name
@@ -13,7 +13,7 @@ import symbols from './symbols';
 
 @injectable()
 export default class PositionServiceImpl implements PositionService {
-  private log = getLogger('PositionService');
+  private log = getLogger(this.constructor.name);
   private timer;
   private isRefreshing: boolean;
   private _positionMap: BrokerMap<BrokerPosition>;
@@ -28,7 +28,6 @@ export default class PositionServiceImpl implements PositionService {
     this.timer = setInterval(() => this.refresh(), this.configStore.config.positionRefreshInterval);
     await this.refresh();
     this.log.debug('Started PositionService.');
-    this.isStarted = true;
   }
 
   async stop(): Promise<void> {
@@ -40,7 +39,6 @@ export default class PositionServiceImpl implements PositionService {
   }
 
   print(): void {
-    if (!this.isStarted) { return; }
     this.log.info(hr(21) + 'POSITION' + hr(21));
     this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} BTC`);
     _.each(this.positionMap, (position: BrokerPosition) =>
@@ -49,8 +47,6 @@ export default class PositionServiceImpl implements PositionService {
     this.log.info(hr(50));
     this.log.debug(JSON.stringify(this.positionMap));
   }
-
-  isStarted: boolean = false;
 
   get netExposure() {
     return eRound(_.sumBy(_.values(this.positionMap), (p: BrokerPosition) => p.btc));

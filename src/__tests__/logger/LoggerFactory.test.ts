@@ -1,6 +1,6 @@
 import * as nock from 'nock';
 import LoggerFactory from '../../logger/LoggerFactory';
-import { ConfigRoot } from '../../type';
+import { ConfigRoot } from '../../types';
 
 const slackUrl = 'https://hooks.slack.com/services';
 const slackApi = nock(slackUrl);

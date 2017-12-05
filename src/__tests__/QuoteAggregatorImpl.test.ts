@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import QuoteAggregatorImpl from '../QuoteAggregatorImpl';
-import { Broker, QuoteSide, QuoteAggregator } from '../type';
+import { Broker, QuoteSide, QuoteAggregator } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
 import BrokerAdapterRouterImpl from '../BrokerAdapterRouterImpl';

@@ -1,4 +1,4 @@
-﻿import { BrokerAdapterRouter, Broker, BrokerAdapter, BrokerMap } from './type';
+﻿import { BrokerAdapterRouter, Broker, BrokerAdapter, BrokerMap } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Order from './Order';
@@ -8,7 +8,7 @@ import symbols from './symbols';
 
 @injectable()
 export default class BrokerAdapterRouterImpl implements BrokerAdapterRouter {
-  private log = getLogger('BrokerAdapterRouter');
+  private log = getLogger(this.constructor.name);
   private brokerAdapterMap: BrokerMap<BrokerAdapter>;
 
   constructor(@multiInject(symbols.BrokerAdapter) brokerAdapters: BrokerAdapter[]) {

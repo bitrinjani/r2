@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Broker, QuoteSide } from './type';
+import { Broker, QuoteSide } from './types';
 import { padStart, padEnd } from './util';
 
 export default class Quote {

@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import Order from './Order';
-import { Broker, CashMarginType, OrderSide } from './type';
+import { Broker, CashMarginType, OrderSide } from './types';
 
 export default class Execution {
   constructor(order: Order) {

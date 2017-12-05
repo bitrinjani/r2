@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { ConfigRoot } from './type';
+import { ConfigRoot, Broker, BrokerConfig } from './types';
 
 interface ToStringable {
   toString(): string;
@@ -48,11 +48,11 @@ export const nonce: () => string = function () {
   };
 }();
 
-export function timestampToDate(n: number) {
+export function timestampToDate(n: number): Date {
   return new Date(n * 1000);
 }
 
-export function mkdir(dir: string) {
+export function mkdir(dir: string): void {
   try {
     fs.mkdirSync(dir);
   } catch (err) {
@@ -67,7 +67,7 @@ export function calculateCommission(price: number, volume: number, commissionPer
     price * volume * (commissionPercent / 100) : 0;
 }
 
-function removeBom(s: string) {
+function removeBom(s: string): string {
   return s.charCodeAt(0) === 0xFEFF ? s.slice(1) : s;
 }
 
@@ -76,12 +76,16 @@ export function readJsonFileSync(filepath: string): any {
   return JSON.parse(removeBom(content));
 }
 
-export function getConfigRoot() {
-  try {
-    const configPath = process.env.NODE_ENV !== 'test' ?
-      `${__dirname}/config.json` : `${__dirname}/__tests__/config_test.json`;
-    return readJsonFileSync(configPath) as ConfigRoot;
-  } catch {
-    return undefined;
+export function getConfigRoot(): ConfigRoot {
+  const configPath = process.env.NODE_ENV !== 'test' ?
+    `${__dirname}/config.json` : `${__dirname}/__tests__/config_test.json`;
+  return readJsonFileSync(configPath) as ConfigRoot;
+}
+
+export function findBrokerConfig(configRoot: ConfigRoot, broker: Broker): BrokerConfig {
+  const found = configRoot.brokers.find(brokerConfig => brokerConfig.broker === broker);
+  if (found === undefined) {
+    throw new Error(`Unabled to find ${broker} in config.`);
   }
+  return found;
 }

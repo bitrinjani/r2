@@ -2,7 +2,7 @@
 // tslint:disable:max-line-length
 import * as nock from 'nock';
 import * as _ from 'lodash';
-import BrokerApi from '../../Coincheck/BrokerApi';
+import BrokerApi from '../../coincheck/BrokerApi';
 import nocksetup from './nocksetup';
 
 nocksetup();

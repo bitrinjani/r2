@@ -1,5 +1,5 @@
 import BrokerPosition from '../BrokerPosition';
-import { Broker } from '../type';
+import { Broker } from '../types';
 
 describe('BrokerPosition', () => {
   test('toString format', () => {

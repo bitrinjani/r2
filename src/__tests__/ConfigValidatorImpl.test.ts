@@ -1,5 +1,5 @@
 import ConfigValidatorImpl from '../ConfigValidatorImpl';
-import { ConfigRoot } from '../type';
+import { ConfigRoot } from '../types';
 
 const config: ConfigRoot = require('./config_test.json');
 

@@ -1,7 +1,7 @@
 // tslint:disable
 import * as nock from 'nock';
 import * as _ from 'lodash';
-import BrokerApi from '../../Bitflyer/BrokerApi';
+import BrokerApi from '../../bitflyer/BrokerApi';
 import nocksetup from './nocksetup';
 
 nocksetup();

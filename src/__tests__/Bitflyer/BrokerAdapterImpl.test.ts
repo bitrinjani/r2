@@ -1,8 +1,8 @@
 // tslint:disable
 import * as nock from 'nock';
 import * as _ from 'lodash';
-import BrokerAdapterImpl from '../../Bitflyer/BrokerAdapterImpl';
-import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType } from '../../type';
+import BrokerAdapterImpl from '../../bitflyer/BrokerAdapterImpl';
+import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType } from '../../types';
 import nocksetup from './nocksetup';
 import Order from '../../Order';
 
