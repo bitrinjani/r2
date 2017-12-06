@@ -7,13 +7,11 @@ import {
   QuoteAggregator, SpreadAnalyzer, Arbitrager, SpreadAnalysisResult,
   OrderType, QuoteSide, OrderSide, LimitCheckerFactory
 } from './types';
-import intl from './intl';
+import t from './intl';
 import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
 import Quote from './Quote';
 import symbols from './symbols';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
-
-const t = s => intl.t(s);
 
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {

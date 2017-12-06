@@ -1,5 +1,5 @@
 ﻿import { ConfigRoot, ConfigValidator, BrokerConfig, Broker, CashMarginType } from './types';
-import intl from './intl';
+import t from './intl';
 import * as _ from 'lodash';
 import { injectable } from 'inversify';
 import { findBrokerConfig } from './util';
@@ -8,7 +8,7 @@ import { findBrokerConfig } from './util';
 export default class ConfigValidatorImpl implements ConfigValidator {
   validate(config: ConfigRoot): void {
     const enabledBrokers = config.brokers.filter(b => b.enabled);
-    this.throwIf(enabledBrokers.length < 2, intl.t('AtLeastTwoBrokersMustBeEnabled'));
+    this.throwIf(enabledBrokers.length < 2, t('AtLeastTwoBrokersMustBeEnabled'));
     this.mustBePositive(config.iterationInterval, 'iterationInterval');
     this.mustBePositive(config.maxNetExposure, 'maxNetExposure');
     this.mustBePositive(config.maxRetryCount, 'maxRetryCount');

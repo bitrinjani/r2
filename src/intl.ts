@@ -1,13 +1,9 @@
 import * as i18next from 'i18next';
 import { en, ja } from './stringResources';
-
-let lng = 'en';
-try { 
-  lng = require('./config.json').language; 
-} catch (err) { /* For unit tests */}
+import { getConfigRoot } from './util';
 
 i18next.init({
-  lng,
+  lng: getConfigRoot().language,
   fallbackLng: 'en',
   resources: {
     en: {
@@ -19,4 +15,4 @@ i18next.init({
   }
 });
 
-export default i18next;
+export default s => i18next.t(s);

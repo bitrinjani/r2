@@ -3,9 +3,7 @@ import {
 } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
-import intl from './intl';
-
-const t = s => intl.t(s);
+import t from './intl';
 
 export default class LimitCheckerImpl implements LimitChecker {
   private log = getLogger(this.constructor.name);

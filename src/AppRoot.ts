@@ -1,5 +1,5 @@
 ﻿import { getLogger } from './logger';
-import intl from './intl';
+import t from './intl';
 import 'reflect-metadata';
 import container from './container';
 import symbols from './symbols';
@@ -16,14 +16,14 @@ export default class AppRoot {
 
   async start(): Promise<void> {
     try {
-      this.log.info(intl.t('StartingTheService'));
+      this.log.info(t('StartingTheService'));
       this.quoteAggregator = this.ioc.get<QuoteAggregator>(symbols.QuoteAggregator);
       await this.quoteAggregator.start();
       this.positionService = this.ioc.get<PositionService>(symbols.PositionService);
       await this.positionService.start();
       this.arbitrager = this.ioc.get<Arbitrager>(symbols.Arbitrager);
       await this.arbitrager.start();
-      this.log.info(intl.t('SuccessfullyStartedTheService'));
+      this.log.info(t('SuccessfullyStartedTheService'));
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
@@ -32,7 +32,7 @@ export default class AppRoot {
   
   async stop(): Promise<void> {
     try {
-      this.log.info(intl.t('StoppingTheService'));
+      this.log.info(t('StoppingTheService'));
       if (this.arbitrager) {
         await this.arbitrager.stop();
       }
@@ -42,7 +42,7 @@ export default class AppRoot {
       if (this.quoteAggregator) {
         await this.quoteAggregator.stop();
       }
-      this.log.info(intl.t('SuccessfullyStoppedTheService'));
+      this.log.info(t('SuccessfullyStoppedTheService'));
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);

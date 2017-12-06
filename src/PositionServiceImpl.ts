@@ -5,7 +5,6 @@ import {
 } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
-// tslint:disable-next-line:import-name
 import Decimal from 'decimal.js';
 import BrokerPosition from './BrokerPosition';
 import { hr, eRound } from './util';

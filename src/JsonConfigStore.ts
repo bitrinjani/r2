@@ -1,17 +1,16 @@
 import { injectable, inject } from 'inversify';
 import { ConfigStore, ConfigRoot, ConfigValidator } from './types';
 import symbols from './symbols';
-import { readJsonFileSync } from './util';
+import { getConfigRoot } from './util';
 
 @injectable()
 export default class JsonConfigStore implements ConfigStore {
   private _config: ConfigRoot;
   
   constructor(
-    @inject(symbols.ConfigValidator) configValidator: ConfigValidator,
-    path: string = `${__dirname}/config.json`
+    @inject(symbols.ConfigValidator) configValidator: ConfigValidator
   ) {
-    this._config = new ConfigRoot(readJsonFileSync(path));
+    this._config = getConfigRoot();
     configValidator.validate(this._config);
   }
 

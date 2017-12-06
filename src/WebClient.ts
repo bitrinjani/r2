@@ -1,4 +1,3 @@
-// tslint:disable-next-line:import-name
 import fetch, { RequestInit as FetchRequestInit } from 'node-fetch';
 import { getLogger } from './logger';
 

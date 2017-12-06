@@ -79,7 +79,7 @@ export function readJsonFileSync(filepath: string): any {
 export function getConfigRoot(): ConfigRoot {
   const configPath = process.env.NODE_ENV !== 'test' ?
     `${__dirname}/config.json` : `${__dirname}/__tests__/config_test.json`;
-  return readJsonFileSync(configPath) as ConfigRoot;
+  return new ConfigRoot(readJsonFileSync(configPath));
 }
 
 export function findBrokerConfig(configRoot: ConfigRoot, broker: Broker): BrokerConfig {

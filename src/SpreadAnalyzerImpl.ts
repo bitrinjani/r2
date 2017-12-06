@@ -5,15 +5,13 @@ import {
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Quote from './Quote';
-import intl from './intl';
+import t from './intl';
 import BrokerPosition from './BrokerPosition';
 import symbols from './symbols';
-// tslint:disable-next-line:import-name
 import Decimal from 'decimal.js';
 import { calculateCommission, findBrokerConfig } from './util';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
 
-const t = s => intl.t(s);
 @injectable()
 export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   private log = getLogger(this.constructor.name);

@@ -1,4 +1,3 @@
-// tslint:disable:import-name
 import fetch, { RequestInit as FetchRequestInit } from 'node-fetch';
 import { SlackConfig } from '../types';
 

@@ -3,9 +3,8 @@ import JsonConfigStore from '../JsonConfigStore';
 import { ConfigStore, ConfigRoot, Broker } from '../types';
 
 test('JsonConfigStore', () => {
-  const path = `${__dirname}/config_test.json`;
   const validator = { validate: (config: ConfigRoot) => true };
-  const store = new JsonConfigStore(validator, path) as ConfigStore;
+  const store = new JsonConfigStore(validator) as ConfigStore;
   expect(store.config.language).toBe('en');
   expect(store.config.demoMode).toBe(true);
   expect(store.config.priceMergeSize).toBe(100);
@@ -16,11 +15,4 @@ test('JsonConfigStore', () => {
   expect(store.config.brokers[1].broker).toBe(Broker.Bitflyer);
   expect(store.config.brokers[1].enabled).toBe(true);
   expect(store.config.brokers[1].maxLongPosition).toBe(0.20);
-});
-
-test('JsonConfigStore default path', () => {
-  const validator = { validate: (config: ConfigRoot) => true };
-  try {
-    const store = new JsonConfigStore(validator) as ConfigStore;
-  } catch (ex) {}
 });

@@ -12,7 +12,6 @@ import Quote from '../Quote';
 import { PriceLevelsResponse, SendOrderRequest, OrdersResponse } from './types';
 import Execution from '../Execution';
 import { timestampToDate, findBrokerConfig } from '../util';
-// tslint:disable-next-line:import-name
 import Decimal from 'decimal.js';
 
 @injectable()

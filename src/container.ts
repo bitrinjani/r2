@@ -10,7 +10,6 @@ import PositionServiceImpl from './PositionServiceImpl';
 import BrokerAdapterRouterImpl from './BrokerAdapterRouterImpl';
 import SpreadAnalyzerImpl from './SpreadAnalyzerImpl';
 import ConfigValidatorImpl from './ConfigValidatorImpl';
-// tslint:disable:import-name
 import * as bitflyer from './Bitflyer';
 import * as coincheck from './Coincheck';
 import * as quoine from './Quoine';
