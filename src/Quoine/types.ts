@@ -92,14 +92,14 @@ export class TradingAccount extends TypeConverter {
   @cast current_leverage_level: number;
   @cast pnl: string;
   @cast equity: string;
-  @cast margin: string;
-  @cast free_margin: string;
+  @cast margin: number;
+  @cast free_margin: number;
   @cast trader_id: string;
   @cast status: string;
   @cast product_code: string;
   @cast currency_pair_code: string;
   @cast position: number;
-  @cast balance: string;
+  @cast balance: number;
   @cast created_at: number;
   @cast updated_at: number;
   @cast pusher_channel: string;

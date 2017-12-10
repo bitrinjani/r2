@@ -20,10 +20,10 @@
     "./node_modules/@types/node/index.d.ts"
   ],
   "include": [
-    "./**/*.ts"
+    "./src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "src/__tests__"    
+    "src/__tests__"
   ]
 }

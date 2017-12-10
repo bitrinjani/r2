@@ -15,6 +15,14 @@ describe('BrokerApi', () => {
     expect(reply.jpy).toBe(0.375);
   });
 
+  test('getLeverageBalance', async () => {
+    const api = new BrokerApi('', '');
+    const reply = await api.getLeverageBalance();
+    expect(reply.margin.jpy).toBeCloseTo(131767.22675655);
+    expect(reply.margin_available.jpy).toBeCloseTo(116995.98446494);
+    expect(reply.margin_level).toBeCloseTo(8.36743);
+  });
+
   test('getLeveragePositions', async () => {
     const api = new BrokerApi('', '');
     const pos = await api.getLeveragePositions({ status: 'open' });

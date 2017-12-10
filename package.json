@@ -8,7 +8,8 @@
     "start": "node ./dist/index.js ",
     "test": "jest --maxWorkers=1 --coverage && cat ./coverage/lcov.info | coveralls",
     "testfast": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "getBalance": "ts-node ./tools/getBalance.ts"
   },
   "dependencies": {
     "@types/decimal.js": "^0.0.31",
@@ -38,6 +39,7 @@
     "nock": "^9.0.24",
     "rimraf": "^2.6.2",
     "ts-jest": "^21.1.2",
+    "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
     "tslint-config-airbnb": "^5.3.0",
     "typescript": "2.6.2"
@@ -60,7 +62,8 @@
       "!src/index.ts",
       "!**/__tests__/**",
       "!**/node_modules/**",
-      "!**/vendor/**"
+      "!**/vendor/**",
+      "!tools/**"
     ]
   }
 }

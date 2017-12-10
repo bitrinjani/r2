@@ -90,6 +90,21 @@ export class AccountsBalanceResponse extends TypeConverter {
   @cast bch_debt: number;
 }
 
+export class Margin extends TypeConverter {
+  @cast jpy: number;
+}
+
+export class MarginAvailable extends TypeConverter {
+  @cast jpy: number;
+}
+
+export class LeverageBalanceResponse extends TypeConverter {
+  @cast success: boolean;
+  @cast margin: Margin;
+  @cast margin_available: MarginAvailable;
+  @cast margin_level: number;
+}
+
 export class Pagination extends TypeConverter {
   @cast limit: number;
   @cast order: 'desc' | 'asc';

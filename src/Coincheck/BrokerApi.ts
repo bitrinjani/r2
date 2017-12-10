@@ -5,7 +5,7 @@ import * as querystring from 'querystring';
 import {
   AccountsBalanceResponse, LeveragePositionsRequest, LeveragePositionsResponse,
   LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse, 
-  CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination, Transaction
+  CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination, Transaction, LeverageBalanceResponse
 } from './types';
 
 export default class BrokerApi {
@@ -23,6 +23,11 @@ export default class BrokerApi {
   async getAccountsBalance(): Promise<AccountsBalanceResponse> {
     const path = '/api/accounts/balance';
     return new AccountsBalanceResponse(await this.get<AccountsBalanceResponse>(path));
+  }
+
+  async getLeverageBalance(): Promise<LeverageBalanceResponse> {
+    const path = '/api/accounts/leverage_balance';
+    return new LeverageBalanceResponse(await this.get<LeverageBalanceResponse>(path));
   }
 
   async getOpenOrders(): Promise<OpenOrdersResponse> {
