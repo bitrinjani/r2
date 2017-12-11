@@ -9,7 +9,9 @@
     "test": "jest --maxWorkers=1 --coverage && cat ./coverage/lcov.info | coveralls",
     "testfast": "jest",
     "coverage": "jest --coverage",
-    "getBalance": "ts-node ./tools/getBalance.ts"
+    "getBalance": "ts-node ./tools/getBalance.ts",
+    "closeCcPosition": "ts-node ./tools/closeCcPosition.ts",
+    "closeBfPosition": "ts-node ./tools/closeBfPosition.ts"
   },
   "dependencies": {
     "@types/decimal.js": "^0.0.31",
