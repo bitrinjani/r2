@@ -113,3 +113,30 @@ export class PriceLevelsResponse extends TypeConverter {
   @cast @element(Array, Number) buy_price_levels: number[][];
   @cast @element(Array, Number) sell_price_levels: number[][];
 }
+
+export type CloseAllResponse = ClosingTrade[];
+export class ClosingTrade extends TypeConverter {
+  @cast id: number;
+  @cast currency_pair_code: string;
+  @cast status: string;
+  @cast side: string;
+  @cast margin_used: number;
+  @cast open_quantity: number;
+  @cast close_quantity: number;
+  @cast quantity: number;
+  @cast leverage_level: number;
+  @cast product_code: string;
+  @cast product_id: number;
+  @cast open_price: number;
+  @cast close_price: number;
+  @cast trader_id: number;
+  @cast open_pnl: number;
+  @cast close_pnl: number;
+  @cast pnl: number;
+  @cast stop_loss: number;
+  @cast take_profit: number;
+  @cast funding_currency: string;
+  @cast created_at: number;
+  @cast updated_at: number;
+  @cast total_interest: number;
+}

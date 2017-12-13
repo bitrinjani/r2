@@ -11,7 +11,9 @@
     "coverage": "jest --coverage",
     "getBalance": "ts-node ./tools/getBalance.ts",
     "closeCcPosition": "ts-node ./tools/closeCcPosition.ts",
-    "closeBfPosition": "ts-node ./tools/closeBfPosition.ts"
+    "closeBfPosition": "ts-node ./tools/closeBfPosition.ts",
+    "closeQuPosition": "ts-node ./tools/closeQuPosition.ts",
+    "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run getBalance"
   },
   "dependencies": {
     "@types/decimal.js": "^0.0.31",

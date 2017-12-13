@@ -2,7 +2,9 @@ import { nonce } from '../util';
 import WebClient from '../WebClient';
 import {
   SendOrderResponse, SendOrderRequest, CancelOrderResponse,
-  OrdersResponse, TradingAccountsResponse, PriceLevelsResponse, TradingAccount
+  OrdersResponse, TradingAccountsResponse, PriceLevelsResponse, TradingAccount,
+  CloseAllResponse,
+  ClosingTrade
 } from './types';
 import * as querystring from 'querystring';
 import * as jwt from 'jsonwebtoken';
@@ -40,6 +42,12 @@ export default class BrokerApi {
   async getPriceLevels(): Promise<PriceLevelsResponse> {
     const path = '/products/5/price_levels';
     return new PriceLevelsResponse(await this.webClient.fetch<PriceLevelsResponse>(path, undefined, false));
+  }
+
+  async closeAll(): Promise<CloseAllResponse> {
+    const path = '/trades/close_all';
+    const response = await this.put<CloseAllResponse>(path);
+    return response.map(x => new ClosingTrade(x));
   }
 
   private async call<R>(path: string, method: string, body: string = ''): Promise<R> {
