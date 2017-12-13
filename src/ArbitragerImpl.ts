@@ -11,12 +11,10 @@ import t from './intl';
 import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
 import Quote from './Quote';
 import symbols from './symbols';
-import { LOT_MIN_DECIMAL_PLACE } from './constants';
 
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {
   private log = getLogger(this.constructor.name);
-  private activeOrders: Order[] = [];
 
   constructor(
     @inject(symbols.QuoteAggregator) private readonly quoteAggregator: QuoteAggregator,
@@ -60,7 +58,7 @@ export default class ArbitragerImpl implements Arbitrager {
       this.log.debug(ex.stack);
       return;
     }
-    this.printSnapshot(spreadAnalysisResult);
+    this.printSpreadAnalysisResult(spreadAnalysisResult);
     const limitChecker = this.limitCheckerFactory.create(spreadAnalysisResult);
     const limitCheckResult = limitChecker.check();
     if (!limitCheckResult.success) {
@@ -72,68 +70,57 @@ export default class ArbitragerImpl implements Arbitrager {
     this.log.info(t('FoundArbitrageOppotunity'));
     try {
       const { bestBid, bestAsk, targetVolume } = spreadAnalysisResult;
-      await Promise.all([
-        this.sendOrder(bestAsk, targetVolume, OrderType.Limit),
-        this.sendOrder(bestBid, targetVolume, OrderType.Limit)
-      ]);
+      const sendTasks = [bestAsk, bestBid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
+      const orders = await Promise.all(sendTasks);
       this.status = 'Sent';
-      await this.checkOrderState();
+      await this.checkOrderState(orders);
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
       this.status = 'Order send/refresh failed';
     }
     this.log.info(t('SleepingAfterSend'), config.sleepAfterSend);
-    this.activeOrders = [];
     await delay(config.sleepAfterSend);
   }
 
-  private printSnapshot(result: SpreadAnalysisResult) {
+  private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
     const columnWidth = 17;
     this.log.info('%s: %s', padEnd(t('BestAsk'), columnWidth), result.bestAsk);
     this.log.info('%s: %s', padEnd(t('BestBid'), columnWidth), result.bestBid);
     this.log.info('%s: %s', padEnd(t('Spread'), columnWidth), -result.invertedSpread);
     this.log.info('%s: %s', padEnd(t('AvailableVolume'), columnWidth), result.availableVolume);
     this.log.info('%s: %s', padEnd(t('TargetVolume'), columnWidth), result.targetVolume);
-    const midNotional = _.mean([result.bestAsk.price, result.bestBid.price]) * result.targetVolume;
-    const profitPercentAgainstNotional = _.round((result.targetProfit / midNotional) * 100, LOT_MIN_DECIMAL_PLACE);
-    this.log.info('%s: %s (%s%%)', padEnd(t('ExpectedProfit'), columnWidth),
-      result.targetProfit, profitPercentAgainstNotional);
+    this.log.info(
+      '%s: %s (%s%%)',
+      padEnd(t('ExpectedProfit'), columnWidth),
+      result.targetProfit,
+      result.profitPercentAgainstNotional
+    );
   }
 
-  private async checkOrderState(): Promise<void> {
-    const buyOrder = _.find(this.activeOrders, x => x.side === OrderSide.Buy) as Order;
-    const sellOrder = _.find(this.activeOrders, x => x.side === OrderSide.Sell) as Order;
+  private async checkOrderState(orders: Order[]): Promise<void> {
     const { config } = this.configStore;
     for (const i of _.range(1, config.maxRetryCount + 1)) {
       await delay(config.orderStatusCheckInterval);
       this.log.info(t('OrderCheckAttempt'), i);
       this.log.info(t('CheckingIfBothLegsAreDoneOrNot'));
       try {
-        await Promise.all([
-          this.brokerAdapterRouter.refresh(buyOrder), 
-          this.brokerAdapterRouter.refresh(sellOrder)
-        ]);
+        const refreshTasks = orders.map(o => this.brokerAdapterRouter.refresh(o));
+        await Promise.all(refreshTasks);
       } catch (ex) {
         this.log.warn(ex.message);
         this.log.debug(ex.stack);
       }
 
-      if (!buyOrder.filled) {
-        this.log.warn(t('BuyLegIsNotFilledYetPendingSizeIs'), buyOrder.pendingSize);
-      }
-      if (!sellOrder.filled) {
-        this.log.warn(t('SellLegIsNotFilledYetPendingSizeIs'), sellOrder.pendingSize);
-      }
+      this.printOrderSummary(orders);
 
-      if (buyOrder.filled && sellOrder.filled) {
+      if (orders.every(o => o.filled)) {
         this.status = 'Filled';
-        const commission = _([buyOrder, sellOrder]).sumBy(o => this.calculateFilledOrderCommission(o));
-        const profit = _.round(sellOrder.filledSize * sellOrder.averageFilledPrice -
-          buyOrder.filledSize * buyOrder.averageFilledPrice - commission);
+        const commission = _(orders).sumBy(o => this.calculateFilledOrderCommission(o));
+        const profit = _.round(
+          _(orders).sumBy(o => (o.side === OrderSide.Sell ? 1 : -1) * o.filledNotional) - commission
+        );
         this.log.info(t('BothLegsAreSuccessfullyFilled'));
-        this.log.info(t('BuyFillPriceIs'), _.round(buyOrder.averageFilledPrice));
-        this.log.info(t('SellFillPriceIs'), _.round(sellOrder.averageFilledPrice));
         this.log.info(t('ProfitIs'), profit);
         if (commission !== 0) {
           this.log.info(t('CommissionIs'), _.round(commission));
@@ -144,17 +131,21 @@ export default class ArbitragerImpl implements Arbitrager {
       if (i === config.maxRetryCount) {
         this.status = 'MaxRetryCount breached';
         this.log.warn(t('MaxRetryCountReachedCancellingThePendingOrders'));
-        const promises: Promise<void>[] = [];
-        if (!buyOrder.filled) {
-          promises.push(this.brokerAdapterRouter.cancel(buyOrder));
-        }
-        if (!sellOrder.filled) {
-          promises.push(this.brokerAdapterRouter.cancel(sellOrder));
-        }
-        await Promise.all(promises);
+        const cancelTasks = orders.filter(o => !o.filled).map(o => this.brokerAdapterRouter.cancel(o));
+        await Promise.all(cancelTasks);
         break;
       }
     }
+  }
+
+  private printOrderSummary(orders: Order[]) {
+    orders.forEach((o) => {
+      if (o.filled) {
+        this.log.info(o.toSummary());
+      } else {
+        this.log.warn(o.toSummary());
+      }
+    });
   }
 
   private calculateFilledOrderCommission(order: Order): number {
@@ -169,14 +160,14 @@ export default class ArbitragerImpl implements Arbitrager {
     this.log.info(hr(50));
   }
 
-  private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<void> {
+  private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<Order> {
     this.log.info(t('SendingOrderTargettingQuote'), quote);
     const brokerConfig = findBrokerConfig(this.configStore.config, quote.broker);
+    const { cashMarginType, leverageLevel } = brokerConfig;    
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
-    const { cashMarginType, leverageLevel } = brokerConfig;
     const order = new Order(quote.broker, orderSide, targetVolume,
       quote.price, cashMarginType, orderType, leverageLevel);
     await this.brokerAdapterRouter.send(order);
-    this.activeOrders.push(order);
+    return order;
   }
 }

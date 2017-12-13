@@ -9,16 +9,10 @@ import {
 import * as querystring from 'querystring';
 
 export default class BrokerApi {
-  key: string;
-  secret: string;
-  webClient: WebClient;
   private baseUrl = 'https://api.bitflyer.jp';
+  private webClient: WebClient = new WebClient(this.baseUrl);
 
-  constructor(key: string, secret: string) {
-    this.webClient = new WebClient(this.baseUrl);
-    this.key = key;
-    this.secret = secret;
-  }
+  constructor(private readonly key: string, private readonly secret: string) { }
 
   async sendChildOrder(request: SendChildOrderRequest): Promise<SendChildOrderResponse> {
     const path = '/v1/me/sendchildorder';

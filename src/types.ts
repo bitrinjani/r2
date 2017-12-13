@@ -37,6 +37,7 @@ export interface SpreadAnalysisResult {
   availableVolume: number;
   targetVolume: number;
   targetProfit: number;
+  profitPercentAgainstNotional: number;
 }
 
 export interface LimitChecker {

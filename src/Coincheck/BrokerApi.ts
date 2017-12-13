@@ -4,21 +4,15 @@ import WebClient from '../WebClient';
 import * as querystring from 'querystring';
 import {
   AccountsBalanceResponse, LeveragePositionsRequest, LeveragePositionsResponse,
-  LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse, 
+  LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse,
   CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination, Transaction, LeverageBalanceResponse
 } from './types';
 
 export default class BrokerApi {
-  key: string;
-  secret: string;
-  webClient: WebClient;
   private baseUrl = 'https://coincheck.com';
+  private webClient: WebClient = new WebClient(this.baseUrl);
 
-  constructor(key: string, secret: string) {
-    this.webClient = new WebClient(this.baseUrl);
-    this.key = key;
-    this.secret = secret;
-  }
+  constructor(private readonly key: string, private readonly secret: string) { }
 
   async getAccountsBalance(): Promise<AccountsBalanceResponse> {
     const path = '/api/accounts/balance';
@@ -44,7 +38,7 @@ export default class BrokerApi {
 
   async getAllOpenLeveragePositions(limit: number = 20): Promise<LeveragePosition[]> {
     let result: LeveragePosition[] = [];
-    const request: LeveragePositionsRequest = { limit, status: 'open',  order: 'desc' };
+    const request: LeveragePositionsRequest = { limit, status: 'open', order: 'desc' };
     let reply = await this.getLeveragePositions(request);
     while (reply.data !== undefined && reply.data.length > 0) {
       result = _.concat(result, reply.data);

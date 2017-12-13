@@ -8,16 +8,10 @@ import * as querystring from 'querystring';
 import * as jwt from 'jsonwebtoken';
 
 export default class BrokerApi {
-  key: string;
-  secret: string;
-  webClient: WebClient;
   private baseUrl = 'https://api.quoine.com';
+  private webClient: WebClient = new WebClient(this.baseUrl);
 
-  constructor(key: string, secret: string) {
-    this.webClient = new WebClient(this.baseUrl);
-    this.key = key;
-    this.secret = secret;
-  }
+  constructor(private readonly key: string, private readonly secret: string) { }
 
   async sendOrder(request: SendOrderRequest): Promise<SendOrderResponse> {
     const path = '/orders/';
@@ -37,18 +31,18 @@ export default class BrokerApi {
     );
   }
 
-  async  getTradingAccounts(): Promise<TradingAccountsResponse> {
+  async getTradingAccounts(): Promise<TradingAccountsResponse> {
     const path = '/trading_accounts';
     const response = await this.get<TradingAccountsResponse>(path);
     return response.map(x => new TradingAccount(x));
   }
 
-  async  getPriceLevels(): Promise<PriceLevelsResponse> {
+  async getPriceLevels(): Promise<PriceLevelsResponse> {
     const path = '/products/5/price_levels';
     return new PriceLevelsResponse(await this.webClient.fetch<PriceLevelsResponse>(path, undefined, false));
   }
 
-  private async  call<R>(path: string, method: string, body: string = ''): Promise<R> {
+  private async call<R>(path: string, method: string, body: string = ''): Promise<R> {
     const n = nonce();
     const payload = {
       path,

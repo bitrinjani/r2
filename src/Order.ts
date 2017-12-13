@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import { format } from 'util';
 import { v4 as uuid } from 'uuid';
 import {
   OrderSide, CashMarginType, OrderType,
@@ -6,6 +7,7 @@ import {
 } from './types';
 import Execution from './Execution';
 import { eRound } from './util';
+import t from './intl';
 
 export default class Order {
   constructor(
@@ -38,6 +40,17 @@ export default class Order {
 
   get filled(): boolean {
     return this.status === OrderStatus.Filled;
+  }
+
+  get filledNotional(): number {
+    return this.averageFilledPrice * this.filledSize;
+  }
+
+  toSummary(): string {
+    return this.filled ?
+      format(t('FilledSummary'), this.broker, this.side, 
+        this.filledSize, _.round(this.averageFilledPrice).toLocaleString()) :
+      format(t('UnfilledSummary'), this.broker, this.side, this.size, this.price.toLocaleString(), this.pendingSize);
   }
 
   toString(): string {

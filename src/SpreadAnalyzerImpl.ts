@@ -47,13 +47,16 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
     const commission = this.calculateTotalCommission([bestBid, bestAsk], targetVolume);
     const targetProfit = _.round(invertedSpread * targetVolume - commission);
+    const midNotional = _.mean([bestAsk.price, bestBid.price]) * targetVolume;
+    const profitPercentAgainstNotional = _.round((targetProfit / midNotional) * 100, LOT_MIN_DECIMAL_PLACE);
     const spreadAnalysisResult = {
       bestBid,
       bestAsk,
       invertedSpread,
       availableVolume,
       targetVolume,
-      targetProfit
+      targetProfit,
+      profitPercentAgainstNotional
     };
     this.log.debug(`Analysis done. Result: ${JSON.stringify(spreadAnalysisResult)}`);
     return spreadAnalysisResult;
