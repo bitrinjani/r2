@@ -48,9 +48,9 @@ export default class Order {
 
   toSummary(): string {
     return this.filled ?
-      format(t('FilledSummary'), this.broker, this.side, 
+      format(t`FilledSummary`, this.broker, this.side, 
         this.filledSize, _.round(this.averageFilledPrice).toLocaleString()) :
-      format(t('UnfilledSummary'), this.broker, this.side, this.size, this.price.toLocaleString(), this.pendingSize);
+      format(t`UnfilledSummary`, this.broker, this.side, this.size, this.price.toLocaleString(), this.pendingSize);
   }
 
   toString(): string {

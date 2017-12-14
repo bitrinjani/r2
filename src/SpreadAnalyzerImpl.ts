@@ -21,7 +21,7 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   ) { }
 
   async analyze(quotes: Quote[], positionMap: BrokerMap<BrokerPosition>): Promise<SpreadAnalysisResult> {
-    this.log.info(t('AnalyzingQuotes'));
+    this.log.info(t`AnalyzingQuotes`);
     const config = this.configStore.config;
     if (_.values(positionMap).length === 0) {
       throw new Error('Position map is empty.');
@@ -34,9 +34,9 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     const bestAsk = _(filteredQuotes).filter(q => q.side === QuoteSide.Ask).first();
     const bestBid = _(filteredQuotes).filter(q => q.side === QuoteSide.Bid).last();
     if (bestBid === undefined) {
-      throw new Error(t('NoBestBidWasFound'));
+      throw new Error(t`NoBestBidWasFound`);
     } else if (bestAsk === undefined) {
-      throw new Error(t('NoBestAskWasFound'));
+      throw new Error(t`NoBestAskWasFound`);
     }
 
     const invertedSpread = bestBid.price - bestAsk.price;

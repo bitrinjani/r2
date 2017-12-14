@@ -53,7 +53,7 @@ class MaxNetExposureLimit implements Limit {
       return { success };
     }
     const reason = 'Max exposure breached';
-    this.log.info(t('NetExposureIsLargerThanMaxNetExposure'));
+    this.log.info(t`NetExposureIsLargerThanMaxNetExposure`);
     return { success, reason };
   }
 }
@@ -69,7 +69,7 @@ class InvertedSpreadLimit implements Limit {
       return { success };
     }
     const reason = 'Spread not inverted';
-    this.log.info(t('NoArbitrageOpportunitySpreadIsNotInverted'));
+    this.log.info(t`NoArbitrageOpportunitySpreadIsNotInverted`);
     return { success, reason };
   }
 }
@@ -87,7 +87,7 @@ class TargetProfitLimit implements Limit {
       return { success };
     }
     const reason = 'Too small profit';
-    this.log.info(t('TargetProfitIsSmallerThanMinProfit'));
+    this.log.info(t`TargetProfitIsSmallerThanMinProfit`);
     return { success, reason };
   }
 
@@ -115,7 +115,7 @@ class DemoModeLimit implements Limit {
       return { success };
     }
     const reason = 'Demo mode';
-    this.log.info(t('ThisIsDemoModeNotSendingOrders'));
+    this.log.info(t`ThisIsDemoModeNotSendingOrders`);
     return { success, reason };
   }
 }

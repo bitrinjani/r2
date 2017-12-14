@@ -15,4 +15,10 @@ i18next.init({
   }
 });
 
-export default s => i18next.t(s);
+export default function translateTaggedTemplate(strings: TemplateStringsArray, ...keys: string[]) {
+  const translated = i18next.t(strings.raw[0]);
+  if (translated === undefined) {
+    return strings.raw[0];
+  }
+  return translated;
+}
