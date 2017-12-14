@@ -14,7 +14,7 @@ import { LOT_MIN_DECIMAL_PLACE } from './constants';
 
 @injectable()
 export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
-  private log = getLogger(this.constructor.name);
+  private readonly log = getLogger(this.constructor.name);
 
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
@@ -22,8 +22,8 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
 
   async analyze(quotes: Quote[], positionMap: BrokerMap<BrokerPosition>): Promise<SpreadAnalysisResult> {
     this.log.info(t`AnalyzingQuotes`);
-    const config = this.configStore.config;
-    if (_.values(positionMap).length === 0) {
+    const { config } = this.configStore;
+    if (_.isEmpty(positionMap)) {
       throw new Error('Position map is empty.');
     }
     const filteredQuotes = _(quotes)

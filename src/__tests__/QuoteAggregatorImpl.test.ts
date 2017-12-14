@@ -185,7 +185,7 @@ describe('Quote Aggregator', () => {
     const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
     await aggregator.start();
     await aggregator.stop();
-    expect(aggregator._quotes.length).toBe(0);
+    expect(aggregator.quotes.length).toBe(0);
   });
 });
 

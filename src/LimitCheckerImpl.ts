@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import t from './intl';
 
 export default class LimitCheckerImpl implements LimitChecker {
-  private log = getLogger(this.constructor.name);
+  private readonly log = getLogger(this.constructor.name);
   private limits: Limit[];
 
   constructor(
@@ -40,7 +40,7 @@ interface Limit {
 }
 
 class MaxNetExposureLimit implements Limit {
-  private log = getLogger('MaxNetExposureLimit');
+  private readonly log = getLogger('MaxNetExposureLimit');
 
   constructor(
     private readonly configStore: ConfigStore,
@@ -59,7 +59,7 @@ class MaxNetExposureLimit implements Limit {
 }
 
 class InvertedSpreadLimit implements Limit {
-  private log = getLogger('InvertedSpreadLimit');
+  private readonly log = getLogger('InvertedSpreadLimit');
 
   constructor(private readonly spreadAnalysisResult: SpreadAnalysisResult) { }
 
@@ -75,7 +75,7 @@ class InvertedSpreadLimit implements Limit {
 }
 
 class TargetProfitLimit implements Limit {
-  private log = getLogger('TargetProfitLimit');
+  private readonly log = getLogger('TargetProfitLimit');
 
   constructor(
     private readonly configStore: ConfigStore,
@@ -105,7 +105,7 @@ class TargetProfitLimit implements Limit {
 }
 
 class DemoModeLimit implements Limit {
-  private log = getLogger('DemoModeLimit');
+  private readonly log = getLogger('DemoModeLimit');
 
   constructor(private readonly configStore: ConfigStore) { }
 

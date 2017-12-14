@@ -9,8 +9,8 @@ import {
 import * as querystring from 'querystring';
 
 export default class BrokerApi {
-  private baseUrl = 'https://api.bitflyer.jp';
-  private webClient: WebClient = new WebClient(this.baseUrl);
+  private readonly baseUrl = 'https://api.bitflyer.jp';
+  private readonly webClient: WebClient = new WebClient(this.baseUrl);
 
   constructor(private readonly key: string, private readonly secret: string) { }
 

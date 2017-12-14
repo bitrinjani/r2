@@ -8,7 +8,7 @@ import symbols from './symbols';
 
 @injectable()
 export default class BrokerAdapterRouterImpl implements BrokerAdapterRouter {
-  private log = getLogger(this.constructor.name);
+  private readonly log = getLogger(this.constructor.name);
   private brokerAdapterMap: BrokerMap<BrokerAdapter>;
 
   constructor(@multiInject(symbols.BrokerAdapter) brokerAdapters: BrokerAdapter[]) {

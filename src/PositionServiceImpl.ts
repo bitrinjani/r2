@@ -12,7 +12,7 @@ import symbols from './symbols';
 
 @injectable()
 export default class PositionServiceImpl implements PositionService {
-  private log = getLogger(this.constructor.name);
+  private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRefreshing: boolean;
   private _positionMap: BrokerMap<BrokerPosition>;
@@ -65,23 +65,9 @@ export default class PositionServiceImpl implements PositionService {
       this.isRefreshing = true;
       const config = this.configStore.config;
       const brokerConfigs = config.brokers.filter(b => b.enabled);
-      const promises = brokerConfigs
-        .map(async (brokerConfig: BrokerConfig): Promise<BrokerPosition> => {
-          const currentBtc = await this.brokerAdapterRouter.getBtcPosition(brokerConfig.broker);
-          const allowedLongSize = 
-            _.max([0, new Decimal(brokerConfig.maxLongPosition).minus(currentBtc).toNumber()]) as number;
-          const allowedShortSize = 
-            _.max([0, new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()]) as number;
-          const pos = new BrokerPosition();
-          pos.broker = brokerConfig.broker;
-          pos.btc = currentBtc;
-          pos.allowedLongSize = allowedLongSize;
-          pos.allowedShortSize = allowedShortSize;   
-          pos.longAllowed = new Decimal(allowedLongSize).gte(config.minSize);
-          pos.shortAllowed = new Decimal(allowedShortSize).gte(config.minSize);
-          return pos;
-        });
-      this._positionMap = _(await Promise.all(promises)).map(p => [p.broker, p]).fromPairs().value();
+      const promises = brokerConfigs.map(brokerConfig => this.getBrokerPosition(brokerConfig, config.minSize));
+      const brokerPositions = await Promise.all(promises);
+      this._positionMap = _(brokerPositions).map(p => [p.broker, p]).fromPairs().value();
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
@@ -89,5 +75,21 @@ export default class PositionServiceImpl implements PositionService {
       this.isRefreshing = false;
       this.log.debug('Finished refresh.');
     }
+  }
+
+  private async getBrokerPosition(brokerConfig: BrokerConfig, minSize: number): Promise<BrokerPosition> {
+    const currentBtc = await this.brokerAdapterRouter.getBtcPosition(brokerConfig.broker);
+    const allowedLongSize = 
+      _.max([0, new Decimal(brokerConfig.maxLongPosition).minus(currentBtc).toNumber()]) as number;
+    const allowedShortSize = 
+      _.max([0, new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()]) as number;
+    const pos = new BrokerPosition();
+    pos.broker = brokerConfig.broker;
+    pos.btc = currentBtc;
+    pos.allowedLongSize = allowedLongSize;
+    pos.allowedShortSize = allowedShortSize;   
+    pos.longAllowed = new Decimal(allowedLongSize).gte(minSize);
+    pos.shortAllowed = new Decimal(allowedShortSize).gte(minSize);
+    return pos;
   }
 }

@@ -3,7 +3,7 @@ import { getLogger } from './logger';
 
 export default class WebClient {
   static fetchTimeout = 5000;
-  private log = getLogger('WebClient');
+  private readonly log = getLogger('WebClient');
 
   constructor(public readonly baseUrl: string) { }
 

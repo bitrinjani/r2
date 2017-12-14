@@ -9,8 +9,8 @@ import {
 } from './types';
 
 export default class BrokerApi {
-  private baseUrl = 'https://coincheck.com';
-  private webClient: WebClient = new WebClient(this.baseUrl);
+  private readonly baseUrl = 'https://coincheck.com';
+  private readonly webClient: WebClient = new WebClient(this.baseUrl);
 
   constructor(private readonly key: string, private readonly secret: string) { }
 

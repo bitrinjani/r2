@@ -16,10 +16,10 @@ import Decimal from 'decimal.js';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
-  private brokerApi: BrokerApi;
-  private log = getLogger('Quoine.BrokerAdapter');
-  private config: BrokerConfig;
-  broker = Broker.Quoine;
+  private readonly brokerApi: BrokerApi;
+  private readonly log = getLogger('Quoine.BrokerAdapter');
+  private readonly config: BrokerConfig;
+  readonly broker = Broker.Quoine;
 
   constructor( @inject(symbols.ConfigStore) configStore: ConfigStore) {
     this.config = findBrokerConfig(configStore.config, this.broker);

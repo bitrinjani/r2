@@ -10,10 +10,10 @@ import symbols from './symbols';
 
 @injectable()
 export default class QuoteAggregatorImpl implements QuoteAggregator {
-  private log = getLogger(this.constructor.name);
+  private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRunning: boolean;
-  private _quotes: Quote[] = [];
+  private quotes: Quote[] = [];
 
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
@@ -22,8 +22,9 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
 
   async start(): Promise<void> {
     this.log.debug('Starting Quote Aggregator...');
-    this.timer = setInterval(this.aggregate.bind(this), this.configStore.config.iterationInterval);
-    this.log.debug(`Iteration interval is set to ${this.configStore.config.iterationInterval}`);
+    const { iterationInterval } =  this.configStore.config;
+    this.timer = setInterval(this.aggregate.bind(this), iterationInterval);
+    this.log.debug(`Iteration interval is set to ${iterationInterval}`);
     await this.aggregate();
     this.log.debug('Started Quote Aggregator.');
   }
@@ -47,8 +48,8 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
       this.isRunning = true;
       this.log.debug('Aggregating quotes...');
       const enabledBrokers = this.getEnabledBrokers();
-      const quotesMap =
-        await Promise.all(enabledBrokers.map(x => this.brokerAdapterRouter.fetchQuotes(x)));
+      const fetchTasks = enabledBrokers.map(x => this.brokerAdapterRouter.fetchQuotes(x));
+      const quotesMap = await Promise.all(fetchTasks);
       const allQuotes = _.flatten(quotesMap);
       await this.setQuotes(this.fold(allQuotes, this.configStore.config.priceMergeSize));
       this.log.debug('Aggregated.');
@@ -61,11 +62,11 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
   }
 
   private async setQuotes(value: Quote[]): Promise<void> {
-    this._quotes = value;
+    this.quotes = value;
     this.log.debug('New quotes have been set.');
     if (this.onQuoteUpdated) {
       this.log.debug('Calling onQuoteUpdated...');
-      await this.onQuoteUpdated(this._quotes);
+      await this.onQuoteUpdated(this.quotes);
       this.log.debug('onQuoteUpdated done.');
     }
   }

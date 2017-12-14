@@ -10,7 +10,7 @@ import Order from '../Order';
 import Quote from '../Quote';
 import BrokerApi from './BrokerApi';
 import {
-  SendChildOrderResponse, ChildOrdersParam, SendChildOrderRequest,
+  ChildOrdersParam, SendChildOrderRequest,
   ChildOrder, BoardResponse
 } from './types';
 import Execution from '../Execution';
@@ -18,10 +18,10 @@ import { eRound, findBrokerConfig } from '../util';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
-  private brokerApi: BrokerApi;
-  private log = getLogger('Bitflyer.BrokerAdapter');
-  private config: BrokerConfig;
-  broker = Broker.Bitflyer;
+  private readonly brokerApi: BrokerApi;
+  private readonly log = getLogger('Bitflyer.BrokerAdapter');
+  private readonly config: BrokerConfig;
+  readonly broker = Broker.Bitflyer;
 
   constructor( @inject(symbols.ConfigStore) configStore: ConfigStore) {
     this.config = findBrokerConfig(configStore.config, this.broker);
@@ -33,7 +33,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       throw new Error();
     }
     const param = this.mapOrderToSendChildOrderRequest(order);
-    const reply: SendChildOrderResponse = await this.brokerApi.sendChildOrder(param);
+    const reply = await this.brokerApi.sendChildOrder(param);
     order.brokerOrderId = reply.child_order_acceptance_id;
     order.status = OrderStatus.New;
     order.sentTime = new Date();

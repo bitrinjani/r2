@@ -10,8 +10,8 @@ import * as querystring from 'querystring';
 import * as jwt from 'jsonwebtoken';
 
 export default class BrokerApi {
-  private baseUrl = 'https://api.quoine.com';
-  private webClient: WebClient = new WebClient(this.baseUrl);
+  private readonly baseUrl = 'https://api.quoine.com';
+  private readonly webClient: WebClient = new WebClient(this.baseUrl);
 
   constructor(private readonly key: string, private readonly secret: string) { }
 

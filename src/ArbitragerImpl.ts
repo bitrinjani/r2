@@ -14,7 +14,7 @@ import symbols from './symbols';
 
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {
-  private log = getLogger(this.constructor.name);
+  private readonly log = getLogger(this.constructor.name);
 
   constructor(
     @inject(symbols.QuoteAggregator) private readonly quoteAggregator: QuoteAggregator,

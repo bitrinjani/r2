@@ -17,10 +17,10 @@ import { eRound, almostEqual, findBrokerConfig } from '../util';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
-  private brokerApi: BrokerApi;
-  private log = getLogger('Coincheck.BrokerAdapter');
-  private config: BrokerConfig;
-  broker = Broker.Coincheck;
+  private readonly brokerApi: BrokerApi;
+  private readonly log = getLogger('Coincheck.BrokerAdapter');
+  private readonly config: BrokerConfig;
+  readonly broker = Broker.Coincheck;
 
   constructor(
     @inject(symbols.ConfigStore) configStore: ConfigStore
@@ -102,15 +102,14 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
         order_type: order.side === OrderSide.Buy ? 'leverage_buy' : 'leverage_sell',
         amount: order.size
       };
-    } else {
-      const targetPosition = _.last(candidates) as LeveragePosition;
-      return {
-        ...request,
-        order_type: order.side === OrderSide.Buy ? 'close_short' : 'close_long',
-        amount: targetPosition.amount,
-        position_id: Number(targetPosition.id)
-      };
     }
+    const targetPosition = _.last(candidates) as LeveragePosition;
+    return {
+      ...request,
+      order_type: order.side === OrderSide.Buy ? 'close_short' : 'close_long',
+      amount: targetPosition.amount,
+      position_id: Number(targetPosition.id)
+    };
   }
 
   async cancel(order: Order): Promise<void> {

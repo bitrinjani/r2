@@ -7,7 +7,7 @@ import { Arbitrager, QuoteAggregator, PositionService } from './types';
 import { Container } from 'inversify';
 
 export default class AppRoot {
-  private log = getLogger(this.constructor.name);
+  private readonly log = getLogger(this.constructor.name);
   private quoteAggregator: QuoteAggregator;
   private positionService: PositionService;
   private arbitrager: Arbitrager;
