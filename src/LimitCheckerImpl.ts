@@ -17,7 +17,8 @@ export default class LimitCheckerImpl implements LimitChecker {
     this.limits = [
       new MaxNetExposureLimit(configStore, positionService),
       new InvertedSpreadLimit(spreadAnalysisResult),
-      new TargetProfitLimit(configStore, spreadAnalysisResult),
+      new MinTargetProfitLimit(configStore, spreadAnalysisResult),
+      new MaxTargetProfitLimit(configStore, spreadAnalysisResult),
       new DemoModeLimit(configStore)
     ];
   }
@@ -74,7 +75,7 @@ class InvertedSpreadLimit implements Limit {
   }
 }
 
-class TargetProfitLimit implements Limit {
+class MinTargetProfitLimit implements Limit {
   private readonly log = getLogger('TargetProfitLimit');
 
   constructor(
@@ -101,6 +102,36 @@ class TargetProfitLimit implements Limit {
         0
     ]) as number;
     return targetProfit >= minTargetProfit;
+  }
+}
+
+class MaxTargetProfitLimit implements Limit {
+  private readonly log = getLogger('MaxTargetProfitLimit');
+
+  constructor(
+    private readonly configStore: ConfigStore,
+    private readonly spreadAnalysisResult: SpreadAnalysisResult) { }
+
+  check() {
+    const success = this.isProfitSmallerThanLimit();
+    if (success) {
+      return { success };
+    }
+    const reason = 'Too large profit';
+    this.log.info(t`TargetProfitIsLargerThanMaxProfit`);
+    return { success, reason };
+  }
+
+  private isProfitSmallerThanLimit(): boolean {
+    const { config } = this.configStore;
+    const { bestBid, bestAsk, targetVolume, targetProfit } = this.spreadAnalysisResult;
+    const maxTargetProfit = _.min([
+      config.maxTargetProfit,
+      config.maxTargetProfitPercent !== undefined ?
+        _.round((config.maxTargetProfitPercent / 100) * _.mean([bestAsk.price, bestBid.price]) * targetVolume) :
+        Number.MAX_SAFE_INTEGER
+    ]) as number;
+    return targetProfit <= maxTargetProfit;
   }
 }
 

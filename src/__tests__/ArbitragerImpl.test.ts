@@ -210,7 +210,50 @@ describe('Arbitrager', () => {
     expect(arbitrager.status).toBe('Too small profit');
   });
 
+  test('Too large profit by maxTargetProfit', async () => {
+    config.maxTargetProfit = 99;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Too large profit');
+  });
+
+  test('Too large profit by maxTargetProfitPercent', async () => {
+    config.maxTargetProfitPercent = 15;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
+      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(baRouter.send).not.toBeCalled();
+    expect(arbitrager.status).toBe('Too large profit');
+  });
+
   test('Demo mode', async () => {
+    config.maxTargetProfitPercent = 20;
     config.demoMode = true;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
