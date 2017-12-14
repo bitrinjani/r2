@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import * as path from 'path';
 import { ConfigRoot, Broker, BrokerConfig } from './types';
 
 interface ToStringable {
@@ -77,8 +78,11 @@ export function readJsonFileSync(filepath: string): any {
 }
 
 export function getConfigRoot(): ConfigRoot {
-  const configPath = process.env.NODE_ENV !== 'test' ?
+  let configPath = process.env.NODE_ENV !== 'test' ?
     `${__dirname}/config.json` : `${__dirname}/__tests__/config_test.json`;
+  if (!fs.existsSync(configPath)) {
+    configPath = path.join(process.cwd(), path.basename(configPath));
+  }
   return new ConfigRoot(readJsonFileSync(configPath));
 }
 
