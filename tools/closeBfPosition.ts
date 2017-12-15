@@ -3,6 +3,7 @@ import * as util from '../src/util';
 import BitflyerApi from '../src/Bitflyer/BrokerApi';
 import { Broker } from '../src/types';
 import { Balance } from '../src/Bitflyer/types';
+import * as _ from 'lodash';
 
 async function main() {
   const config = util.getConfigRoot();
@@ -15,7 +16,7 @@ async function main() {
     product_code: 'BTC_JPY',
     child_order_type: 'MARKET',
     side: 'SELL',
-    size: bfBtc
+    size: _.floor(bfBtc, 4)
   };
   try {
     console.log(`Selling ${bfBtc}...`);
