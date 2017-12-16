@@ -26,7 +26,6 @@ describe('Quoine BrokerAdapter', () => {
     await target.send(order);
     expect(order.status).toBe(OrderStatus.New);
     expect(order.brokerOrderId).toBe('118573146');
-    console.log(JSON.stringify(order));
   });
 
   test('send wrong broker order', async () => {
