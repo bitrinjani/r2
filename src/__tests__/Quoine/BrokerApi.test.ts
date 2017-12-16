@@ -38,6 +38,12 @@ describe('Quoine BrokerApi', () => {
     expect(res.sell_price_levels.length).toBe(21);
   });
 
+  test('closeAll', async () => {
+    const target = new BrokerApi(key, secret);
+    const res = await target.closeAll();
+    expect(res[0].id).toBe(12345);
+  });
+
   afterAll(() => {
     nock.restore();
   });
