@@ -16,7 +16,7 @@ export interface SendChildOrderRequest {
   product_code: string;
   child_order_type: string;
   side: string;
-  price: number;
+  price?: number;
   size: number;
   minute_to_expire?: number;
   time_in_force?: string;

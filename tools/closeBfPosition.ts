@@ -9,7 +9,6 @@ async function main() {
   const config = util.getConfigRoot();
   const bfConfig = util.findBrokerConfig(config, Broker.Bitflyer);
   const bfApi = new BitflyerApi(bfConfig.key, bfConfig.secret);
-
   const bfBalance = await bfApi.getBalance();
   const bfBtc = (bfBalance.find(x => x.currency_code === 'BTC') as Balance).available;
   const request = {
@@ -20,7 +19,7 @@ async function main() {
   };
   try {
     console.log(`Selling ${bfBtc}...`);
-    const response = await bfApi.sendChildOrder(request as any);
+    const response = await bfApi.sendChildOrder(request);
     console.log(response);
   } catch (ex) {
     console.log(ex.message);
