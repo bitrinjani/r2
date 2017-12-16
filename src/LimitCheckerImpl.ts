@@ -7,7 +7,7 @@ import t from './intl';
 
 export default class LimitCheckerImpl implements LimitChecker {
   private readonly log = getLogger(this.constructor.name);
-  private limits: Limit[];
+  private limits: LimitChecker[];
 
   constructor(
     configStore: ConfigStore,
@@ -36,11 +36,7 @@ export default class LimitCheckerImpl implements LimitChecker {
   }
 }
 
-interface Limit {
-  check(): LimitCheckResult;
-}
-
-class MaxNetExposureLimit implements Limit {
+class MaxNetExposureLimit implements LimitChecker {
   private readonly log = getLogger('MaxNetExposureLimit');
 
   constructor(
@@ -59,7 +55,7 @@ class MaxNetExposureLimit implements Limit {
   }
 }
 
-class InvertedSpreadLimit implements Limit {
+class InvertedSpreadLimit implements LimitChecker {
   private readonly log = getLogger('InvertedSpreadLimit');
 
   constructor(private readonly spreadAnalysisResult: SpreadAnalysisResult) { }
@@ -75,7 +71,7 @@ class InvertedSpreadLimit implements Limit {
   }
 }
 
-class MinTargetProfitLimit implements Limit {
+class MinTargetProfitLimit implements LimitChecker {
   private readonly log = getLogger('TargetProfitLimit');
 
   constructor(
@@ -105,7 +101,7 @@ class MinTargetProfitLimit implements Limit {
   }
 }
 
-class MaxTargetProfitLimit implements Limit {
+class MaxTargetProfitLimit implements LimitChecker {
   private readonly log = getLogger('MaxTargetProfitLimit');
 
   constructor(
@@ -135,7 +131,7 @@ class MaxTargetProfitLimit implements Limit {
   }
 }
 
-class DemoModeLimit implements Limit {
+class DemoModeLimit implements LimitChecker {
   private readonly log = getLogger('DemoModeLimit');
 
   constructor(private readonly configStore: ConfigStore) { }
