@@ -21,12 +21,14 @@ export default class LineIntegration {
     const payload = {
       message
     };
-    const init: FetchRequestInit = {
+    const body = querystring.stringify(payload);
+    const init: FetchRequestInit = {      
+      body,
       method: 'POST',
-      body: querystring.stringify(payload),
       headers: {
         Authorization: `Bearer ${this.config.token}`, 
-        'Content-Type': 'application/x-www-form-urlencoded' 
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': body.length.toString()
       },      
       timeout: LineIntegration.fetchTimeout
     };
