@@ -70,7 +70,6 @@ export enum TimeInForce {
 export enum CashMarginType {
   Cash = 'Cash',
   MarginOpen = 'MarginOpen',
-  MarginClose = 'MarginClose',
   NetOut = 'NetOut'
 }
 
