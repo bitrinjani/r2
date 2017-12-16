@@ -9,11 +9,13 @@ import BrokerApi from './BrokerApi';
 import Execution from '../Execution';
 import {
   CashMarginType, ConfigStore, BrokerConfig, Broker,
-  BrokerAdapter, QuoteSide, OrderStatus, OrderSide
+  BrokerAdapter, QuoteSide, OrderStatus
 } from '../types';
-import { OrderBooksResponse, NewOrderRequest, LeveragePosition } from './types';
-import { getBrokerOrderType } from './mapper';
+import { OrderBooksResponse, CashMarginTypeStrategy } from './types';
 import { eRound, almostEqual, findBrokerConfig } from '../util';
+import CashStrategy from './CashStrategy';
+import MarginOpenStrategy from './MarginOpenStrategy';
+import NetOutStrategy from './NetOutStrategy';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
@@ -21,22 +23,26 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly log = getLogger('Coincheck.BrokerAdapter');
   private readonly config: BrokerConfig;
   readonly broker = Broker.Coincheck;
+  readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(
     @inject(symbols.ConfigStore) configStore: ConfigStore
   ) {
     this.config = findBrokerConfig(configStore.config, this.broker);
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
+    this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
+      [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
+      [CashMarginType.MarginOpen, new MarginOpenStrategy(this.brokerApi)],
+      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)]
+    ]);
   }
 
   async getBtcPosition(): Promise<number> {
-    if (this.config.cashMarginType === CashMarginType.Cash) {
-      return (await this.brokerApi.getAccountsBalance()).btc;
+    const strategy = this.strategyMap.get(this.config.cashMarginType);
+    if (strategy === undefined) {
+      throw new Error(`Unable to find a strategy for ${this.config.cashMarginType}.`);
     }
-    const positions = await this.brokerApi.getAllOpenLeveragePositions();
-    const longPosition = _.sumBy(positions.filter(p => p.side === 'buy'), p => p.amount);
-    const shortPosition = _.sumBy(positions.filter(p => p.side === 'sell'), p => p.amount);
-    return eRound(longPosition - shortPosition);
+    return await strategy.getBtcPosition();
   }
 
   async fetchQuotes(): Promise<Quote[]> {
@@ -66,50 +72,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     if (order.broker !== this.broker) {
       throw new Error();
     }
-    let request: NewOrderRequest;
-    if (order.cashMarginType === CashMarginType.NetOut) {
-      request = await this.getNetOutRequest(order);
-    } else {
-      const orderType = getBrokerOrderType(order);
-      request = {
-        pair: 'btc_jpy',
-        order_type: orderType,
-        amount: order.size,
-        rate: order.price
-      };
-    }
-    const reply = await this.brokerApi.newOrder(request);
-    if (!reply.success) {
-      throw new Error('Send failed.');
-    }
-    order.sentTime = reply.created_at;
-    order.status = OrderStatus.New;
-    order.brokerOrderId = reply.id;
-    order.lastUpdated = new Date();
-  }
-
-  private async getNetOutRequest(order: Order): Promise<NewOrderRequest> {
-    const openPositions = await this.brokerApi.getAllOpenLeveragePositions();
-    const targetSide = order.side === OrderSide.Buy ? 'sell' : 'buy';
-    const candidates = _(openPositions)
-      .filter(p => p.side === targetSide)
-      .filter(p => almostEqual(p.amount, order.size, 1))
-      .value();
-    const request = { pair: 'btc_jpy', rate: order.price };
-    if (candidates.length === 0) {
-      return {
-        ...request,
-        order_type: order.side === OrderSide.Buy ? 'leverage_buy' : 'leverage_sell',
-        amount: order.size
-      };
-    }
-    const targetPosition = _.last(candidates) as LeveragePosition;
-    return {
-      ...request,
-      order_type: order.side === OrderSide.Buy ? 'close_short' : 'close_long',
-      amount: targetPosition.amount,
-      position_id: Number(targetPosition.id)
-    };
+    const strategy = this.strategyMap.get(order.cashMarginType);
+    if (strategy === undefined) {
+      throw new Error(`Unable to find a strategy for ${order.cashMarginType}.`);
+    } 
+    await strategy.send(order);
   }
 
   async cancel(order: Order): Promise<void> {

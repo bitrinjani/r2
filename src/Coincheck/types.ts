@@ -1,5 +1,6 @@
 // tslint:disable:variable-name
 import { TypeConverter, cast, element } from '../TypeConverter';
+import Order from '../Order';
 
 export class AccountsBalanceResponse extends TypeConverter {
   @cast success: boolean;
@@ -228,4 +229,9 @@ export class TransactionsResponse extends TypeConverter {
   @cast success: boolean;
   @cast pagination: Pagination;
   @cast @element(Transaction) data: Transaction[];
+}
+
+export interface CashMarginTypeStrategy {
+  send(order: Order): Promise<void>;
+  getBtcPosition(): Promise<number>;
 }
