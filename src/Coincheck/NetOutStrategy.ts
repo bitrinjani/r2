@@ -1,7 +1,7 @@
 import { CashMarginTypeStrategy, NewOrderRequest, LeveragePosition } from './types';
 import BrokerApi from './BrokerApi';
 import Order from '../Order';
-import { OrderStatus, OrderSide, CashMarginType } from '../types';
+import { OrderStatus, OrderSide, CashMarginType, OrderType } from '../types';
 import { eRound, almostEqual } from '../util';
 import * as _ from 'lodash';
 
@@ -37,7 +37,12 @@ export default class NetOutStrategy implements CashMarginTypeStrategy {
       .filter(p => p.side === targetSide)
       .filter(p => almostEqual(p.amount, order.size, 1))
       .value();
-    const request = { pair: 'btc_jpy', rate: order.price };
+    if (order.symbol !== 'BTCJPY') {
+      throw new Error('Not supported');
+    }
+    const pair = 'btc_jpy';
+    const rate = order.type === OrderType.Market ? undefined : order.price;
+    const request = { pair, rate };
     if (candidates.length === 0) {
       return {
         ...request,

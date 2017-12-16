@@ -50,3 +50,9 @@ test('readJsonFileSync with no BOM', () => {
 test('findBrokerConfig with no config', () => {
   expect(() => util.findBrokerConfig({brokers: []}, Broker.Bitflyer)).toThrow();
 });
+
+test('safeQueryStringStringify', () => {
+  const o = { a: 1, b: undefined };
+  const result = util.safeQueryStringStringify(o);
+  expect(result).toBe('a=1');
+});

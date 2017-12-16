@@ -1,4 +1,4 @@
-import { hmac, nonce } from '../util';
+import { hmac, nonce, safeQueryStringStringify } from '../util';
 import WebClient from '../WebClient';
 import {
   SendChildOrderRequest, SendChildOrderResponse,
@@ -6,7 +6,6 @@ import {
   ChildOrdersResponse, ExecutionsResponse, ExecutionsParam, Execution, BalanceResponse,
   BoardResponse, ChildOrder, Balance
 } from './types';
-import * as querystring from 'querystring';
 
 export default class BrokerApi {
   private readonly baseUrl = 'https://api.bitflyer.jp';
@@ -75,7 +74,7 @@ export default class BrokerApi {
     const method = 'GET';
     let pathWithParam = path;
     if (requestParam) {
-      const param = querystring.stringify(requestParam);
+      const param = safeQueryStringStringify(requestParam);
       pathWithParam += `?${param}`;
     }
     return await this.call<R>(pathWithParam, method);

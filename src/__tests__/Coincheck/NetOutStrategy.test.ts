@@ -88,6 +88,46 @@ describe('NetOutStrategy', () => {
     expect(order.brokerOrderId).toBe('391697892');
   });
 
+  test('netout market when no closable position', async () => {
+    const strategy = new NetOutStrategy(new BrokerApi('', ''));
+    const order = new Order(
+      Broker.Coincheck, 
+      OrderSide.Sell, 
+      0.01, 
+      830000, 
+      CashMarginType.NetOut, 
+      OrderType.Market, 
+      undefined
+    );
+    const request: NewOrderRequest = await strategy.getNetOutRequest(order);
+    expect(request.order_type).toBe('leverage_sell');
+    expect(request.amount).toBe(0.01);
+    expect(request.position_id).toBeUndefined();
+    expect(request.rate).toBeUndefined();
+  });
+
+  test('netout non BTCJPY', async () => {
+    const strategy = new NetOutStrategy(new BrokerApi('', ''));
+    const order = new Order(
+      Broker.Coincheck, 
+      OrderSide.Sell, 
+      0.01, 
+      830000, 
+      CashMarginType.NetOut, 
+      OrderType.Limit, 
+      undefined
+    );
+    order.symbol = 'ZZZJPY';
+    const fn = jest.fn();
+    try {
+      await strategy.getNetOutRequest(order);
+      expect(true).toBe(false);
+    } catch (ex) {
+      fn();
+    }
+    expect(fn.mock.calls.length).toBe(1);
+  });
+
   afterAll(() => {
     nock.restore();
   });

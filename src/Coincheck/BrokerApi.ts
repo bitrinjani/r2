@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
-import { hmac, nonce } from '../util';
+import { hmac, nonce, safeQueryStringStringify } from '../util';
 import WebClient from '../WebClient';
-import * as querystring from 'querystring';
 import {
   AccountsBalanceResponse, LeveragePositionsRequest, LeveragePositionsResponse,
   LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse,
@@ -107,7 +106,7 @@ export default class BrokerApi {
 
   private post<R, T>(path: string, requestBody: T): Promise<R> {
     const method = 'POST';
-    const body = querystring.stringify(requestBody);
+    const body = safeQueryStringStringify(requestBody);
     return this.call<R>(path, method, body);
   }
 
@@ -115,7 +114,7 @@ export default class BrokerApi {
     const method = 'GET';
     let pathWithParam = path;
     if (requestParam) {
-      const param = querystring.stringify(requestParam);
+      const param = safeQueryStringStringify(requestParam);
       pathWithParam += `?${param}`;
     }
     return this.call<R>(pathWithParam, method);

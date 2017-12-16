@@ -1,4 +1,4 @@
-import { nonce } from '../util';
+import { nonce, safeQueryStringStringify } from '../util';
 import WebClient from '../WebClient';
 import {
   SendOrderResponse, SendOrderRequest, CancelOrderResponse,
@@ -6,7 +6,6 @@ import {
   CloseAllResponse,
   ClosingTrade
 } from './types';
-import * as querystring from 'querystring';
 import * as jwt from 'jsonwebtoken';
 
 export default class BrokerApi {
@@ -77,7 +76,7 @@ export default class BrokerApi {
     const method = 'GET';
     let pathWithParam = path;
     if (requestParam) {
-      const param = querystring.stringify(requestParam);
+      const param = safeQueryStringStringify(requestParam);
       pathWithParam += `?${param}`;
     }
     return await this.call<R>(pathWithParam, method);

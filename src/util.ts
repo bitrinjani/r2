@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as querystring from 'querystring';
 import { ConfigRoot, Broker, BrokerConfig } from './types';
 
 interface ToStringable {
@@ -92,4 +93,9 @@ export function findBrokerConfig(configRoot: ConfigRoot, broker: Broker): Broker
     throw new Error(`Unabled to find ${broker} in config.`);
   }
   return found;
+}
+
+export function safeQueryStringStringify(o: any) {
+  const noUndefinedFields = _.pickBy(o, _.negate(_.isUndefined));
+  return querystring.stringify(noUndefinedFields);
 }
