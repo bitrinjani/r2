@@ -49,6 +49,16 @@ describe('BrokerApi', () => {
     expect(positions[1].new_order.created_at.toISOString()).toBe('2017-10-20T22:41:59.000Z');
   });
 
+  test('getAllOpenLeveragePositions cache', async () => {
+    const api = new BrokerApi('', '');
+    let positions = await api.getAllOpenLeveragePositions(4);
+    expect(positions.length).toBe(9);
+    expect(positions[1].new_order.created_at.toISOString()).toBe('2017-10-20T22:41:59.000Z');
+    positions = await api.getAllOpenLeveragePositions(4);
+    expect(positions.length).toBe(9);
+    expect(positions[1].new_order.created_at.toISOString()).toBe('2017-10-20T22:41:59.000Z');
+  });
+
   test('getOrderBooks', async () => {
     const api = new BrokerApi('', '');
     const orderBooks = await api.getOrderBooks();
