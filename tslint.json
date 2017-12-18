@@ -114,6 +114,7 @@
       "check-type",
       "check-typecast"
     ],
-    "import-name": false
+    "import-name": false,
+    "ter-arrow-parens": false
   }
 }
