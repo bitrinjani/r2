@@ -41,7 +41,7 @@ describe('Spread Analyzer', () => {
     expect(result.bestBid.volume).toBe(4);
     expect(result.invertedSpread).toBe(-0.5);
     expect(result.targetVolume).toBe(0.5);
-    expect(result.targetProfit).toBe(0);
+    expect(result.targetProfit).toBeCloseTo(0);
   });
 
   test('analyze positive profit', async () => {
@@ -142,6 +142,21 @@ describe('Spread Analyzer', () => {
       const result = await target.analyze(quotes, positionMap);
     } catch (ex) {
       expect(ex.message).toBe('No best ask was found.');
+      return;
+    }
+    throw new Error();
+  });
+
+  test('invalid closingPairs', async () => {
+    quotes = [
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 3, 1),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 3.5, 3)
+    ];
+    const target = new SpreadAnalyzerImpl(configStore);
+    try {
+      const result = await target.analyze(quotes, positionMap, [{size: 0.001}, {size: 0.002}]);
+    } catch (ex) {
+      expect(ex.message).toBe('Invalid closing pair.');
       return;
     }
     throw new Error();

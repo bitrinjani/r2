@@ -10,7 +10,7 @@ export default class LimitCheckerFactoryImpl implements LimitCheckerFactory {
     @inject(symbols.PositionService) private readonly positionService: PositionService
   ) { }
 
-  create(spreadAnalysisResult: SpreadAnalysisResult): LimitChecker {
-    return new LimitCheckerImpl(this.configStore, this.positionService, spreadAnalysisResult);
+  create(spreadAnalysisResult: SpreadAnalysisResult, exitFlag: boolean): LimitChecker {
+    return new LimitCheckerImpl(this.configStore, this.positionService, spreadAnalysisResult, exitFlag);
   }
 }

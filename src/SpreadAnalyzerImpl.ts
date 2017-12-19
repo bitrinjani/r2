@@ -1,7 +1,5 @@
 ﻿import { injectable, inject } from 'inversify';
-import {
-  SpreadAnalyzer, ConfigStore, QuoteSide, SpreadAnalysisResult, BrokerMap
-} from './types';
+import { SpreadAnalyzer, ConfigStore, QuoteSide, SpreadAnalysisResult, BrokerMap, OrderPair, OrderSide } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Quote from './Quote';
@@ -11,28 +9,51 @@ import symbols from './symbols';
 import Decimal from 'decimal.js';
 import { calculateCommission, findBrokerConfig } from './util';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
+import Order from './Order';
 
 @injectable()
 export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   private readonly log = getLogger(this.constructor.name);
 
-  constructor(
-    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
-  ) { }
+  constructor(@inject(symbols.ConfigStore) private readonly configStore: ConfigStore) {}
 
-  async analyze(quotes: Quote[], positionMap: BrokerMap<BrokerPosition>): Promise<SpreadAnalysisResult> {
-    this.log.info(t`AnalyzingQuotes`);
+  async analyze(
+    quotes: Quote[],
+    positionMap: BrokerMap<BrokerPosition>,
+    closingPair?: OrderPair
+  ): Promise<SpreadAnalysisResult> {
+    if (closingPair && closingPair[0].size !== closingPair[1].size) {
+      throw new Error('Invalid closing pair.');
+    }
+
     const { config } = this.configStore;
     if (_.isEmpty(positionMap)) {
       throw new Error('Position map is empty.');
     }
-    const filteredQuotes = _(quotes)
+    let filteredQuotes = _(quotes)
       .filter(q => this.isAllowedByCurrentPosition(q, positionMap[q.broker]))
       .filter(q => new Decimal(q.volume).gte(config.minSize))
       .orderBy(['price'])
       .value();
-    const bestAsk = _(filteredQuotes).filter(q => q.side === QuoteSide.Ask).first();
-    const bestBid = _(filteredQuotes).filter(q => q.side === QuoteSide.Bid).last();
+    if (closingPair) {
+      const isOppositeSide = (o: Order, q: Quote) =>
+        q.side === (o.side === OrderSide.Buy ? QuoteSide.Bid : QuoteSide.Ask);
+      const isSameBroker = (o: Order, q: Quote) => o.broker === q.broker;
+      filteredQuotes = _(filteredQuotes)
+        .filter(
+          q =>
+            (isSameBroker(closingPair[0], q) && isOppositeSide(closingPair[0], q)) ||
+            (isSameBroker(closingPair[1], q) && isOppositeSide(closingPair[1], q))
+        )
+        .filter(q => new Decimal(q.volume).gte(closingPair[0].size))
+        .value();
+    }
+    const bestAsk = _(filteredQuotes)
+      .filter(q => q.side === QuoteSide.Ask)
+      .first();
+    const bestBid = _(filteredQuotes)
+      .filter(q => q.side === QuoteSide.Bid)
+      .last();
     if (bestBid === undefined) {
       throw new Error(t`NoBestBidWasFound`);
     } else if (bestAsk === undefined) {
@@ -45,10 +66,13 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
     const allowedLongSize = positionMap[bestAsk.broker].allowedLongSize;
     let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]) as number;
     targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
+    if (closingPair) {
+      targetVolume = closingPair[0].size;
+    }
     const commission = this.calculateTotalCommission([bestBid, bestAsk], targetVolume);
     const targetProfit = _.round(invertedSpread * targetVolume - commission);
     const midNotional = _.mean([bestAsk.price, bestBid.price]) * targetVolume;
-    const profitPercentAgainstNotional = _.round((targetProfit / midNotional) * 100, LOT_MIN_DECIMAL_PLACE);
+    const profitPercentAgainstNotional = _.round(targetProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
     const spreadAnalysisResult = {
       bestBid,
       bestAsk,
@@ -63,7 +87,7 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   }
 
   private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {
-    return _(quotes).sumBy((q) => {
+    return _(quotes).sumBy(q => {
       const brokerConfig = findBrokerConfig(this.configStore.config, q.broker);
       return calculateCommission(q.price, targetVolume, brokerConfig.commissionPercent);
     });

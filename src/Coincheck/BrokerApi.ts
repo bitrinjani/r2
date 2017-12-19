@@ -6,8 +6,11 @@ import {
   LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse,
   CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination, Transaction, LeverageBalanceResponse
 } from './types';
+import { setTimeout } from 'timers';
 
 export default class BrokerApi {
+  private static CACHE_MS = 1000;
+  private leveragePositionsCache?: LeveragePosition[];
   private readonly baseUrl = 'https://coincheck.com';
   private readonly webClient: WebClient = new WebClient(this.baseUrl);
 
@@ -36,6 +39,9 @@ export default class BrokerApi {
   }
 
   async getAllOpenLeveragePositions(limit: number = 20): Promise<LeveragePosition[]> {
+    if (this.leveragePositionsCache) {      
+      return _.cloneDeep(this.leveragePositionsCache);
+    }
     let result: LeveragePosition[] = [];
     const request: LeveragePositionsRequest = { limit, status: 'open', order: 'desc' };
     let reply = await this.getLeveragePositions(request);
@@ -45,6 +51,8 @@ export default class BrokerApi {
       const last = _.last(reply.data) as LeveragePosition;
       reply = await this.getLeveragePositions({ ...request, starting_after: last.id });
     }
+    this.leveragePositionsCache = result;
+    setTimeout(() => this.leveragePositionsCache = undefined, BrokerApi.CACHE_MS);
     return result;
   }
 

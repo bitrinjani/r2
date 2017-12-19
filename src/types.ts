@@ -27,7 +27,11 @@ export interface QuoteAggregator {
 }
 
 export interface SpreadAnalyzer {
-  analyze(quotes: Quote[], positionMap: BrokerMap<BrokerPosition>): Promise<SpreadAnalysisResult>;
+  analyze(
+    quotes: Quote[],
+    positionMap: BrokerMap<BrokerPosition>,
+    closingPair?: OrderPair
+  ): Promise<SpreadAnalysisResult>;
 }
 
 export interface SpreadAnalysisResult {
@@ -50,7 +54,7 @@ export interface LimitCheckResult {
 }
 
 export interface LimitCheckerFactory {
-  create(spreadAnalysisResult: SpreadAnalysisResult): LimitChecker;
+  create(spreadAnalysisResult: SpreadAnalysisResult, exit: boolean): LimitChecker;
 }
 
 export enum OrderSide {
@@ -147,13 +151,17 @@ export class SlackConfig extends TypeConverter {
   @cast url: string;
   @cast channel: string;
   @cast username: string;
-  @cast @element(String) keywords: string[];
+  @cast
+  @element(String)
+  keywords: string[];
 }
 
 export class LineConfig extends TypeConverter {
   @cast enabled: boolean;
   @cast token: string;
-  @cast @element(String) keywords: string[];
+  @cast
+  @element(String)
+  keywords: string[];
 }
 
 export class LoggingConfig extends TypeConverter {
@@ -168,7 +176,9 @@ export class ConfigRoot extends TypeConverter {
   @cast maxSize: number;
   @cast minSize: number;
   @cast minTargetProfit: number;
+  @cast minExitTargetProfit: number;
   @cast minTargetProfitPercent: number;
+  @cast minExitTargetProfitPercent: number;
   @cast maxTargetProfit: number;
   @cast maxTargetProfitPercent: number;
   @cast iterationInterval: number;
@@ -177,6 +187,10 @@ export class ConfigRoot extends TypeConverter {
   @cast maxNetExposure: number;
   @cast maxRetryCount: number;
   @cast orderStatusCheckInterval: number;
-  @cast @element(BrokerConfig) brokers: BrokerConfig[];
+  @cast
+  @element(BrokerConfig)
+  brokers: BrokerConfig[];
   @cast logging: LoggingConfig;
 }
+
+export type OrderPair = [Order, Order];
