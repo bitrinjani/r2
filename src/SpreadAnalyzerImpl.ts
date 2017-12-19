@@ -17,8 +17,6 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
 
   constructor(@inject(symbols.ConfigStore) private readonly configStore: ConfigStore) {}
 
-  lastResult?: SpreadAnalysisResult;
-
   async analyze(
     quotes: Quote[],
     positionMap: BrokerMap<BrokerPosition>,
@@ -86,7 +84,6 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
       profitPercentAgainstNotional
     };
     this.log.debug(`Analysis done. Result: ${JSON.stringify(spreadAnalysisResult)}`);
-    this.lastResult = spreadAnalysisResult;
     return spreadAnalysisResult;
   }
 

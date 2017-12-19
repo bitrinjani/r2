@@ -43,7 +43,8 @@ export const en = {
   AnalyzingQuotes: 'Analyzing quotes...',
   WaitingForPositionService: 'Waiting for Position Service...',
   FilledSummary: 'Filled: %s %s %d BTC filled at %s',
-  UnfilledSummary: 'Pending: %s %s %d BTC sent at %s, pending size %d BTC'
+  UnfilledSummary: 'Pending: %s %s %d BTC sent at %s, pending size %d BTC',
+  FoundClosableOrders: 'Found closable orders.'
 };
 
 export const ja = {
@@ -90,5 +91,6 @@ export const ja = {
   AnalyzingQuotes: '板情報解析中...',
   WaitingForPositionService: 'ポジションサービスの待機中...',
   FilledSummary: '>>約定済み: %s %s %d BTC 約定価格 %s',
-  UnfilledSummary: '>>執行中: %s %s %d BTC 指値 %s, 残り数量 %d BTC'
+  UnfilledSummary: '>>執行中: %s %s %d BTC 指値 %s, 残り数量 %d BTC',
+  FoundClosableOrders: 'クローズ可能なオーダーを発見。'
 };

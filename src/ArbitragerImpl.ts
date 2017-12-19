@@ -25,6 +25,7 @@ import symbols from './symbols';
 export default class ArbitragerImpl implements Arbitrager {
   private readonly log = getLogger(this.constructor.name);
   private activePairs: OrderPair[] = [];
+  private lastSpreadAnalysisResult: SpreadAnalysisResult;
 
   constructor(
     @inject(symbols.QuoteAggregator) private readonly quoteAggregator: QuoteAggregator,
@@ -55,21 +56,25 @@ export default class ArbitragerImpl implements Arbitrager {
     this.status = 'Stopped';
   }
 
+  private async quoteUpdated(quotes: Quote[]): Promise<void> {
+    this.positionService.print();
+    this.log.info(hr(20) + 'ARBITRAGER' + hr(20));
+    await this.arbitrage(quotes);
+    this.log.info(hr(50));
+  }
+
   private async arbitrage(quotes: Quote[]): Promise<void> {
     this.status = 'Arbitraging';
     this.log.info(t`LookingForOpportunity`);
     const { config } = this.configStore;
-    
+
     const exitFlag = await this.findClosable(quotes);
-    let spreadAnalysisResult;
-    if (exitFlag) { 
-      if (this.spreadAnalyzer.lastResult === undefined) {
-        throw new Error();
-      }
-      spreadAnalysisResult = this.spreadAnalyzer.lastResult;
+    let spreadAnalysisResult: SpreadAnalysisResult;
+    if (exitFlag) {
+      spreadAnalysisResult = this.lastSpreadAnalysisResult;
     } else {
       try {
-        spreadAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap); 
+        spreadAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap);
       } catch (ex) {
         this.status = 'Spread analysis failed';
         this.log.warn(t`FailedToGetASpreadAnalysisResult`, ex.message);
@@ -77,7 +82,7 @@ export default class ArbitragerImpl implements Arbitrager {
         return;
       }
     }
-    
+
     this.printSpreadAnalysisResult(spreadAnalysisResult);
     const limitChecker = this.limitCheckerFactory.create(spreadAnalysisResult, exitFlag);
     const limitCheckResult = limitChecker.check();
@@ -87,7 +92,11 @@ export default class ArbitragerImpl implements Arbitrager {
       }
       return;
     }
-    this.log.info(t`FoundArbitrageOppotunity`);
+    if (exitFlag) {      
+      this.log.info(t`FoundClosableOrders`);
+    } else {
+      this.log.info(t`FoundArbitrageOppotunity`);
+    }
     try {
       const { bestBid, bestAsk, targetVolume } = spreadAnalysisResult;
       const sendTasks = [bestAsk, bestBid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
@@ -101,21 +110,6 @@ export default class ArbitragerImpl implements Arbitrager {
     }
     this.log.info(t`SleepingAfterSend`, config.sleepAfterSend);
     await delay(config.sleepAfterSend);
-  }
-
-  private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
-    const columnWidth = 17;
-    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), result.bestAsk);
-    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), result.bestBid);
-    this.log.info('%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
-    this.log.info('%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
-    this.log.info('%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);
-    this.log.info(
-      '%s: %s (%s%%)',
-      padEnd(t`ExpectedProfit`, columnWidth),
-      result.targetProfit,
-      result.profitPercentAgainstNotional
-    );
   }
 
   private async checkOrderState(orders: OrderPair, exitFlag: boolean = false): Promise<void> {
@@ -135,8 +129,10 @@ export default class ArbitragerImpl implements Arbitrager {
       this.printOrderSummary(orders);
 
       if (orders.every(o => o.filled)) {
-        this.status = 'Filled';
-        if (!exitFlag) {
+        if (exitFlag) {
+          this.status = 'Closed';
+        } else {
+          this.status = 'Filled';
           this.activePairs.push(orders);
         }
         const commission = _(orders).sumBy(o => this.calculateFilledOrderCommission(o));
@@ -161,30 +157,16 @@ export default class ArbitragerImpl implements Arbitrager {
     }
   }
 
-  private printOrderSummary(orders: Order[]) {
-    orders.forEach(o => {
-      if (o.filled) {
-        this.log.info(o.toSummary());
-      } else {
-        this.log.warn(o.toSummary());
-      }
-    });
-  }
-
   private calculateFilledOrderCommission(order: Order): number {
     const brokerConfig = findBrokerConfig(this.configStore.config, order.broker);
     return calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
   }
 
-  private async quoteUpdated(quotes: Quote[]): Promise<void> {
-    this.positionService.print();
-    this.log.info(hr(20) + 'ARBITRAGER' + hr(20));
-    await this.arbitrage(quotes);
-    this.log.info(hr(50));
-  }
-
   private async findClosable(quotes: Quote[]): Promise<boolean> {
-    const { config } = this.configStore;
+    const { minExitTargetProfit, minExitTargetProfitPercent } = this.configStore.config;
+    if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
+      return false;
+    }
     this.log.debug(`activePairs: ${this.activePairs}`);
     for (const pair of _.reverse(this.activePairs)) {
       try {
@@ -194,14 +176,15 @@ export default class ArbitragerImpl implements Arbitrager {
         const { bestBid, bestAsk, targetVolume, targetProfit } = result;
         const targetVolumeNotional = _.mean([bestAsk.price, bestBid.price]) * targetVolume;
         const effectiveMinExitTargetProfit = _.max([
-          config.minExitTargetProfit,
-          config.minExitTargetProfitPercent !== undefined
-            ? _.round(config.minExitTargetProfitPercent / 100 * targetVolumeNotional)
+          minExitTargetProfit,
+          minExitTargetProfitPercent !== undefined
+            ? _.round(minExitTargetProfitPercent / 100 * targetVolumeNotional)
             : Number.MIN_SAFE_INTEGER
         ]) as number;
         this.log.debug(`effectiveMinExitTargetProfit: ${effectiveMinExitTargetProfit}`);
         if (targetProfit >= effectiveMinExitTargetProfit) {
           this.activePairs = _.without(this.activePairs, pair);
+          this.lastSpreadAnalysisResult = result;
           return true;
         }
       } catch (ex) {
@@ -227,5 +210,30 @@ export default class ArbitragerImpl implements Arbitrager {
     );
     await this.brokerAdapterRouter.send(order);
     return order;
+  }
+
+  private printOrderSummary(orders: Order[]) {
+    orders.forEach(o => {
+      if (o.filled) {
+        this.log.info(o.toSummary());
+      } else {
+        this.log.warn(o.toSummary());
+      }
+    });
+  }
+
+  private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
+    const columnWidth = 17;
+    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), result.bestAsk);
+    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), result.bestBid);
+    this.log.info('%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
+    this.log.info('%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
+    this.log.info('%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);
+    this.log.info(
+      '%s: %s (%s%%)',
+      padEnd(t`ExpectedProfit`, columnWidth),
+      result.targetProfit,
+      result.profitPercentAgainstNotional
+    );
   }
 }

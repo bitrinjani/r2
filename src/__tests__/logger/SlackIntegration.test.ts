@@ -19,6 +19,19 @@ describe('SlackIntegration', () => {
     slack.handler('with keyword: profit');
   });
 
+  test('slack exception handling', () => {
+    const config = {
+      enabled: true,
+      url: 'https://hooks.slack.com/services/xxxxxx',
+      channel: '#ch1',
+      username: 'abc',
+      keywords: ['error', 'profit']
+    } as SlackConfig;
+    const slack = new SlackIntegration(config);
+    slack.handler('test message');
+    slack.handler('with keyword: profit');
+  });
+
   test('slack with no keyword', () => {
     const config = {
       enabled: true,

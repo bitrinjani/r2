@@ -1,16 +1,29 @@
 // tslint:disable
 import {
-  QuoteAggregator, Broker, QuoteSide, ConfigRoot, ConfigStore,
-  PositionService, BrokerAdapterRouter, CashMarginType, OrderStatus, OrderSide
+  QuoteAggregator,
+  Broker,
+  QuoteSide,
+  ConfigRoot,
+  ConfigStore,
+  PositionService,
+  BrokerAdapterRouter,
+  CashMarginType,
+  OrderStatus,
+  OrderSide
 } from '../types';
 import ArbitragerImpl from '../ArbitragerImpl';
 import Quote from '../Quote';
 import LimitCheckerFactoryImpl from '../LimitCheckerFactoryImpl';
+import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
 
 let quoteAggregator,
   config: ConfigRoot,
-  configStore, positionMap, positionService,
-  baRouter, spreadAnalyzer, quotes,
+  configStore,
+  positionMap,
+  positionService,
+  baRouter,
+  spreadAnalyzer,
+  quotes,
   limitCheckerFactory;
 
 beforeEach(() => {
@@ -20,10 +33,29 @@ beforeEach(() => {
   } as QuoteAggregator;
   config = {
     maxNetExposure: 10.0,
+    minSize: 0.005,
     brokers: [
-      { broker: Broker.Bitflyer, cashMarginType: CashMarginType.Cash, leverageLevel: 1 },
-      { broker: Broker.Coincheck, cashMarginType: CashMarginType.MarginOpen, leverageLevel: 8 },
-      { broker: Broker.Quoine, cashMarginType: CashMarginType.NetOut, leverageLevel: 9 }
+      {
+        broker: Broker.Bitflyer,
+        cashMarginType: CashMarginType.Cash,
+        leverageLevel: 1,
+        maxLongPosition: 100,
+        maxShortPosition: 100
+      },
+      {
+        broker: Broker.Coincheck,
+        cashMarginType: CashMarginType.MarginOpen,
+        leverageLevel: 8,
+        maxLongPosition: 100,
+        maxShortPosition: 100
+      },
+      {
+        broker: Broker.Quoine,
+        cashMarginType: CashMarginType.NetOut,
+        leverageLevel: 9,
+        maxLongPosition: 100,
+        maxShortPosition: 100
+      }
     ]
   } as ConfigRoot;
   configStore = { config } as ConfigStore;
@@ -40,7 +72,7 @@ beforeEach(() => {
       allowedShortSize: 10,
       longAllowed: true,
       shortAllowed: true,
-      btc: - 0.1
+      btc: -0.1
     }
   };
   positionService = {
@@ -76,8 +108,14 @@ beforeEach(() => {
 
 describe('Arbitrager', () => {
   test('start/stop', async () => {
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     await arbitrager.start();
     expect(quoteAggregator.onQuoteUpdated).not.toBeUndefined();
     expect(arbitrager.status).toBe('Started');
@@ -93,9 +131,17 @@ describe('Arbitrager', () => {
 
   test('SpreadAnalyzer throws', async () => {
     config.maxNetExposure = 10;
-    spreadAnalyzer.analyze.mockImplementation(() => { throw new Error(); });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      throw new Error();
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -116,8 +162,14 @@ describe('Arbitrager', () => {
     });
     config.maxNetExposure = 0.1;
     positionService.netExposure = 0.2;
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
     expect(spreadAnalyzer.analyze).toBeCalled();
@@ -135,8 +187,14 @@ describe('Arbitrager', () => {
         targetProfit: -100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -144,7 +202,7 @@ describe('Arbitrager', () => {
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Spread not inverted');
   });
-  
+
   test('Too small profit', async () => {
     config.minTargetProfit = 1000;
     spreadAnalyzer.analyze.mockImplementation(() => {
@@ -157,8 +215,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -179,8 +243,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -201,8 +271,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -222,8 +298,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -243,8 +325,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -265,8 +353,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -276,11 +370,11 @@ describe('Arbitrager', () => {
 
   test('Send and only buy order filled', async () => {
     let i = 1;
-    baRouter.refresh = (order) => {
+    baRouter.refresh = order => {
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
       }
-    }
+    };
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -292,8 +386,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -302,11 +402,11 @@ describe('Arbitrager', () => {
 
   test('Send and only sell order filled', async () => {
     let i = 1;
-    baRouter.refresh = (order) => {
+    baRouter.refresh = order => {
       if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
       }
-    }
+    };
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -318,8 +418,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -338,8 +444,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -358,9 +470,17 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    baRouter.send = () => { throw new Error('Mock refresh error.'); };
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    baRouter.send = () => {
+      throw new Error('Mock refresh error.');
+    };
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -379,18 +499,25 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    baRouter.refresh = () => { throw new Error('Mock refresh error.'); };
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    baRouter.refresh = () => {
+      throw new Error('Mock refresh error.');
+    };
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
   });
 
-
   test('Send and filled', async () => {
-    baRouter.refresh.mockImplementation((order) => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -402,8 +529,14 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -411,7 +544,7 @@ describe('Arbitrager', () => {
   });
 
   test('Send and filled with commission', async () => {
-    baRouter.refresh.mockImplementation((order) => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
     config.brokers[0].commissionPercent = 0.1;
     config.brokers[1].commissionPercent = 0.2;
@@ -426,11 +559,216 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(quoteAggregator, configStore,
-      positionService, baRouter, spreadAnalyzer, limitCheckerFactory);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
     expect(arbitrager.status).toBe('Filled');
+  });
+
+  test('Close filled orders', async () => {
+    const quotes = [
+      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfit = -1000;
+    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(1);
+    // closing
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Closed');
+    expect(arbitrager.activePairs.length).toBe(0);
+  });
+
+  test('Close filled orders with minExitTargetProfitPercent', async () => {
+    const quotes = [
+      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfitPercent = -80;
+    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(1);
+    // closing
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Closed');
+    expect(arbitrager.activePairs.length).toBe(0);
+  });
+
+  test('Not close filled orders with minExitTargetProfitPercent', async () => {
+    const quotes = [
+      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfitPercent = -20;
+    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(1);
+    // closing
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(2);
+  });
+
+  test('Close two filled orders', async () => {
+    const quotes = [
+      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfit = -200;
+    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(1);
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(2);
+
+    //closing
+    const quotes2 = [
+      new Quote(Broker.Quoine, QuoteSide.Ask, 620, 4),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 450, 1)
+    ];
+    await quoteAggregator.onQuoteUpdated(quotes2);
+    expect(arbitrager.status).toBe('Closed');
+    expect(arbitrager.activePairs.length).toBe(1);
+    await quoteAggregator.onQuoteUpdated(quotes2);
+    expect(arbitrager.status).toBe('Closed');
+    expect(arbitrager.activePairs.length).toBe(0);
+  });
+
+  test('Closing filled orders with no lastResult in spread analyzer', async () => {
+    const quotes = [
+      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfit = -1000;
+    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(1);
+    // closing
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Closed');
+    expect(arbitrager.activePairs.length).toBe(0);
+  });
+
+  test('Closing filled orders when spread analyzer throws', async () => {
+    const quotes = [
+      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
+      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfit = -1000;
+    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.activePairs.length).toBe(1);
+    // closing
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('Spread analysis failed');
+    expect(arbitrager.activePairs.length).toBe(1);
   });
 });

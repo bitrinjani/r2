@@ -32,7 +32,6 @@ export interface SpreadAnalyzer {
     positionMap: BrokerMap<BrokerPosition>,
     closingPair?: OrderPair
   ): Promise<SpreadAnalysisResult>;
-  lastResult?: SpreadAnalysisResult;
 }
 
 export interface SpreadAnalysisResult {
