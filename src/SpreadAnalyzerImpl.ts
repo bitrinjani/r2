@@ -26,7 +26,6 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
       throw new Error('Invalid closing pair.');
     }
 
-    this.log.info(t`AnalyzingQuotes`);
     const { config } = this.configStore;
     if (_.isEmpty(positionMap)) {
       throw new Error('Position map is empty.');

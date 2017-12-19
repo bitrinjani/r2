@@ -83,7 +83,10 @@ export default class ArbitragerImpl implements Arbitrager {
       }
     }
 
-    this.printSpreadAnalysisResult(spreadAnalysisResult);
+    if (!exitFlag) {
+      this.printSpreadAnalysisResult(spreadAnalysisResult);
+    }
+
     const limitChecker = this.limitCheckerFactory.create(spreadAnalysisResult, exitFlag);
     const limitCheckResult = limitChecker.check();
     if (!limitCheckResult.success) {
@@ -92,7 +95,8 @@ export default class ArbitragerImpl implements Arbitrager {
       }
       return;
     }
-    if (exitFlag) {      
+
+    if (exitFlag) {
       this.log.info(t`FoundClosableOrders`);
     } else {
       this.log.info(t`FoundArbitrageOppotunity`);
@@ -167,8 +171,8 @@ export default class ArbitragerImpl implements Arbitrager {
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
       return false;
     }
-    this.log.debug(`activePairs: ${this.activePairs}`);
-    for (const pair of _.reverse(this.activePairs)) {
+    this.printActivePairs();
+    for (const pair of this.activePairs.slice().reverse()) {
       try {
         this.log.debug(`Analyzing pair: ${pair}...`);
         const result = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap, pair);
@@ -235,5 +239,17 @@ export default class ArbitragerImpl implements Arbitrager {
       result.targetProfit,
       result.profitPercentAgainstNotional
     );
+  }
+
+  private printActivePairs(): void {
+    if (this.activePairs.length === 0) {
+      return;
+    }
+    this.log.info(t`OpenPairs`);
+    this.activePairs.forEach(pair => {
+      this.log.info(
+        `[${pair[0].broker} ${pair[0].side} ${pair[0].size}, ${pair[1].broker} ${pair[1].side} ${pair[1].size}]`
+      );
+    });
   }
 }

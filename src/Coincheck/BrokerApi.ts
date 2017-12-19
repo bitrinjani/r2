@@ -9,7 +9,7 @@ import {
 import { setTimeout } from 'timers';
 
 export default class BrokerApi {
-  private static CACHE_MS = 50;
+  private static CACHE_MS = 1000;
   private leveragePositionsCache?: LeveragePosition[];
   private readonly baseUrl = 'https://coincheck.com';
   private readonly webClient: WebClient = new WebClient(this.baseUrl);

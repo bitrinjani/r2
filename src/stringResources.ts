@@ -44,7 +44,8 @@ export const en = {
   WaitingForPositionService: 'Waiting for Position Service...',
   FilledSummary: 'Filled: %s %s %d BTC filled at %s',
   UnfilledSummary: 'Pending: %s %s %d BTC sent at %s, pending size %d BTC',
-  FoundClosableOrders: 'Found closable orders.'
+  FoundClosableOrders: 'Found closable orders.',
+  OpenPairs: 'Open pairs:'
 };
 
 export const ja = {
@@ -57,7 +58,7 @@ export const ja = {
   BothLegsAreSuccessfullyFilled: '>>両方のオーダーの約定完了。',
   BuyFillPriceIs: '>>買い約定価格: %s',
   BuyLegIsNotFilledYetPendingSizeIs: '>>買いオーダー未約定。残り数量%s',
-  CheckingIfBothLegsAreDoneOrNot: '>>両方のオーダーが約定したか確認中...',
+  CheckingIfBothLegsAreDoneOrNot: '>>約定確認中...',
   ExpectedProfit: '予想収益　　',
   FailedToGetASpreadAnalysisResult: 'スプレッド解析結果の取得に失敗しました。取引所設定のmaxLongPosition, maxShortPositionが十分に大きいか確認してください。 %s',
   FoundArbitrageOppotunity: '>>裁定機会を発見。',
@@ -92,5 +93,6 @@ export const ja = {
   WaitingForPositionService: 'ポジションサービスの待機中...',
   FilledSummary: '>>約定済み: %s %s %d BTC 約定価格 %s',
   UnfilledSummary: '>>執行中: %s %s %d BTC 指値 %s, 残り数量 %d BTC',
-  FoundClosableOrders: 'クローズ可能なオーダーを発見。'
+  FoundClosableOrders: 'クローズ可能なオーダーを発見。',
+  OpenPairs: 'オープン状態のオーダーペア:'
 };
