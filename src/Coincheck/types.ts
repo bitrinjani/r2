@@ -1,8 +1,8 @@
 // tslint:disable:variable-name
-import { TypeConverter, cast, element } from '../TypeConverter';
+import { Castable, cast, element } from '@bitr/castable'
 import Order from '../Order';
 
-export class AccountsBalanceResponse extends TypeConverter {
+export class AccountsBalanceResponse extends Castable {
   @cast success: boolean;
   @cast jpy: number;
   @cast btc: number;
@@ -91,22 +91,22 @@ export class AccountsBalanceResponse extends TypeConverter {
   @cast bch_debt: number;
 }
 
-export class Margin extends TypeConverter {
+export class Margin extends Castable {
   @cast jpy: number;
 }
 
-export class MarginAvailable extends TypeConverter {
+export class MarginAvailable extends Castable {
   @cast jpy: number;
 }
 
-export class LeverageBalanceResponse extends TypeConverter {
+export class LeverageBalanceResponse extends Castable {
   @cast success: boolean;
   @cast margin: Margin;
   @cast margin_available: MarginAvailable;
   @cast margin_level: number;
 }
 
-export class Pagination extends TypeConverter {
+export class Pagination extends Castable {
   @cast limit: number;
   @cast order: 'desc' | 'asc';
   @cast starting_after: string;
@@ -117,7 +117,7 @@ export interface LeveragePositionsRequest extends Partial<Pagination> {
   status?: 'open' | 'closed';
 }
 
-export class NewOrder extends TypeConverter {
+export class NewOrder extends Castable {
   @cast id: string;
   @cast side: string;
   @cast rate?: number;
@@ -127,7 +127,7 @@ export class NewOrder extends TypeConverter {
   @cast(Date) created_at: Date;
 }
 
-export class CloseOrder extends TypeConverter {
+export class CloseOrder extends Castable {
   @cast id: string;
   @cast side: string;
   @cast rate: number;
@@ -137,7 +137,7 @@ export class CloseOrder extends TypeConverter {
   @cast created_at: Date;
 }
 
-export class LeveragePosition extends TypeConverter {
+export class LeveragePosition extends Castable {
   @cast id: string;
   @cast pair: string;
   @cast status: string;
@@ -153,13 +153,13 @@ export class LeveragePosition extends TypeConverter {
   @cast @element(CloseOrder) close_orders: CloseOrder[];
 }
 
-export class LeveragePositionsResponse extends TypeConverter {
+export class LeveragePositionsResponse extends Castable {
   @cast success: boolean;
   @cast @element(LeveragePosition) data: LeveragePosition[];
   @cast pagination: Pagination;
 }
 
-export class OrderBooksResponse extends TypeConverter {
+export class OrderBooksResponse extends Castable {
   @cast @element(Array, Number) asks: number[][];
   @cast @element(Array, Number) bids: number[][];
 }
@@ -174,7 +174,7 @@ export interface NewOrderRequest {
   stop_loss_rate?: number;
 }
 
-export class NewOrderResponse extends TypeConverter {
+export class NewOrderResponse extends Castable {
   @cast success: boolean;
   @cast id: string;
   @cast rate: number;
@@ -186,12 +186,12 @@ export class NewOrderResponse extends TypeConverter {
   @cast(Date) created_at: Date;
 }
 
-export class CancelOrderResponse extends TypeConverter {
+export class CancelOrderResponse extends Castable {
   @cast success: boolean;
   @cast id: string;
 }
 
-export class OpenOrder extends TypeConverter {
+export class OpenOrder extends Castable {
   @cast id: string;
   @cast order_type: string;
   @cast rate?: number;
@@ -202,17 +202,17 @@ export class OpenOrder extends TypeConverter {
   @cast(Date) created_at: Date;
 }
 
-export class OpenOrdersResponse extends TypeConverter {
+export class OpenOrdersResponse extends Castable {
   @cast success: boolean;
   @cast @element(OpenOrder) orders: OpenOrder[];
 }
 
-export class Funds extends TypeConverter {
+export class Funds extends Castable {
   @cast btc: number;
   @cast jpy: number;
 }
 
-export class Transaction extends TypeConverter {
+export class Transaction extends Castable {
   @cast id: string;
   @cast order_id: string;
   @cast(Date) created_at: Date;
@@ -225,7 +225,7 @@ export class Transaction extends TypeConverter {
   @cast side: string;
 }
 
-export class TransactionsResponse extends TypeConverter {
+export class TransactionsResponse extends Castable {
   @cast success: boolean;
   @cast pagination: Pagination;
   @cast @element(Transaction) data: Transaction[];

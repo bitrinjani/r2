@@ -1,7 +1,7 @@
 ﻿import BrokerPosition from './BrokerPosition';
 import Order from './Order';
 import Quote from './Quote';
-import { cast, element, TypeConverter } from './TypeConverter';
+import { Castable, cast, element } from '@bitr/castable';
 
 export interface ConfigValidator {
   validate(config: ConfigRoot): void;
@@ -134,7 +134,7 @@ export enum Broker {
   Quoine = 'Quoine'
 }
 
-export class BrokerConfig extends TypeConverter {
+export class BrokerConfig extends Castable {
   @cast broker: Broker;
   @cast enabled: boolean;
   @cast key: string;
@@ -146,7 +146,7 @@ export class BrokerConfig extends TypeConverter {
   @cast commissionPercent: number;
 }
 
-export class SlackConfig extends TypeConverter {
+export class SlackConfig extends Castable {
   @cast enabled: boolean;
   @cast url: string;
   @cast channel: string;
@@ -156,7 +156,7 @@ export class SlackConfig extends TypeConverter {
   keywords: string[];
 }
 
-export class LineConfig extends TypeConverter {
+export class LineConfig extends Castable {
   @cast enabled: boolean;
   @cast token: string;
   @cast
@@ -164,12 +164,12 @@ export class LineConfig extends TypeConverter {
   keywords: string[];
 }
 
-export class LoggingConfig extends TypeConverter {
+export class LoggingConfig extends Castable {
   @cast slack: SlackConfig;
   @cast line: LineConfig;
 }
 
-export class ConfigRoot extends TypeConverter {
+export class ConfigRoot extends Castable {
   @cast language: string;
   @cast demoMode: boolean;
   @cast priceMergeSize: number;

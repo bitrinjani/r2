@@ -1,5 +1,5 @@
 // tslint:disable:variable-name
-import { TypeConverter, cast, element } from '../TypeConverter';
+import { Castable, cast, element } from '@bitr/castable'
 
 export interface Order {
   order_type: string;
@@ -15,7 +15,7 @@ export interface SendOrderRequest {
   order: Order;
 }
 
-export class SendOrderResponse extends TypeConverter {
+export class SendOrderResponse extends Castable {
   @cast id: string;
   @cast order_type: string;
   @cast quantity: string;
@@ -44,7 +44,7 @@ export class SendOrderResponse extends TypeConverter {
 
 export type CancelOrderResponse = any;
 
-export class Execution extends TypeConverter {
+export class Execution extends Castable {
   @cast id: string;
   @cast quantity: string;
   @cast price: string;
@@ -53,7 +53,7 @@ export class Execution extends TypeConverter {
   @cast my_side: string;
 }
 
-export class OrdersResponse extends TypeConverter {
+export class OrdersResponse extends Castable {
   @cast id: string;
   @cast order_type: string;
   @cast quantity: string;
@@ -85,7 +85,7 @@ export class OrdersResponse extends TypeConverter {
   @cast stop_triggered_time?: any;
 }
 
-export class TradingAccount extends TypeConverter {
+export class TradingAccount extends Castable {
   @cast id: string;
   @cast leverage_level: number;
   @cast max_leverage_level: number;
@@ -109,13 +109,13 @@ export class TradingAccount extends TypeConverter {
 }
 
 export type TradingAccountsResponse = TradingAccount[];
-export class PriceLevelsResponse extends TypeConverter {
+export class PriceLevelsResponse extends Castable {
   @cast @element(Array, Number) buy_price_levels: number[][];
   @cast @element(Array, Number) sell_price_levels: number[][];
 }
 
 export type CloseAllResponse = ClosingTrade[];
-export class ClosingTrade extends TypeConverter {
+export class ClosingTrade extends Castable {
   @cast id: number;
   @cast currency_pair_code: string;
   @cast status: string;

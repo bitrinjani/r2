@@ -10,6 +10,12 @@
     esutils "^2.0.2"
     js-tokens "^3.0.0"
 
+"@bitr/castable@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@bitr/castable/-/castable-1.0.1.tgz#ddfa38580e35668ea3f270b250bc99022cb2bdf9"
+  dependencies:
+    reflect-metadata "^0.1.10"
+
 "@types/decimal.js@^0.0.31":
   version "0.0.31"
   resolved "https://registry.yarnpkg.com/@types/decimal.js/-/decimal.js-0.0.31.tgz#cb2a797ccb0cbb0ead0b91134bd6b02429db931f"
