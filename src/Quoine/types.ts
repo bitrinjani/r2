@@ -1,5 +1,5 @@
 // tslint:disable:variable-name
-import { Castable, cast, element } from '@bitr/castable'
+import { Castable, cast, element } from '@bitr/castable';
 
 export interface Order {
   order_type: string;
