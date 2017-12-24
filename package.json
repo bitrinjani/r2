@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "prestart": "rimraf dist && tsc -p tsconfig.json && cpy src/config.json dist ",
-    "start": "node ./dist/index.js | node ./dist/logger/transport.js",
+    "start": "node ./dist | node ./dist/transport",
     "test": "jest --maxWorkers=1 --coverage && cat ./coverage/lcov.info | coveralls",
     "testfast": "jest",
     "coverage": "jest --coverage",
@@ -72,6 +72,7 @@
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",
       "!src/index.ts",
+      "!src/transport/index.ts",
       "!**/__tests__/**",
       "!**/node_modules/**",
       "!**/vendor/**",

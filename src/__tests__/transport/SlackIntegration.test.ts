@@ -1,4 +1,4 @@
-import SlackIntegration from '../../logger/SlackIntegration';
+import SlackIntegration from '../../transport/SlackIntegration';
 import { SlackConfig } from '../../types';
 import * as nock from 'nock';
 

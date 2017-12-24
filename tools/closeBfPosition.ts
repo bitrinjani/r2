@@ -4,6 +4,9 @@ import BitflyerApi from '../src/Bitflyer/BrokerApi';
 import { Broker } from '../src/types';
 import { Balance } from '../src/Bitflyer/types';
 import * as _ from 'lodash';
+import { options } from '../src/logger';
+
+options.enabled = false;
 
 async function main() {
   const config = util.getConfigRoot();
