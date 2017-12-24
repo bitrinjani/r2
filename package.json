@@ -34,8 +34,7 @@
     "pino": "^4.10.2",
     "reflect-metadata": "^0.1.10",
     "split2": "^2.2.0",
-    "uuid": "^3.1.0",
-    "winston": "^3.0.0-rc1"
+    "uuid": "^3.1.0"
   },
   "devDependencies": {
     "@types/jest": "^21.1.4",
