@@ -2,6 +2,9 @@
 import * as util from '../src/util';
 import QuoineApi from '../src/Quoine/BrokerApi';
 import { Broker } from '../src/types';
+import { options } from '../src/logger';
+
+options.enabled = false;
 
 async function main() {
   const config = util.getConfigRoot();  

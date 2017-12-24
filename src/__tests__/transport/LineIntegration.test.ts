@@ -1,4 +1,4 @@
-import LineIntegration from '../../logger/LineIntegration';
+import LineIntegration from '../../transport/LineIntegration';
 import { LineConfig } from '../../types';
 import * as nock from 'nock';
 import { delay } from '../../util';

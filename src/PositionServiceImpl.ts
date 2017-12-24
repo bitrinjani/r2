@@ -41,7 +41,7 @@ export default class PositionServiceImpl implements PositionService {
     this.log.info(hr(21) + 'POSITION' + hr(21));
     this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} BTC`);
     _.each(this.positionMap, (position: BrokerPosition) =>
-      this.log.info(position)
+      this.log.info(position.toString())
     );
     this.log.info(hr(50));
     this.log.debug(JSON.stringify(this.positionMap));

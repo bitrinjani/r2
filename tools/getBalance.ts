@@ -8,6 +8,9 @@ import QuoineApi from '../src/Quoine/BrokerApi';
 import { Broker } from '../src/types';
 import { Balance } from '../src/Bitflyer/types';
 import { TradingAccount } from '../src/Quoine/types';
+import { options } from '../src/logger';
+
+options.enabled = false;
 
 async function main() {
   const config = util.getConfigRoot();

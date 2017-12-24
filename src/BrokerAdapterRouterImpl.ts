@@ -16,17 +16,17 @@ export default class BrokerAdapterRouterImpl implements BrokerAdapterRouter {
   }
 
   async send(order: Order): Promise<void> {
-    this.log.debug(order);
+    this.log.debug(order.toString());
     await this.brokerAdapterMap[order.broker].send(order);
   }
 
   async cancel(order: Order): Promise<void> {
-    this.log.debug(order);
+    this.log.debug(order.toString());
     await this.brokerAdapterMap[order.broker].cancel(order);
   }
 
   async refresh(order: Order): Promise<void> {
-    this.log.debug(order);
+    this.log.debug(order.toString());
     await this.brokerAdapterMap[order.broker].refresh(order);
   }
 

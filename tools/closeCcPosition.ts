@@ -3,6 +3,9 @@
 import * as util from '../src/util';
 import CoincheckApi from '../src/Coincheck/BrokerApi';
 import { Broker } from '../src/types';
+import { options } from '../src/logger';
+
+options.enabled = false;
 
 async function main() {
   const config = util.getConfigRoot();
