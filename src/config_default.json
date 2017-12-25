@@ -13,6 +13,10 @@
   "maxNetExposure": 0.1,
   "maxRetryCount": 10,
   "orderStatusCheckInterval": 3000,
+  "onSingleLeg": {
+    "action": "Cancel",
+    "options": {}
+  },
   "brokers": [
     {
       "broker": "Coincheck",
