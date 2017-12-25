@@ -14,18 +14,22 @@ import {
   QuoteSide,
   OrderSide,
   LimitCheckerFactory,
-  OrderPair
+  OrderPair,
+  ReverseOption,
+  ProceedOption
 } from './types';
 import t from './intl';
 import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
 import Quote from './Quote';
 import symbols from './symbols';
+import { fatalErrors } from './constants';
 
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {
   private readonly log = getLogger(this.constructor.name);
   private activePairs: OrderPair[] = [];
   private lastSpreadAnalysisResult: SpreadAnalysisResult;
+  private shouldStop: boolean = false;
 
   constructor(
     @inject(symbols.QuoteAggregator) private readonly quoteAggregator: QuoteAggregator,
@@ -57,6 +61,10 @@ export default class ArbitragerImpl implements Arbitrager {
   }
 
   private async quoteUpdated(quotes: Quote[]): Promise<void> {
+    if (this.shouldStop) {
+      await this.stop();
+      return;
+    }
     this.positionService.print();
     this.log.info(hr(20) + 'ARBITRAGER' + hr(20));
     await this.arbitrage(quotes);
@@ -111,6 +119,10 @@ export default class ArbitragerImpl implements Arbitrager {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
       this.status = 'Order send/refresh failed';
+      if (typeof ex.message === 'string' && _.some(fatalErrors, f => (ex.message as string).includes(f))) {
+        this.shouldStop = true;
+        return;
+      }
     }
     this.log.info(t`SleepingAfterSend`, config.sleepAfterSend);
     await delay(config.sleepAfterSend);
@@ -156,6 +168,9 @@ export default class ArbitragerImpl implements Arbitrager {
         this.log.warn(t`MaxRetryCountReachedCancellingThePendingOrders`);
         const cancelTasks = orders.filter(o => !o.filled).map(o => this.brokerAdapterRouter.cancel(o));
         await Promise.all(cancelTasks);
+        if (orders.filter(o => o.filled).length === 1) {
+          await this.handleSingleLeg(orders);
+        }
         break;
       }
     }
@@ -214,6 +229,79 @@ export default class ArbitragerImpl implements Arbitrager {
     );
     await this.brokerAdapterRouter.send(order);
     return order;
+  }
+
+  private async handleSingleLeg(orders: OrderPair) {
+    if (this.configStore.config.onSingleLeg === undefined || this.configStore.config.onSingleLeg.action === 'Cancel') {
+      return;
+    }
+
+    const { action, options } = this.configStore.config.onSingleLeg;
+    switch (action) {
+      case 'Reverse':
+        await this.reverseLeg(orders, options as ReverseOption);
+        return;
+      case 'Proceed':
+        await this.proceedLeg(orders, options as ProceedOption);
+        return;
+      default:
+        throw new Error('Invalid action.');
+    }
+  }
+
+  private async reverseLeg(orders: OrderPair, options: ReverseOption) {
+    this.log.info(`Reversing the filled leg...`);
+    const filledOrders = orders.filter(o => o.filled);
+    const target = filledOrders[0];
+    const sign = target.side === OrderSide.Buy ? -1 : 1;
+    const price = target.price * (1 + sign * options.limitMovePercent / 100);
+    this.log.info(`Target leg: ${target}, target price: ${price}`);
+    const reversalOrder = new Order(
+      target.broker,
+      target.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
+      target.size,
+      price,
+      target.cashMarginType,
+      OrderType.Limit,
+      target.leverageLevel
+    );
+    await this.sendOrderWithTtl(reversalOrder, options.ttl);
+  }
+
+  private async proceedLeg(orders: OrderPair, options: ProceedOption) {
+    this.log.info(`Proceeding to fill another leg with a new price...`);
+    const unfilledOrders = orders.filter(o => !o.filled);
+    const target = unfilledOrders[0];
+    const sign = target.side === OrderSide.Buy ? 1 : -1;
+    const price = target.price * (1 + sign * options.limitMovePercent / 100);
+    this.log.info(`Target leg: ${target}, target price: ${price}`);
+    const revisedOrder = new Order(
+      target.broker,
+      target.side,
+      target.size,
+      price,
+      target.cashMarginType,
+      OrderType.Limit,
+      target.leverageLevel
+    );
+    await this.sendOrderWithTtl(revisedOrder, options.ttl);
+  }
+
+  private async sendOrderWithTtl(order: Order, ttl: number) {
+    try {
+      this.log.info(`Sending an order with TTL ${ttl} ms...`);
+      await this.brokerAdapterRouter.send(order);
+      await delay(ttl);
+      await this.brokerAdapterRouter.refresh(order);
+      if (!order.filled) {
+        this.log.info(`The order was not filled within TTL ${ttl} ms. Cancelling the order.`);
+        await this.brokerAdapterRouter.cancel(order);
+      } else {
+        this.log.info(`The order was filled.`);
+      }
+    } catch (ex) {
+      this.log.warn(ex.message);
+    }
   }
 
   private printOrderSummary(orders: Order[]) {
