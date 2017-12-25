@@ -5,6 +5,8 @@ import BrokerAdapterImpl from '../../Bitflyer/BrokerAdapterImpl';
 import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType } from '../../types';
 import nocksetup from './nocksetup';
 import Order from '../../Order';
+import { options } from '../../logger';
+options.enabled = false;
 
 nocksetup();
 afterAll(() => {

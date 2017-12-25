@@ -3,6 +3,8 @@
 import WebClient from '../WebClient';
 import { RequestInit } from 'node-fetch';
 import * as nock from 'nock';
+import { options } from '../logger';
+options.enabled = false;
 
 const baseUrl = 'http://local';
 const mocky = nock(baseUrl);

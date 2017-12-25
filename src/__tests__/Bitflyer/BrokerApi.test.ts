@@ -3,6 +3,8 @@ import * as nock from 'nock';
 import * as _ from 'lodash';
 import BrokerApi from '../../Bitflyer/BrokerApi';
 import nocksetup from './nocksetup';
+import { options } from '../../logger';
+options.enabled = false;
 
 nocksetup();
 afterAll(() => {

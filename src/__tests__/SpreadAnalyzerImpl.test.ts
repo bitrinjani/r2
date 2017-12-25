@@ -3,6 +3,8 @@ import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
 import { Broker, QuoteSide, ConfigStore } from '../types';
 import * as _ from 'lodash';
 import Quote from '../Quote';
+import { options } from '../logger';
+options.enabled = false;
 
 const config = require('./config_test.json');
 config.maxSize = 0.5;

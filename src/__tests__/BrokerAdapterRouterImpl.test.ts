@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import Order from '../Order';
 import { CashMarginType, OrderType, OrderSide, Broker } from '../types';
 import BrokerAdapterRouterImpl from '../BrokerAdapterRouterImpl';
+import { options } from '../logger';
+options.enabled = false;
 
 const baBitflyer = {
   broker: Broker.Bitflyer,

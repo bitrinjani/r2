@@ -5,6 +5,8 @@ import nocksetup from './nocksetup';
 import Order from '../../Order';
 import { NewOrderRequest } from '../../Coincheck/types';
 import * as nock from 'nock';
+import { options } from '../../logger';
+options.enabled = false;
 
 nocksetup();
 

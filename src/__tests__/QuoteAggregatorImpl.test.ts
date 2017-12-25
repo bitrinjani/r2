@@ -4,6 +4,8 @@ import { Broker, QuoteSide, QuoteAggregator } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
 import BrokerAdapterRouterImpl from '../BrokerAdapterRouterImpl';
+import { options } from '../logger';
+options.enabled = false;
 
 const config = {
   iterationInterval: 3000,
