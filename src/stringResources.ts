@@ -97,5 +97,8 @@ export const ja = {
   FilledSummary: '>>約定済み: %s %s %d BTC 約定価格 %s',
   UnfilledSummary: '>>執行中: %s %s %d BTC 指値 %s, 残り数量 %d BTC',
   FoundClosableOrders: 'クローズ可能なオーダーを発見。',
-  OpenPairs: 'オープン状態のオーダーペア:'
+  OpenPairs: 'オープン状態のオーダーペア:',
+  SendingOrderTtl: 'TTL %d msのオーダーを送信中...',
+  NotFilledTtl: 'TTL %d msの間にオーダーは約定しませんでした。キャンセルします。',
+  ExecuteUnfilledLeg: '約定しなかったオーダー %s %s %d BTC を価格 %s で再送信中...'
 };
