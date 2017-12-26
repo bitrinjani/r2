@@ -1,7 +1,8 @@
 
 jest.mock('fs', () => ({
   existsSync: jest.fn(() => false),
-  readFileSync: jest.fn(() => '{"language": "test"}')
+  readFileSync: jest.fn(() => '{"language": "test"}'),
+  mkdirSync: jest.fn(() => { throw { code: 'EEXIST' }; })
 }));
 
 import * as fs from 'fs';
@@ -21,6 +22,10 @@ test('getConfigRoot with process.env mock', () => {
   } finally {
     process.env.NODE_ENV = 'test';
   }
+});
+
+test('mkdir throws', () => {
+  expect(() => util.mkdir('mockdir')).not.toThrow();
 });
 
 afterAll(() => jest.unmock('fs'));
