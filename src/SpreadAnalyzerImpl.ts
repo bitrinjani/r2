@@ -96,4 +96,4 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   private isAllowedByCurrentPosition(q: Quote, pos: BrokerPosition): boolean {
     return q.side === QuoteSide.Bid ? pos.shortAllowed : pos.longAllowed;
   }
-}
+} /* istanbul ignore next */

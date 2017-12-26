@@ -38,7 +38,7 @@ export default class ArbitragerImpl implements Arbitrager {
     @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter,
     @inject(symbols.SpreadAnalyzer) private readonly spreadAnalyzer: SpreadAnalyzer,
     @inject(symbols.LimitCheckerFactory) private readonly limitCheckerFactory: LimitCheckerFactory
-  ) {}
+  ) {} 
 
   status: string = 'Init';
 
@@ -98,9 +98,7 @@ export default class ArbitragerImpl implements Arbitrager {
     const limitChecker = this.limitCheckerFactory.create(spreadAnalysisResult, exitFlag);
     const limitCheckResult = limitChecker.check();
     if (!limitCheckResult.success) {
-      if (limitCheckResult.reason) {
-        this.status = limitCheckResult.reason;
-      }
+      this.status = limitCheckResult.reason;
       return;
     }
 
@@ -128,7 +126,7 @@ export default class ArbitragerImpl implements Arbitrager {
     await delay(config.sleepAfterSend);
   }
 
-  private async checkOrderState(orders: OrderPair, exitFlag: boolean = false): Promise<void> {
+  private async checkOrderState(orders: OrderPair, exitFlag: boolean): Promise<void> {
     const { config } = this.configStore;
     for (const i of _.range(1, config.maxRetryCount + 1)) {
       await delay(config.orderStatusCheckInterval);
@@ -313,8 +311,8 @@ export default class ArbitragerImpl implements Arbitrager {
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
     const columnWidth = 17;
-    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), result.bestAsk);
-    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), result.bestBid);
+    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), result.bestAsk.toString());
+    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), result.bestBid.toString());
     this.log.info('%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
     this.log.info('%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
     this.log.info('%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);
@@ -335,4 +333,4 @@ export default class ArbitragerImpl implements Arbitrager {
       this.log.info(`[${pair[0].toShortString()}, ${pair[1].toShortString()}]`);
     });
   }
-}
+} /* istanbul ignore next */

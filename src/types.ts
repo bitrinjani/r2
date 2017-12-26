@@ -50,7 +50,7 @@ export interface LimitChecker {
 
 export interface LimitCheckResult {
   success: boolean;
-  reason?: string;
+  reason: string;
 }
 
 export interface LimitCheckerFactory {

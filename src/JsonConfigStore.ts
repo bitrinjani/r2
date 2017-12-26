@@ -12,9 +12,9 @@ export default class JsonConfigStore implements ConfigStore {
   ) {
     this._config = getConfigRoot();
     configValidator.validate(this._config);
-  }
+  } 
 
   get config(): ConfigRoot {
     return this._config;
   }
-}
+} /* istanbul ignore next */

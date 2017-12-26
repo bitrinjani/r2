@@ -92,4 +92,4 @@ export default class PositionServiceImpl implements PositionService {
     pos.shortAllowed = new Decimal(allowedShortSize).gte(minSize);
     return pos;
   }
-}
+} /* istanbul ignore next */

@@ -96,4 +96,4 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
       )
       .value();
   }
-}
+} /* istanbul ignore next */

@@ -39,7 +39,7 @@ export default class LimitCheckerImpl implements LimitChecker {
         return result;
       }
     }
-    return { success: true };
+    return { success: true, reason: '' };
   }
 }
 
@@ -51,7 +51,7 @@ class MaxNetExposureLimit implements LimitChecker {
   check() {
     const success = Math.abs(this.positionService.netExposure) <= this.configStore.config.maxNetExposure;
     if (success) {
-      return { success };
+      return { success, reason: '' };
     }
     const reason = 'Max exposure breached';
     this.log.info(t`NetExposureIsLargerThanMaxNetExposure`);
@@ -67,7 +67,7 @@ class InvertedSpreadLimit implements LimitChecker {
   check() {
     const success = this.spreadAnalysisResult.invertedSpread > 0;
     if (success) {
-      return { success };
+      return { success, reason: '' };
     }
     const reason = 'Spread not inverted';
     this.log.info(t`NoArbitrageOpportunitySpreadIsNotInverted`);
@@ -83,7 +83,7 @@ class MinTargetProfitLimit implements LimitChecker {
   check() {
     const success = this.isTargetProfitLargeEnough();
     if (success) {
-      return { success };
+      return { success, reason: '' };
     }
     const reason = 'Too small profit';
     this.log.info(t`TargetProfitIsSmallerThanMinProfit`);
@@ -112,7 +112,7 @@ class MaxTargetProfitLimit implements LimitChecker {
   check() {
     const success = this.isProfitSmallerThanLimit();
     if (success) {
-      return { success };
+      return { success, reason: '' };
     }
     const reason = 'Too large profit';
     this.log.info(t`TargetProfitIsLargerThanMaxProfit`);
@@ -140,7 +140,7 @@ class DemoModeLimit implements LimitChecker {
   check() {
     const success = !this.configStore.config.demoMode;
     if (success) {
-      return { success };
+      return { success, reason: '' };
     }
     const reason = 'Demo mode';
     this.log.info(t`ThisIsDemoModeNotSendingOrders`);
