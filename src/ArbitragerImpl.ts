@@ -235,7 +235,6 @@ export default class ArbitragerImpl implements Arbitrager {
     if (this.configStore.config.onSingleLeg === undefined || this.configStore.config.onSingleLeg.action === 'Cancel') {
       return;
     }
-
     const { action, options } = this.configStore.config.onSingleLeg;
     switch (action) {
       case 'Reverse':
@@ -251,53 +250,51 @@ export default class ArbitragerImpl implements Arbitrager {
 
   private async reverseLeg(orders: OrderPair, options: ReverseOption) {
     this.log.info(`Reversing the filled leg...`);
-    const filledOrders = orders.filter(o => o.filled);
-    const target = filledOrders[0];
-    const sign = target.side === OrderSide.Buy ? -1 : 1;
-    const price = target.price * (1 + sign * options.limitMovePercent / 100);
-    this.log.info(`Target leg: ${target}, target price: ${price}`);
+    const filledLeg = orders.filter(o => o.filled)[0];
+    const sign = filledLeg.side === OrderSide.Buy ? -1 : 1;
+    const price = _.round(filledLeg.price * (1 + sign * options.limitMovePercent / 100));
+    this.log.info(`Target leg: ${filledLeg}, target price: ${price}`);
     const reversalOrder = new Order(
-      target.broker,
-      target.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
-      target.size,
+      filledLeg.broker,
+      filledLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
+      filledLeg.size,
       price,
-      target.cashMarginType,
+      filledLeg.cashMarginType,
       OrderType.Limit,
-      target.leverageLevel
+      filledLeg.leverageLevel
     );
     await this.sendOrderWithTtl(reversalOrder, options.ttl);
   }
 
   private async proceedLeg(orders: OrderPair, options: ProceedOption) {
-    this.log.info(`Proceeding to fill another leg with a new price...`);
-    const unfilledOrders = orders.filter(o => !o.filled);
-    const target = unfilledOrders[0];
-    const sign = target.side === OrderSide.Buy ? 1 : -1;
-    const price = target.price * (1 + sign * options.limitMovePercent / 100);
-    this.log.info(`Target leg: ${target}, target price: ${price}`);
+    const unfilledLeg = orders.filter(o => !o.filled)[0];
+    const sign = unfilledLeg.side === OrderSide.Buy ? 1 : -1;
+    const price = _.round(unfilledLeg.price * (1 + sign * options.limitMovePercent / 100));
+    this.log.info(t`ExecuteUnfilledLeg`, unfilledLeg.broker, unfilledLeg.side, unfilledLeg.size, price);
     const revisedOrder = new Order(
-      target.broker,
-      target.side,
-      target.size,
+      unfilledLeg.broker,
+      unfilledLeg.side,
+      unfilledLeg.size,
       price,
-      target.cashMarginType,
+      unfilledLeg.cashMarginType,
       OrderType.Limit,
-      target.leverageLevel
+      unfilledLeg.leverageLevel
     );
     await this.sendOrderWithTtl(revisedOrder, options.ttl);
   }
 
   private async sendOrderWithTtl(order: Order, ttl: number) {
     try {
-      this.log.info(`Sending an order with TTL ${ttl} ms...`);
+      this.log.info(t`SendingOrderTtl`, ttl);
+      this.log.info(`${order.toShortString()} at ${order.price}`);
       await this.brokerAdapterRouter.send(order);
       await delay(ttl);
       await this.brokerAdapterRouter.refresh(order);
-      if (!order.filled) {
-        this.log.info(`The order was not filled within TTL ${ttl} ms. Cancelling the order.`);
-        await this.brokerAdapterRouter.cancel(order);
+      if (order.filled) {
+        this.log.info(order.toExecSummary());
       } else {
-        this.log.info(`The order was filled.`);
+        this.log.info(t`NotFilledTtl`, ttl);
+        await this.brokerAdapterRouter.cancel(order);
       }
     } catch (ex) {
       this.log.warn(ex.message);
@@ -307,9 +304,9 @@ export default class ArbitragerImpl implements Arbitrager {
   private printOrderSummary(orders: Order[]) {
     orders.forEach(o => {
       if (o.filled) {
-        this.log.info(o.toSummary());
+        this.log.info(o.toExecSummary());
       } else {
-        this.log.warn(o.toSummary());
+        this.log.warn(o.toExecSummary());
       }
     });
   }
@@ -335,9 +332,7 @@ export default class ArbitragerImpl implements Arbitrager {
     }
     this.log.info(t`OpenPairs`);
     this.activePairs.forEach(pair => {
-      this.log.info(
-        `[${pair[0].broker} ${pair[0].side} ${pair[0].size}, ${pair[1].broker} ${pair[1].side} ${pair[1].size}]`
-      );
+      this.log.info(`[${pair[0].toShortString()}, ${pair[1].toShortString()}]`);
     });
   }
 }

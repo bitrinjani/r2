@@ -45,7 +45,10 @@ export const en = {
   FilledSummary: 'Filled: %s %s %d BTC filled at %s',
   UnfilledSummary: 'Pending: %s %s %d BTC sent at %s, pending size %d BTC',
   FoundClosableOrders: 'Found closable orders.',
-  OpenPairs: 'Open pairs:'
+  OpenPairs: 'Open pairs:',
+  SendingOrderTtl: 'Sending an order with TTL %d ms...',
+  NotFilledTtl: 'The order was not filled within TTL %d ms. Cancelling the order.',
+  ExecuteUnfilledLeg: 'Trying to execute the unfilled leg %s %s %d BTC at new price: %s'
 };
 
 export const ja = {
