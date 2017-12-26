@@ -247,11 +247,10 @@ export default class ArbitragerImpl implements Arbitrager {
   }
 
   private async reverseLeg(orders: OrderPair, options: ReverseOption) {
-    this.log.info(`Reversing the filled leg...`);
     const filledLeg = orders.filter(o => o.filled)[0];
     const sign = filledLeg.side === OrderSide.Buy ? -1 : 1;
     const price = _.round(filledLeg.price * (1 + sign * options.limitMovePercent / 100));
-    this.log.info(`Target leg: ${filledLeg}, target price: ${price}`);
+    this.log.info(t`ReverseFilledLeg`, filledLeg.toShortString(), price.toLocaleString());
     const reversalOrder = new Order(
       filledLeg.broker,
       filledLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
@@ -268,7 +267,7 @@ export default class ArbitragerImpl implements Arbitrager {
     const unfilledLeg = orders.filter(o => !o.filled)[0];
     const sign = unfilledLeg.side === OrderSide.Buy ? 1 : -1;
     const price = _.round(unfilledLeg.price * (1 + sign * options.limitMovePercent / 100));
-    this.log.info(t`ExecuteUnfilledLeg`, unfilledLeg.broker, unfilledLeg.side, unfilledLeg.size, price);
+    this.log.info(t`ExecuteUnfilledLeg`, unfilledLeg.toShortString(), price.toLocaleString());
     const revisedOrder = new Order(
       unfilledLeg.broker,
       unfilledLeg.side,
@@ -284,12 +283,11 @@ export default class ArbitragerImpl implements Arbitrager {
   private async sendOrderWithTtl(order: Order, ttl: number) {
     try {
       this.log.info(t`SendingOrderTtl`, ttl);
-      this.log.info(`${order.toShortString()} at ${order.price}`);
       await this.brokerAdapterRouter.send(order);
       await delay(ttl);
       await this.brokerAdapterRouter.refresh(order);
       if (order.filled) {
-        this.log.info(order.toExecSummary());
+        this.log.info(`${order.toExecSummary()}`);
       } else {
         this.log.info(t`NotFilledTtl`, ttl);
         await this.brokerAdapterRouter.cancel(order);
