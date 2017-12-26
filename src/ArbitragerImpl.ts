@@ -16,7 +16,8 @@ import {
   LimitCheckerFactory,
   OrderPair,
   ReverseOption,
-  ProceedOption
+  ProceedOption,
+  OnSingleLegConfig
 } from './types';
 import t from './intl';
 import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
@@ -167,7 +168,8 @@ export default class ArbitragerImpl implements Arbitrager {
         const cancelTasks = orders.filter(o => !o.filled).map(o => this.brokerAdapterRouter.cancel(o));
         await Promise.all(cancelTasks);
         if (orders.filter(o => o.filled).length === 1) {
-          await this.handleSingleLeg(orders);
+          const onSingleLegConfig = config.onSingleLeg;
+          await this.handleSingleLeg(orders, onSingleLegConfig, exitFlag);
         }
         break;
       }
@@ -229,11 +231,15 @@ export default class ArbitragerImpl implements Arbitrager {
     return order;
   }
 
-  private async handleSingleLeg(orders: OrderPair) {
-    if (this.configStore.config.onSingleLeg === undefined || this.configStore.config.onSingleLeg.action === 'Cancel') {
+  private async handleSingleLeg(orders: OrderPair, onSingleLegConfig: OnSingleLegConfig, exitFlag: Boolean) {
+    if (onSingleLegConfig === undefined) {
       return;
     }
-    const { action, options } = this.configStore.config.onSingleLeg;
+    const action = exitFlag ? onSingleLegConfig.actionOnExit : onSingleLegConfig.action;
+    if (action === undefined || action === 'Cancel') {
+      return;
+    }
+    const { options } = onSingleLegConfig;
     switch (action) {
       case 'Reverse':
         await this.reverseLeg(orders, options as ReverseOption);

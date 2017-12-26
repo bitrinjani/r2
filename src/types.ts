@@ -170,6 +170,7 @@ export class LoggingConfig extends Castable {
 }
 export class OnSingleLegConfig extends Castable {
   @cast action: 'Cancel' | 'Reverse' | 'Proceed';
+  @cast actionOnExit: 'Cancel' | 'Reverse' | 'Proceed';
   @cast options: CancelOption | ReverseOption | ProceedOption;
 }
 
