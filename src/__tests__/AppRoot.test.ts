@@ -1,5 +1,7 @@
 import { Container } from 'inversify';
 import AppRoot from '../AppRoot';
+import { options } from '../logger';
+options.enabled = false;
 
 describe('AppRoot', () => {
   test('start and stop', async () => {

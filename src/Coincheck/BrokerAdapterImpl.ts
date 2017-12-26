@@ -121,4 +121,4 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     order.status = almostEqual(order.filledSize, order.size, 1) ? OrderStatus.Filled : OrderStatus.Canceled;
     order.lastUpdated = new Date();
   }
-}
+} /* istanbul ignore next */

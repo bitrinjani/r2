@@ -176,4 +176,4 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       .value();
     return _.concat(asks, bids);
   }
-}
+} /* istanbul ignore next */

@@ -3,6 +3,8 @@ import PositionServiceImpl from '../PositionServiceImpl';
 import { Broker } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
+import { options } from '../logger';
+options.enabled = false;
 
 const config = {
   minSize: 0.01,

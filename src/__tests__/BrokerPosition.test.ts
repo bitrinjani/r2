@@ -1,5 +1,7 @@
 import BrokerPosition from '../BrokerPosition';
 import { Broker } from '../types';
+import { options } from '../logger';
+options.enabled = false;
 
 describe('BrokerPosition', () => {
   test('toString format', () => {

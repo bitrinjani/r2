@@ -6,6 +6,8 @@ import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType, ConfigRoot }
 import nocksetup from './nocksetup';
 import Order from '../../Order';
 import { NewOrderRequest } from '../../Coincheck/types';
+import { options } from '../../logger';
+options.enabled = false;
 
 nocksetup();
 

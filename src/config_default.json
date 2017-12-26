@@ -13,6 +13,14 @@
   "maxNetExposure": 0.1,
   "maxRetryCount": 10,
   "orderStatusCheckInterval": 3000,
+  "onSingleLeg": {
+    "action": "Reverse",
+    "actionOnExit": "Proceed",
+    "options": {
+      "limitMovePercent": 5,
+      "ttl": 3000
+    }
+  },
   "brokers": [
     {
       "broker": "Coincheck",

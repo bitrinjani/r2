@@ -1,6 +1,8 @@
 import 'reflect-metadata';
 import JsonConfigStore from '../JsonConfigStore';
 import { ConfigStore, ConfigRoot, Broker } from '../types';
+import { options } from '../logger';
+options.enabled = false;
 
 test('JsonConfigStore', () => {
   const validator = { validate: (config: ConfigRoot) => true };

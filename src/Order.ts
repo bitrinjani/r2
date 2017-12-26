@@ -46,11 +46,15 @@ export default class Order {
     return this.averageFilledPrice * this.filledSize;
   }
 
-  toSummary(): string {
+  toExecSummary(): string {
     return this.filled ?
       format(t`FilledSummary`, this.broker, this.side, 
         this.filledSize, _.round(this.averageFilledPrice).toLocaleString()) :
       format(t`UnfilledSummary`, this.broker, this.side, this.size, this.price.toLocaleString(), this.pendingSize);
+  }
+
+  toShortString(): string {
+    return `${this.broker} ${this.side} ${this.size} BTC`;
   }
 
   toString(): string {

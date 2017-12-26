@@ -4,6 +4,8 @@ import nocksetup from './nocksetup';
 import BrokerApi from '../../Coincheck/BrokerApi';
 import Order from '../../Order';
 import * as nock from 'nock';
+import { options } from '../../logger';
+options.enabled = false;
 
 nocksetup();
 

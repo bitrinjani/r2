@@ -50,7 +50,7 @@ export interface LimitChecker {
 
 export interface LimitCheckResult {
   success: boolean;
-  reason?: string;
+  reason: string;
 }
 
 export interface LimitCheckerFactory {
@@ -168,6 +168,23 @@ export class LoggingConfig extends Castable {
   @cast slack: SlackConfig;
   @cast line: LineConfig;
 }
+export class OnSingleLegConfig extends Castable {
+  @cast action: 'Cancel' | 'Reverse' | 'Proceed';
+  @cast actionOnExit: 'Cancel' | 'Reverse' | 'Proceed';
+  @cast options: CancelOption | ReverseOption | ProceedOption;
+}
+
+export type CancelOption = {};
+
+export class ReverseOption extends Castable {
+  @cast limitMovePercent: number;
+  @cast ttl: number;
+}
+
+export class ProceedOption extends Castable {
+  @cast limitMovePercent: number;
+  @cast ttl: number;
+}
 
 export class ConfigRoot extends Castable {
   @cast language: string;
@@ -187,6 +204,7 @@ export class ConfigRoot extends Castable {
   @cast maxNetExposure: number;
   @cast maxRetryCount: number;
   @cast orderStatusCheckInterval: number;
+  @cast onSingleLeg: OnSingleLegConfig;
   @cast
   @element(BrokerConfig)
   brokers: BrokerConfig[];

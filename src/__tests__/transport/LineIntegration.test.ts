@@ -7,6 +7,7 @@ const lineUrl = 'https://notify-api.line.me/api/notify';
 const lineApi = nock(lineUrl);
 lineApi.post('').reply(200, 'ok');
 lineApi.post('').reply(500, 'ng');
+lineApi.post('').replyWithError('mock error');
 
 describe('LineIntegration', () => {
   test('line', () => {
@@ -40,7 +41,7 @@ describe('LineIntegration', () => {
     line.handler('with keyword: profit');
   });
 
-  test('line exception response', () => {
+  test('line exception response', async () => {
     const config = {
       enabled: true,
       token: 'TOKEN',
@@ -48,6 +49,7 @@ describe('LineIntegration', () => {
     } as LineConfig;
     const line = new LineIntegration(config);
     line.handler('with keyword: profit');
+    await delay(0);
   });
 
   afterAll(() => {
