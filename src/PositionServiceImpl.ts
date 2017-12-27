@@ -1,8 +1,5 @@
 import { injectable, inject } from 'inversify';
-import {
-  PositionService, BrokerAdapterRouter,
-  ConfigStore, BrokerConfig, BrokerMap
-} from './types';
+import { PositionService, BrokerAdapterRouter, ConfigStore, BrokerConfig, BrokerMap } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -20,7 +17,7 @@ export default class PositionServiceImpl implements PositionService {
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter
-  ) { }
+  ) {}
 
   async start(): Promise<void> {
     this.log.debug('Starting PositionService...');
@@ -40,9 +37,7 @@ export default class PositionServiceImpl implements PositionService {
   print(): void {
     this.log.info(hr(21) + 'POSITION' + hr(21));
     this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} BTC`);
-    _.each(this.positionMap, (position: BrokerPosition) =>
-      this.log.info(position.toString())
-    );
+    _.each(this.positionMap, (position: BrokerPosition) => this.log.info(position.toString()));
     this.log.info(hr(50));
     this.log.debug(JSON.stringify(this.positionMap));
   }
@@ -67,7 +62,10 @@ export default class PositionServiceImpl implements PositionService {
       const brokerConfigs = config.brokers.filter(b => b.enabled);
       const promises = brokerConfigs.map(brokerConfig => this.getBrokerPosition(brokerConfig, config.minSize));
       const brokerPositions = await Promise.all(promises);
-      this._positionMap = _(brokerPositions).map(p => [p.broker, p]).fromPairs().value();
+      this._positionMap = _(brokerPositions)
+        .map(p => [p.broker, p])
+        .fromPairs()
+        .value();
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
@@ -79,15 +77,19 @@ export default class PositionServiceImpl implements PositionService {
 
   private async getBrokerPosition(brokerConfig: BrokerConfig, minSize: number): Promise<BrokerPosition> {
     const currentBtc = await this.brokerAdapterRouter.getBtcPosition(brokerConfig.broker);
-    const allowedLongSize = 
-      _.max([0, new Decimal(brokerConfig.maxLongPosition).minus(currentBtc).toNumber()]) as number;
-    const allowedShortSize = 
-      _.max([0, new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()]) as number;
+    const allowedLongSize = _.max([
+      0,
+      new Decimal(brokerConfig.maxLongPosition).minus(currentBtc).toNumber()
+    ]) as number;
+    const allowedShortSize = _.max([
+      0,
+      new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()
+    ]) as number;
     const pos = new BrokerPosition();
     pos.broker = brokerConfig.broker;
     pos.btc = currentBtc;
     pos.allowedLongSize = allowedLongSize;
-    pos.allowedShortSize = allowedShortSize;   
+    pos.allowedShortSize = allowedShortSize;
     pos.longAllowed = new Decimal(allowedLongSize).gte(minSize);
     pos.shortAllowed = new Decimal(allowedShortSize).gte(minSize);
     return pos;

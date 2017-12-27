@@ -8,7 +8,7 @@ export default class LimitCheckerFactoryImpl implements LimitCheckerFactory {
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     @inject(symbols.PositionService) private readonly positionService: PositionService
-  ) { } 
+  ) {}
 
   create(spreadAnalysisResult: SpreadAnalysisResult, exitFlag: boolean): LimitChecker {
     return new LimitCheckerImpl(this.configStore, this.positionService, spreadAnalysisResult, exitFlag);

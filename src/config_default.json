@@ -5,7 +5,7 @@
   "maxSize": 0.01,
   "minSize": 0.01,
   "minTargetProfit": 10,
-  "minTargetProfitPercent": 0.00,
+  "minTargetProfitPercent": 0.0,
   "minExitTargetProfit": -5,
   "iterationInterval": 3000,
   "positionRefreshInterval": 5000,

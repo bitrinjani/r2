@@ -4,12 +4,12 @@ import Order from '../Order';
 import { OrderStatus, OrderSide, OrderType, CashMarginType } from '../types';
 
 export default class CashStrategy implements CashMarginTypeStrategy {
-  constructor(private readonly brokerApi: BrokerApi) { }
+  constructor(private readonly brokerApi: BrokerApi) {}
 
   async send(order: Order): Promise<void> {
     if (order.cashMarginType !== CashMarginType.Cash) {
       throw new Error();
-    }  
+    }
     const request = {
       pair: 'btc_jpy',
       order_type: this.getBrokerOrderType(order),

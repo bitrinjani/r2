@@ -6,13 +6,11 @@ import { getConfigRoot } from './util';
 @injectable()
 export default class JsonConfigStore implements ConfigStore {
   private _config: ConfigRoot;
-  
-  constructor(
-    @inject(symbols.ConfigValidator) configValidator: ConfigValidator
-  ) {
+
+  constructor(@inject(symbols.ConfigValidator) configValidator: ConfigValidator) {
     this._config = getConfigRoot();
     configValidator.validate(this._config);
-  } 
+  }
 
   get config(): ConfigRoot {
     return this._config;

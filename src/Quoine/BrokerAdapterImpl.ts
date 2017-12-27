@@ -1,6 +1,13 @@
 ﻿import {
-  BrokerAdapter, BrokerConfig, ConfigStore, OrderStatus,
-  OrderType, OrderSide, CashMarginType, QuoteSide, Broker
+  BrokerAdapter,
+  BrokerConfig,
+  ConfigStore,
+  OrderStatus,
+  OrderType,
+  OrderSide,
+  CashMarginType,
+  QuoteSide,
+  Broker
 } from '../types';
 import BrokerApi from './BrokerApi';
 import { getLogger } from '../logger';
@@ -21,7 +28,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly config: BrokerConfig;
   readonly broker = Broker.Quoine;
 
-  constructor( @inject(symbols.ConfigStore) configStore: ConfigStore) {
+  constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {
     this.config = findBrokerConfig(configStore.config, this.broker);
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
   }
@@ -128,7 +135,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     } else if (order.filledSize > 0) {
       order.status = OrderStatus.PartiallyFilled;
     }
-    order.executions = _.map(ordersResponse.executions, (x) => {
+    order.executions = _.map(ordersResponse.executions, x => {
       const e = new Execution(order);
       e.price = Number(x.price);
       e.size = Number(x.quantity);

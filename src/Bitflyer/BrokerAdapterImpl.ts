@@ -1,6 +1,14 @@
 ﻿import {
-  BrokerAdapter, BrokerConfig, ConfigStore, OrderStatus,
-  OrderType, TimeInForce, OrderSide, CashMarginType, QuoteSide, Broker
+  BrokerAdapter,
+  BrokerConfig,
+  ConfigStore,
+  OrderStatus,
+  OrderType,
+  TimeInForce,
+  OrderSide,
+  CashMarginType,
+  QuoteSide,
+  Broker
 } from '../types';
 import { getLogger } from '../logger';
 import { injectable, inject } from 'inversify';
@@ -9,10 +17,7 @@ import * as _ from 'lodash';
 import Order from '../Order';
 import Quote from '../Quote';
 import BrokerApi from './BrokerApi';
-import {
-  ChildOrdersParam, SendChildOrderRequest,
-  ChildOrder, BoardResponse
-} from './types';
+import { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from './types';
 import Execution from '../Execution';
 import { eRound, findBrokerConfig } from '../util';
 
@@ -23,7 +28,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly config: BrokerConfig;
   readonly broker = Broker.Bitflyer;
 
-  constructor( @inject(symbols.ConfigStore) configStore: ConfigStore) {
+  constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {
     this.config = findBrokerConfig(configStore.config, this.broker);
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
   }
@@ -53,7 +58,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
 
     this.setOrderFields(childOrder, order);
     const executions = await this.brokerApi.getExecutions({ child_order_acceptance_id: orderId });
-    order.executions = _.map(executions, (x) => {
+    order.executions = _.map(executions, x => {
       const e = new Execution(order);
       e.size = x.size;
       e.price = x.price;
@@ -124,7 +129,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
         childOrderType = 'MARKET';
         price = 0;
         break;
-      default: throw new Error('Not implemented.');
+      default:
+        throw new Error('Not implemented.');
     }
 
     let timeInForce;
@@ -138,7 +144,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       case TimeInForce.Ioc:
         timeInForce = 'IOC';
         break;
-      default: throw new Error('Not implemented.');
+      default:
+        throw new Error('Not implemented.');
     }
 
     return {

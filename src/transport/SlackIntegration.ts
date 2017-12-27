@@ -13,7 +13,7 @@ export default class SlackIntegration {
     if (!(keywords instanceof Array)) {
       return;
     }
-    if (!keywords.some(x => message.includes(x))) {      
+    if (!keywords.some(x => message.includes(x))) {
       return;
     }
     const payload = {
@@ -27,6 +27,6 @@ export default class SlackIntegration {
       headers: { 'Content-Type': 'application/json' },
       timeout: SlackIntegration.fetchTimeout
     };
-    fetch(this.config.url, init).catch(ex => console.log(ex)); 
+    fetch(this.config.url, init).catch(ex => console.log(ex));
   }
 }

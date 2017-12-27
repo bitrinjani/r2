@@ -1,10 +1,7 @@
 import * as _ from 'lodash';
 import { format } from 'util';
 import { v4 as uuid } from 'uuid';
-import {
-  OrderSide, CashMarginType, OrderType,
-  TimeInForce, OrderStatus, Broker
-} from './types';
+import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker } from './types';
 import Execution from './Execution';
 import { eRound } from './util';
 import t from './intl';
@@ -17,7 +14,8 @@ export default class Order {
     public price: number,
     public cashMarginType: CashMarginType,
     public type: OrderType,
-    public leverageLevel: number) { }
+    public leverageLevel: number
+  ) {}
 
   id: string = uuid();
   symbol: string = 'BTCJPY';
@@ -30,7 +28,9 @@ export default class Order {
   lastUpdated: Date;
   executions: Execution[] = [];
 
-  get pendingSize(): number { return eRound(this.size - this.filledSize); }
+  get pendingSize(): number {
+    return eRound(this.size - this.filledSize);
+  }
 
   get averageFilledPrice(): number {
     return _.isEmpty(this.executions)
@@ -47,10 +47,15 @@ export default class Order {
   }
 
   toExecSummary(): string {
-    return this.filled ?
-      format(t`FilledSummary`, this.broker, this.side, 
-        this.filledSize, _.round(this.averageFilledPrice).toLocaleString()) :
-      format(t`UnfilledSummary`, this.broker, this.side, this.size, this.price.toLocaleString(), this.pendingSize);
+    return this.filled
+      ? format(
+          t`FilledSummary`,
+          this.broker,
+          this.side,
+          this.filledSize,
+          _.round(this.averageFilledPrice).toLocaleString()
+        )
+      : format(t`UnfilledSummary`, this.broker, this.side, this.size, this.price.toLocaleString(), this.pendingSize);
   }
 
   toShortString(): string {

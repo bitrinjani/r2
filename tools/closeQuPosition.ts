@@ -7,7 +7,7 @@ import { options } from '../src/logger';
 options.enabled = false;
 
 async function main() {
-  const config = util.getConfigRoot();  
+  const config = util.getConfigRoot();
   const quConfig = util.findBrokerConfig(config, Broker.Quoine);
   const quApi = new QuoineApi(quConfig.key, quConfig.secret);
 

@@ -150,18 +150,26 @@ export class LeveragePosition extends Castable {
   @cast side: string;
   @cast pl: number;
   @cast new_order: NewOrder;
-  @cast @element(CloseOrder) close_orders: CloseOrder[];
+  @cast
+  @element(CloseOrder)
+  close_orders: CloseOrder[];
 }
 
 export class LeveragePositionsResponse extends Castable {
   @cast success: boolean;
-  @cast @element(LeveragePosition) data: LeveragePosition[];
+  @cast
+  @element(LeveragePosition)
+  data: LeveragePosition[];
   @cast pagination: Pagination;
 }
 
 export class OrderBooksResponse extends Castable {
-  @cast @element(Array, Number) asks: number[][];
-  @cast @element(Array, Number) bids: number[][];
+  @cast
+  @element(Array, Number)
+  asks: number[][];
+  @cast
+  @element(Array, Number)
+  bids: number[][];
 }
 
 export interface NewOrderRequest {
@@ -204,7 +212,9 @@ export class OpenOrder extends Castable {
 
 export class OpenOrdersResponse extends Castable {
   @cast success: boolean;
-  @cast @element(OpenOrder) orders: OpenOrder[];
+  @cast
+  @element(OpenOrder)
+  orders: OpenOrder[];
 }
 
 export class Funds extends Castable {
@@ -228,7 +238,9 @@ export class Transaction extends Castable {
 export class TransactionsResponse extends Castable {
   @cast success: boolean;
   @cast pagination: Pagination;
-  @cast @element(Transaction) data: Transaction[];
+  @cast
+  @element(Transaction)
+  data: Transaction[];
 }
 
 export interface CashMarginTypeStrategy {

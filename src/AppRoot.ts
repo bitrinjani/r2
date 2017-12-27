@@ -12,7 +12,7 @@ export default class AppRoot {
   private positionService: PositionService;
   private arbitrager: Arbitrager;
 
-  constructor(private readonly ioc: Container = container) { }
+  constructor(private readonly ioc: Container = container) {}
 
   async start(): Promise<void> {
     try {
@@ -29,7 +29,7 @@ export default class AppRoot {
       this.log.debug(ex.stack);
     }
   }
-  
+
   async stop(): Promise<void> {
     try {
       this.log.info(t`StoppingTheService`);
@@ -46,6 +46,6 @@ export default class AppRoot {
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
-    } 
+    }
   }
 }

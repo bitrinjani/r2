@@ -81,7 +81,9 @@ export class OrdersResponse extends Castable {
   @cast settings?: any;
   @cast trailing_stop_type: boolean;
   @cast trailing_stop_value: boolean;
-  @cast @element(Execution) executions: Execution[];
+  @cast
+  @element(Execution)
+  executions: Execution[];
   @cast stop_triggered_time?: any;
 }
 
@@ -110,8 +112,12 @@ export class TradingAccount extends Castable {
 
 export type TradingAccountsResponse = TradingAccount[];
 export class PriceLevelsResponse extends Castable {
-  @cast @element(Array, Number) buy_price_levels: number[][];
-  @cast @element(Array, Number) sell_price_levels: number[][];
+  @cast
+  @element(Array, Number)
+  buy_price_levels: number[][];
+  @cast
+  @element(Array, Number)
+  sell_price_levels: number[][];
 }
 
 export type CloseAllResponse = ClosingTrade[];

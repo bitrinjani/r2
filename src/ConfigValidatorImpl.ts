@@ -22,23 +22,23 @@ export default class ConfigValidatorImpl implements ConfigValidator {
 
     const bitflyer = findBrokerConfig(config, Broker.Bitflyer);
     if (this.isEnabled(bitflyer)) {
-      this.throwIf(bitflyer.cashMarginType !== CashMarginType.Cash,
-        'CashMarginType must be Cash for Bitflyer.');
+      this.throwIf(bitflyer.cashMarginType !== CashMarginType.Cash, 'CashMarginType must be Cash for Bitflyer.');
       this.validateBrokerConfigCommon(bitflyer);
     }
 
     const coincheck = findBrokerConfig(config, Broker.Coincheck);
     if (this.isEnabled(coincheck)) {
       const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.MarginOpen, CashMarginType.NetOut];
-      this.throwIf(!_.includes(allowedCashMarginType, coincheck.cashMarginType),
-        'CashMarginType must be Cash or MarginOpen for Coincheck.');
+      this.throwIf(
+        !_.includes(allowedCashMarginType, coincheck.cashMarginType),
+        'CashMarginType must be Cash or MarginOpen for Coincheck.'
+      );
       this.validateBrokerConfigCommon(coincheck);
     }
 
     const quoine = findBrokerConfig(config, Broker.Quoine);
     if (this.isEnabled(quoine)) {
-      this.throwIf(quoine.cashMarginType !== CashMarginType.NetOut,
-        'CashMarginType must be NetOut for Quoine.');
+      this.throwIf(quoine.cashMarginType !== CashMarginType.NetOut, 'CashMarginType must be NetOut for Quoine.');
       this.validateBrokerConfigCommon(quoine);
     }
   }

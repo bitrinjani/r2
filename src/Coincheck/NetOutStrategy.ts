@@ -6,7 +6,7 @@ import { eRound, almostEqual } from '../util';
 import * as _ from 'lodash';
 
 export default class NetOutStrategy implements CashMarginTypeStrategy {
-  constructor(private readonly brokerApi: BrokerApi) { }
+  constructor(private readonly brokerApi: BrokerApi) {}
 
   async send(order: Order): Promise<void> {
     if (order.cashMarginType !== CashMarginType.NetOut) {

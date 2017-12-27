@@ -8,8 +8,12 @@ class PriceSizePair extends Castable {
 
 export class BoardResponse extends Castable {
   @cast mid_price: number;
-  @cast @element(PriceSizePair) bids: PriceSizePair[];
-  @cast @element(PriceSizePair) asks: PriceSizePair[];
+  @cast
+  @element(PriceSizePair)
+  bids: PriceSizePair[];
+  @cast
+  @element(PriceSizePair)
+  asks: PriceSizePair[];
 }
 
 export interface SendChildOrderRequest {
@@ -32,8 +36,7 @@ export interface CancelChildOrderRequest {
   child_order_id?: string;
 }
 
-export interface CancelChildOrderResponse {
-}
+export interface CancelChildOrderResponse {}
 
 export interface ExecutionsParam {
   product_code?: string;

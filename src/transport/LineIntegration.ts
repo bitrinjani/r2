@@ -15,29 +15,29 @@ export default class LineIntegration {
     if (!(keywords instanceof Array)) {
       return;
     }
-    if (!keywords.some(x => message.includes(x))) {      
+    if (!keywords.some(x => message.includes(x))) {
       return;
     }
     const payload = {
       message
     };
     const body = querystring.stringify(payload);
-    const init: FetchRequestInit = {      
+    const init: FetchRequestInit = {
       body,
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.config.token}`, 
+        Authorization: `Bearer ${this.config.token}`,
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': body.length.toString()
-      },      
+      },
       timeout: LineIntegration.fetchTimeout
     };
     fetch(LineIntegration.apiUrl, init)
-      .then((res) => {
+      .then(res => {
         if (!res.ok) {
           res.text().then(s => console.log(`LINE notify failed. ${res.statusText}: ${s}`));
         }
       })
-      .catch(ex => console.log(`LINE notify failed. ${ex}`)); 
+      .catch(ex => console.log(`LINE notify failed. ${ex}`));
   }
 }

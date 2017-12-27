@@ -34,7 +34,7 @@ addIntegration(SlackIntegration, slackConfig);
 addIntegration(LineIntegration, lineConfig);
 
 function addIntegration(
-  Integration: { new(config: any): SlackIntegration | LineIntegration },
+  Integration: { new (config: any): SlackIntegration | LineIntegration },
   config: SlackConfig | LineConfig | undefined
 ): void {
   if (config && config.enabled) {

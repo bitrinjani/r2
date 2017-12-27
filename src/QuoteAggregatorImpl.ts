@@ -1,8 +1,5 @@
 ﻿import { injectable, inject } from 'inversify';
-import {
-  QuoteAggregator, ConfigStore, BrokerConfig,
-  QuoteSide, BrokerAdapterRouter, Broker
-} from './types';
+import { QuoteAggregator, ConfigStore, BrokerConfig, QuoteSide, BrokerAdapterRouter, Broker } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Quote from './Quote';
@@ -18,11 +15,11 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter
-  ) { }
+  ) {}
 
   async start(): Promise<void> {
     this.log.debug('Starting Quote Aggregator...');
-    const { iterationInterval } =  this.configStore.config;
+    const { iterationInterval } = this.configStore.config;
     this.timer = setInterval(this.aggregate.bind(this), iterationInterval);
     this.log.debug(`Iteration interval is set to ${iterationInterval}`);
     await this.aggregate();
@@ -81,18 +78,17 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
   private fold(quotes: Quote[], step: number): Quote[] {
     return _(quotes)
       .groupBy((q: Quote) => {
-        const price = q.side === QuoteSide.Ask ?
-          _.ceil(q.price / step) * step :
-          _.floor(q.price / step) * step;
+        const price = q.side === QuoteSide.Ask ? _.ceil(q.price / step) * step : _.floor(q.price / step) * step;
         return _.join([price, q.broker, QuoteSide[q.side]], '#');
       })
-      .map((value: Quote[], key) =>
-        new Quote(
-          value[0].broker,
-          value[0].side,
-          Number(key.substring(0, key.indexOf('#'))),
-          _.sumBy(value, q => q.volume)
-        )
+      .map(
+        (value: Quote[], key) =>
+          new Quote(
+            value[0].broker,
+            value[0].side,
+            Number(key.substring(0, key.indexOf('#'))),
+            _.sumBy(value, q => q.volume)
+          )
       )
       .value();
   }

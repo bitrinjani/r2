@@ -2,9 +2,19 @@ import * as _ from 'lodash';
 import { hmac, nonce, safeQueryStringStringify } from '../util';
 import WebClient from '../WebClient';
 import {
-  AccountsBalanceResponse, LeveragePositionsRequest, LeveragePositionsResponse,
-  LeveragePosition, OrderBooksResponse, NewOrderRequest, NewOrderResponse,
-  CancelOrderResponse, OpenOrdersResponse, TransactionsResponse, Pagination, Transaction, LeverageBalanceResponse
+  AccountsBalanceResponse,
+  LeveragePositionsRequest,
+  LeveragePositionsResponse,
+  LeveragePosition,
+  OrderBooksResponse,
+  NewOrderRequest,
+  NewOrderResponse,
+  CancelOrderResponse,
+  OpenOrdersResponse,
+  TransactionsResponse,
+  Pagination,
+  Transaction,
+  LeverageBalanceResponse
 } from './types';
 import { setTimeout } from 'timers';
 
@@ -14,7 +24,7 @@ export default class BrokerApi {
   private readonly baseUrl = 'https://coincheck.com';
   private readonly webClient: WebClient = new WebClient(this.baseUrl);
 
-  constructor(private readonly key: string, private readonly secret: string) { }
+  constructor(private readonly key: string, private readonly secret: string) {}
 
   async getAccountsBalance(): Promise<AccountsBalanceResponse> {
     const path = '/api/accounts/balance';
@@ -39,7 +49,7 @@ export default class BrokerApi {
   }
 
   async getAllOpenLeveragePositions(limit: number = 20): Promise<LeveragePosition[]> {
-    if (this.leveragePositionsCache) {      
+    if (this.leveragePositionsCache) {
       return _.cloneDeep(this.leveragePositionsCache);
     }
     let result: LeveragePosition[] = [];
@@ -47,12 +57,14 @@ export default class BrokerApi {
     let reply = await this.getLeveragePositions(request);
     while (reply.data !== undefined && reply.data.length > 0) {
       result = _.concat(result, reply.data);
-      if (reply.data.length < limit) { break; }
+      if (reply.data.length < limit) {
+        break;
+      }
       const last = _.last(reply.data) as LeveragePosition;
       reply = await this.getLeveragePositions({ ...request, starting_after: last.id });
     }
     this.leveragePositionsCache = result;
-    setTimeout(() => this.leveragePositionsCache = undefined, BrokerApi.CACHE_MS);
+    setTimeout(() => (this.leveragePositionsCache = undefined), BrokerApi.CACHE_MS);
     return result;
   }
 
@@ -73,9 +85,7 @@ export default class BrokerApi {
 
   async getTransactions(pagination: Partial<Pagination>): Promise<TransactionsResponse> {
     const path = '/api/exchange/orders/transactions_pagination';
-    return new TransactionsResponse(
-      await this.get<TransactionsResponse, Partial<Pagination>>(path, pagination)
-    );
+    return new TransactionsResponse(await this.get<TransactionsResponse, Partial<Pagination>>(path, pagination));
   }
 
   async getTransactionsWithStartDate(from: Date): Promise<Transaction[]> {
@@ -85,8 +95,7 @@ export default class BrokerApi {
     while (res.data.length > 0) {
       const last = _.last(res.data) as Transaction;
       transactions = _.concat(transactions, res.data.filter(x => from < x.created_at));
-      if (from > last.created_at ||
-        res.pagination.limit > res.data.length) {
+      if (from > last.created_at || res.pagination.limit > res.data.length) {
         break;
       }
       const lastId = last.id;

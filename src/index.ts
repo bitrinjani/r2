@@ -5,8 +5,8 @@ process.title = 'r2app';
 const app = new AppRoot();
 app.start();
 
-function exit(code: number = 0) {  
-  exec(`pkill ${process.title}`);  
+function exit(code: number = 0) {
+  exec(`pkill ${process.title}`);
   process.exit(code);
 }
 
@@ -20,6 +20,6 @@ process.on('SIGINT', async () => {
 process.on('unhandledRejection', async (reason, p) => {
   console.error(reason);
   await app.stop();
-  console.log('Stopped app.');  
+  console.log('Stopped app.');
   exit(1);
 });

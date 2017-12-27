@@ -1,23 +1,30 @@
 import { hmac, nonce, safeQueryStringStringify } from '../util';
 import WebClient from '../WebClient';
 import {
-  SendChildOrderRequest, SendChildOrderResponse,
-  CancelChildOrderRequest, CancelChildOrderResponse, ChildOrdersParam,
-  ChildOrdersResponse, ExecutionsResponse, ExecutionsParam, Execution, BalanceResponse,
-  BoardResponse, ChildOrder, Balance
+  SendChildOrderRequest,
+  SendChildOrderResponse,
+  CancelChildOrderRequest,
+  CancelChildOrderResponse,
+  ChildOrdersParam,
+  ChildOrdersResponse,
+  ExecutionsResponse,
+  ExecutionsParam,
+  Execution,
+  BalanceResponse,
+  BoardResponse,
+  ChildOrder,
+  Balance
 } from './types';
 
 export default class BrokerApi {
   private readonly baseUrl = 'https://api.bitflyer.jp';
   private readonly webClient: WebClient = new WebClient(this.baseUrl);
 
-  constructor(private readonly key: string, private readonly secret: string) { }
+  constructor(private readonly key: string, private readonly secret: string) {}
 
   async sendChildOrder(request: SendChildOrderRequest): Promise<SendChildOrderResponse> {
     const path = '/v1/me/sendchildorder';
-    return new SendChildOrderResponse(
-      await this.post<SendChildOrderResponse, SendChildOrderRequest>(path, request)
-    );
+    return new SendChildOrderResponse(await this.post<SendChildOrderResponse, SendChildOrderRequest>(path, request));
   }
 
   async cancelChildOrder(request: CancelChildOrderRequest): Promise<CancelChildOrderResponse> {
@@ -45,9 +52,7 @@ export default class BrokerApi {
 
   async getBoard(): Promise<BoardResponse> {
     const path = '/v1/board';
-    return new BoardResponse(
-      await this.webClient.fetch<BoardResponse>(path, undefined, false)
-    );
+    return new BoardResponse(await this.webClient.fetch<BoardResponse>(path, undefined, false));
   }
 
   private async call<R>(path: string, method: string, body: string = ''): Promise<R> {

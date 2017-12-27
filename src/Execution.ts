@@ -11,7 +11,7 @@ export default class Execution {
     this.symbol = order.symbol;
   }
 
-  id: string =  uuid();
+  id: string = uuid();
   broker: Broker = Broker.None;
   brokerOrderId: string;
   cashMarginType: CashMarginType;
