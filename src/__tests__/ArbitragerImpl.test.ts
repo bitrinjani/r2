@@ -9,7 +9,8 @@ import {
   BrokerAdapterRouter,
   CashMarginType,
   OrderStatus,
-  OrderSide
+  OrderSide,
+  OnSingleLegConfig
 } from '../types';
 import ArbitragerImpl from '../ArbitragerImpl';
 import Quote from '../Quote';
@@ -127,7 +128,7 @@ describe('Arbitrager', () => {
   });
 
   test('stop without start', async () => {
-    const arbitrager = new ArbitragerImpl();
+    const arbitrager = new ArbitragerImpl(undefined, {config: {OnSingleLegConfig:{}});    
     await arbitrager.stop();
     expect(arbitrager.status).toBe('Stopped');
   });
