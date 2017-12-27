@@ -23,7 +23,7 @@ import t from './intl';
 import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
 import Quote from './Quote';
 import symbols from './symbols';
-import { fatalErrors } from './constants';
+import { fatalErrors, LOT_MIN_DECIMAL_PLACE } from './constants';
 
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {
@@ -256,11 +256,12 @@ export default class ArbitragerImpl implements Arbitrager {
     const filledLeg = orders.filter(o => o.filled)[0];
     const sign = filledLeg.side === OrderSide.Buy ? -1 : 1;
     const price = _.round(filledLeg.price * (1 + sign * options.limitMovePercent / 100));
-    this.log.info(t`ReverseFilledLeg`, filledLeg.toShortString(), price.toLocaleString());
+    const size = _.floor(filledLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
+    this.log.info(t`ReverseFilledLeg`, filledLeg.toShortString(), price.toLocaleString(), size);
     const reversalOrder = new Order(
       filledLeg.broker,
       filledLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
-      filledLeg.size,
+      size,
       price,
       filledLeg.cashMarginType,
       OrderType.Limit,
@@ -273,11 +274,12 @@ export default class ArbitragerImpl implements Arbitrager {
     const unfilledLeg = orders.filter(o => !o.filled)[0];
     const sign = unfilledLeg.side === OrderSide.Buy ? 1 : -1;
     const price = _.round(unfilledLeg.price * (1 + sign * options.limitMovePercent / 100));
-    this.log.info(t`ExecuteUnfilledLeg`, unfilledLeg.toShortString(), price.toLocaleString());
+    const size = _.floor(unfilledLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
+    this.log.info(t`ExecuteUnfilledLeg`, unfilledLeg.toShortString(), price.toLocaleString(), size);
     const revisedOrder = new Order(
       unfilledLeg.broker,
       unfilledLeg.side,
-      unfilledLeg.size,
+      size,
       price,
       unfilledLeg.cashMarginType,
       OrderType.Limit,

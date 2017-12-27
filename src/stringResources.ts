@@ -48,8 +48,8 @@ export const en = {
   OpenPairs: 'Open pairs:',
   SendingOrderTtl: '>>Sending an order with TTL %d ms...',
   NotFilledTtl: '>>The order was not filled within TTL %d ms. Cancelling the order.',
-  ExecuteUnfilledLeg: '>>Trying to execute the unfilled leg %s at new price %s',
-  ReverseFilledLeg: '>>Trying to reverse the filled leg %s at new price %s'
+  ExecuteUnfilledLeg: '>>Trying to execute the unfilled leg %s at new price %s, size %s BTC',
+  ReverseFilledLeg: '>>Trying to reverse the filled leg %s at new price %s, size %s BTC'
 };
 
 export const ja = {
@@ -101,6 +101,6 @@ export const ja = {
   OpenPairs: 'オープン状態のオーダーペア:',
   SendingOrderTtl: '>>TTL %d msのオーダーを送信中...',
   NotFilledTtl: '>>TTL %d msの間にオーダーは約定しませんでした。キャンセルします。',
-  ExecuteUnfilledLeg: '>>約定しなかったオーダー %s を価格 %s で再送信中...',
-  ReverseFilledLeg: '>>約定したオーダー %s を価格 %s で反対売買中...'
+  ExecuteUnfilledLeg: '>>約定しなかったオーダー %s を価格 %s 数量 %s で再送信中...',
+  ReverseFilledLeg: '>>約定したオーダー %s を価格 %s 数量 %s で反対売買中...'
 };
