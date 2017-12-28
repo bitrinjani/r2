@@ -38,7 +38,8 @@ onSingleLeg設定で裁定ペアの片側だけ約定したときの動作を指
 
 設定例:
 
-```json:config.json
+```json
+// config.json
 ...
   "onSingleLeg": {
     "action": "Reverse",
@@ -126,4 +127,5 @@ CoincheckのcashMarginTypeをNetOutに設定すると、裁定プロセスはオ
 Slack WebフックURL、LINE Notifyトークンの取得方法については、以下の投稿を参考ください。
 
 [SlackのWebhook URL取得手順](https://qiita.com/vmmhypervisor/items/18c99624a84df8b31008)
+
 [[超簡単]LINE notify を使ってみる](https://qiita.com/takeshi_ok_desu/items/576a8226ba6584864d95)
