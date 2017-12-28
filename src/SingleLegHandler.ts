@@ -45,9 +45,10 @@ export default class SingleLegHandler {
 
   private async reverseLeg(orders: OrderPair, options: ReverseOption) {
     const filledLeg = orders.filter(o => o.filled)[0];
+    const unfilledLeg = orders.filter(o => !o.filled)[0];
     const sign = filledLeg.side === OrderSide.Buy ? -1 : 1;
     const price = _.round(filledLeg.price * (1 + sign * options.limitMovePercent / 100));
-    const size = _.floor(filledLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
+    const size = _.floor(filledLeg.filledSize - unfilledLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
     this.log.info(t`ReverseFilledLeg`, filledLeg.toShortString(), price.toLocaleString(), size);
     const reversalOrder = new Order(
       filledLeg.broker,
