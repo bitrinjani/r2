@@ -145,22 +145,15 @@ export default class ArbitragerImpl implements Arbitrager {
 
       this.printOrderSummary(orders);
 
-      if (orders.every(o => o.filled)) {
+      if (orders.every(o => o.filled)) {        
+        this.log.info(t`BothLegsAreSuccessfullyFilled`);
         if (exitFlag) {
           this.status = 'Closed';
         } else {
           this.status = 'Filled';
           this.activePairs.push(orders);
-        }
-        const commission = _(orders).sumBy(o => this.calculateFilledOrderCommission(o));
-        const profit = _.round(
-          _(orders).sumBy(o => (o.side === OrderSide.Sell ? 1 : -1) * o.filledNotional) - commission
-        );
-        this.log.info(t`BothLegsAreSuccessfullyFilled`);
-        this.log.info(t`ProfitIs`, profit);
-        if (commission !== 0) {
-          this.log.info(t`CommissionIs`, _.round(commission));
-        }
+        }        
+        this.printProfit(orders);
         break;
       }
 
@@ -170,14 +163,21 @@ export default class ArbitragerImpl implements Arbitrager {
         const cancelTasks = orders.filter(o => !o.filled).map(o => this.brokerAdapterRouter.cancel(o));
         await Promise.all(cancelTasks);
         if (orders.filter(o => o.filled).length === 1) {
-          await this.singleLegHandler.handle(orders, exitFlag);
+          const subOrders = await this.singleLegHandler.handle(orders, exitFlag);
+          if (subOrders.every(o => o.filled)) {
+            this.printProfit(_.concat(orders, subOrders));
+          }
         }
         break;
       }
     }
   }
 
-  private calculateFilledOrderCommission(order: Order): number {
+  private calcProfit(orders: Order[], commission: number) {
+    return _(orders).sumBy(o => (o.side === OrderSide.Sell ? 1 : -1) * o.filledNotional) - commission;
+  }
+
+  private calcCommissionFromConfig(order: Order): number {
     const brokerConfig = findBrokerConfig(this.configStore.config, order.broker);
     return calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
   }
@@ -265,5 +265,14 @@ export default class ArbitragerImpl implements Arbitrager {
     this.activePairs.forEach(pair => {
       this.log.info(`[${pair[0].toShortString()}, ${pair[1].toShortString()}]`);
     });
+  }
+
+  private printProfit(orders: Order[]): void {
+    const commission = _(orders).sumBy(o => this.calcCommissionFromConfig(o));
+    const profit = this.calcProfit(orders, commission);
+    this.log.info(t`ProfitIs`, _.round(profit));
+    if (commission !== 0) {
+      this.log.info(t`CommissionIs`, _.round(commission));
+    }
   }
 } /* istanbul ignore next */

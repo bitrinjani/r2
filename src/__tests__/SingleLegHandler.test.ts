@@ -32,11 +32,14 @@ test('reverse fill', async () => {
   sellLeg.filledSize = 0;
   sellLeg.status = OrderStatus.New;
   const orders = [buyLeg, sellLeg];
-  await handler.handle(orders, false);
+  const subOrders = await handler.handle(orders, false);
   const sentOrder = baRouter.send.mock.calls[0][0] as Order;
   expect(sentOrder.size).toBe(0.1);
   expect(sentOrder.broker).toBe('Dummy1');
   expect(sentOrder.side).toBe(OrderSide.Sell);
+  expect(subOrders[0].size).toBe(0.1);
+  expect(subOrders[0].broker).toBe('Dummy1');
+  expect(subOrders[0].side).toBe(OrderSide.Sell);
 });
 
 test('proceed fill', async () => {
@@ -50,11 +53,14 @@ test('proceed fill', async () => {
   sellLeg.filledSize = 0;
   sellLeg.status = OrderStatus.PartiallyFilled;
   const orders = [buyLeg, sellLeg];
-  await handler.handle(orders, false);
+  const subOrders = await handler.handle(orders, false);
   const sentOrder = baRouter.send.mock.calls[0][0] as Order;
   expect(sentOrder.size).toBe(0.1);
   expect(sentOrder.broker).toBe('Dummy2');
   expect(sentOrder.side).toBe(OrderSide.Sell);
+  expect(subOrders[0].size).toBe(0.1);
+  expect(subOrders[0].broker).toBe('Dummy2');
+  expect(subOrders[0].side).toBe(OrderSide.Sell);
 });
 
 test('reverse partial fill', async () => {
@@ -68,11 +74,14 @@ test('reverse partial fill', async () => {
   sellLeg.filledSize = 0.04;
   sellLeg.status = OrderStatus.PartiallyFilled;
   const orders = [buyLeg, sellLeg];
-  await handler.handle(orders, false);
+  const subOrders = await handler.handle(orders, false);
   const sentOrder = baRouter.send.mock.calls[0][0] as Order;
   expect(sentOrder.size).toBe(0.06);
   expect(sentOrder.broker).toBe('Dummy1');
   expect(sentOrder.side).toBe(OrderSide.Sell);
+  expect(subOrders[0].size).toBe(0.06);
+  expect(subOrders[0].broker).toBe('Dummy1');
+  expect(subOrders[0].side).toBe(OrderSide.Sell);
 });
 
 test('proceed partial fill', async () => {
@@ -86,9 +95,12 @@ test('proceed partial fill', async () => {
   sellLeg.filledSize = 0.04;
   sellLeg.status = OrderStatus.PartiallyFilled;
   const orders = [buyLeg, sellLeg];
-  await handler.handle(orders, false);
+  const subOrders = await handler.handle(orders, false);
   const sentOrder = baRouter.send.mock.calls[0][0] as Order;
   expect(sentOrder.size).toBe(0.06);
   expect(sentOrder.broker).toBe('Dummy2');
   expect(sentOrder.side).toBe(OrderSide.Sell);
+  expect(subOrders[0].size).toBe(0.06);
+  expect(subOrders[0].broker).toBe('Dummy2');
+  expect(subOrders[0].side).toBe(OrderSide.Sell);
 });

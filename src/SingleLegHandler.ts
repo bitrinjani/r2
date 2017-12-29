@@ -22,28 +22,26 @@ export default class SingleLegHandler {
     private readonly onSingleLegConfig: OnSingleLegConfig
   ) {}
 
-  async handle(orders: OrderPair, exitFlag: Boolean) {
+  async handle(orders: OrderPair, exitFlag: Boolean): Promise<Order[]> {
     if (this.onSingleLegConfig === undefined) {
-      return;
+      return [];
     }
     const action = exitFlag ? this.onSingleLegConfig.actionOnExit : this.onSingleLegConfig.action;
     if (action === undefined || action === 'Cancel') {
-      return;
+      return [];
     }
     const { options } = this.onSingleLegConfig;
     switch (action) {
       case 'Reverse':
-        await this.reverseLeg(orders, options as ReverseOption);
-        return;
+        return await this.reverseLeg(orders, options as ReverseOption);
       case 'Proceed':
-        await this.proceedLeg(orders, options as ProceedOption);
-        return;
+        return await this.proceedLeg(orders, options as ProceedOption);
       default:
         throw new Error('Invalid action.');
     }
   }
 
-  private async reverseLeg(orders: OrderPair, options: ReverseOption) {
+  private async reverseLeg(orders: OrderPair, options: ReverseOption): Promise<Order[]> {
     const filledLeg = orders.filter(o => o.filled)[0];
     const unfilledLeg = orders.filter(o => !o.filled)[0];
     const sign = filledLeg.side === OrderSide.Buy ? -1 : 1;
@@ -60,15 +58,16 @@ export default class SingleLegHandler {
       filledLeg.leverageLevel
     );
     await this.sendOrderWithTtl(reversalOrder, options.ttl);
+    return [reversalOrder];
   }
 
-  private async proceedLeg(orders: OrderPair, options: ProceedOption) {
+  private async proceedLeg(orders: OrderPair, options: ProceedOption): Promise<Order[]> {
     const unfilledLeg = orders.filter(o => !o.filled)[0];
     const sign = unfilledLeg.side === OrderSide.Buy ? 1 : -1;
     const price = _.round(unfilledLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(unfilledLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
     this.log.info(t`ExecuteUnfilledLeg`, unfilledLeg.toShortString(), price.toLocaleString(), size);
-    const revisedOrder = new Order(
+    const proceedOrder = new Order(
       unfilledLeg.broker,
       unfilledLeg.side,
       size,
@@ -77,7 +76,8 @@ export default class SingleLegHandler {
       OrderType.Limit,
       unfilledLeg.leverageLevel
     );
-    await this.sendOrderWithTtl(revisedOrder, options.ttl);
+    await this.sendOrderWithTtl(proceedOrder, options.ttl);
+    return [proceedOrder];
   }
 
   private async sendOrderWithTtl(order: Order, ttl: number) {
