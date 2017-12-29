@@ -187,6 +187,7 @@ export default class ArbitragerImpl implements Arbitrager {
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
       return false;
     }
+    this.activePairs = this.activePairs.filter(pair => pair[0].size === pair[1].size);
     this.printActivePairs();
     for (const pair of this.activePairs.slice().reverse()) {
       try {
