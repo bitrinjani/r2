@@ -25,6 +25,7 @@ export default class LimitCheckerImpl implements LimitChecker {
         new InvertedSpreadLimit(spreadAnalysisResult),
         new MinTargetProfitLimit(configStore, spreadAnalysisResult),
         new MaxTargetProfitLimit(configStore, spreadAnalysisResult),
+        new MaxTargetVolumeLimit(configStore, spreadAnalysisResult),
         new DemoModeLimit(configStore)
       ];
     }
@@ -129,6 +130,33 @@ class MaxTargetProfitLimit implements LimitChecker {
         : Number.MAX_SAFE_INTEGER
     ]) as number;
     return targetProfit <= maxTargetProfit;
+  }
+}
+
+class MaxTargetVolumeLimit implements LimitChecker {
+  private readonly log = getLogger('MaxTargetVolumeLimit');
+
+  constructor(private readonly configStore: ConfigStore, private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
+
+  check() {
+    const success = this.isVolumeSmallerThanLimit();
+    if (success) {
+      return { success, reason: '' };
+    }
+    const reason = 'Too large Volume';
+    this.log.info(t`TargetVolumeIsLargerThanMaxTargetVolumePercent`);
+    return { success, reason };
+  }
+
+  private isVolumeSmallerThanLimit(): boolean {
+    const { config } = this.configStore;
+    const { availableVolume, targetVolume } = this.spreadAnalysisResult;
+    const maxTargetVolume = _.min([
+      config.maxTargetVolumePercent !== undefined
+        ? _.round(config.maxTargetVolumePercent / 100 * availableVolume)
+        : Number.MAX_SAFE_INTEGER
+    ]) as number;
+    return targetVolume <= maxTargetVolume;
   }
 }
 
