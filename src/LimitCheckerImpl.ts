@@ -151,7 +151,11 @@ class MaxTargetVolumeLimit implements LimitChecker {
   private isVolumeSmallerThanLimit(): boolean {
     const { config } = this.configStore;
     const { availableVolume, targetVolume } = this.spreadAnalysisResult;
-    const maxTargetVolume = config.maxTargetVolumePercent / 100 * availableVolume;
+    const maxTargetVolume = _.min([
+      config.maxTargetVolumePercent !== undefined
+        ? config.maxTargetVolumePercent / 100 * availableVolume
+        : Number.MAX_SAFE_INTEGER
+    ]) as number;
     return targetVolume <= maxTargetVolume;
   }
 }
