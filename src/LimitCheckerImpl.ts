@@ -17,6 +17,7 @@ export default class LimitCheckerImpl implements LimitChecker {
       this.limits = [
         new MaxNetExposureLimit(configStore, positionService),
         new MaxTargetProfitLimit(configStore, spreadAnalysisResult),
+        new MaxTargetVolumeLimit(configStore, spreadAnalysisResult),
         new DemoModeLimit(configStore)
       ];
     } else {
