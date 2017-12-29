@@ -164,7 +164,7 @@ export default class ArbitragerImpl implements Arbitrager {
         await Promise.all(cancelTasks);
         if (orders.filter(o => o.filled).length === 1) {
           const subOrders = await this.singleLegHandler.handle(orders, exitFlag);
-          if (subOrders.every(o => o.filled)) {
+          if (subOrders.length !== 0 && subOrders.every(o => o.filled)) {
             this.printProfit(_.concat(orders, subOrders));
           }
         }
