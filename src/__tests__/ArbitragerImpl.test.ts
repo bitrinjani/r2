@@ -372,6 +372,39 @@ describe('Arbitrager', () => {
     expect(arbitrager.status).toBe('Demo mode');
   });
 
+  test('Send and both orders filled', async () => {
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(order => {
+      order.status = OrderStatus.Filled;
+    };
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('Filled');
+    expect(baRouter.refresh.mock.calls.length).toBe(2);
+    expect(baRouter.send.mock.calls.length).toBe(2);
+    expect(baRouter.cancel.mock.calls.length).toBe(0);
+  });
+
   test('Send and only buy order filled', async () => {
     let i = 1;
     baRouter.refresh = order => {
@@ -443,8 +476,10 @@ describe('Arbitrager', () => {
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
     let i = 1;
     baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
       if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
+        order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
@@ -475,12 +510,14 @@ describe('Arbitrager', () => {
     expect(baRouter.cancel.mock.calls.length).toBe(2);
   });
 
-  test('Send and only buy order filled -> reverse', async () => {
+  test('Send and sell order filled and buy order partial filled -> reverse', async () => {
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
     let i = 1;
     baRouter.refresh = jest.fn().mockImplementation(async order => {
-      if (order.side === OrderSide.Buy) {
+      order.filledSize = 0.3;
+      if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
+        order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
@@ -508,6 +545,267 @@ describe('Arbitrager', () => {
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(2);
+  });
+
+  test('Send and sell order unfilled and buy order partial filled -> reverse', async () => {
+    config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.3;
+      if (order.side === OrderSide.Sell) {
+        order.filledSize = 0;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(3);
+  });
+
+  test('Send and only buy order filled -> reverse', async () => {
+    config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
+      if (order.side === OrderSide.Buy) {
+        order.status = OrderStatus.Filled;
+        order.filledSize = 1;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(2);
+  });
+
+  test('Send and buy order filled and sel order partial filled -> reverse', async () => {
+    config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.3;
+      if (order.side === OrderSide.Buy) {
+        order.status = OrderStatus.Filled;
+        order.filledSize = 1;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(2);
+  });
+
+  test('Send and buy order unfilled and sel order partial filled -> reverse', async () => {
+    config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.3;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(3);
+  });
+
+  test('Send and both orders partial filled -> reverse', async () => {
+    config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.7;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0.2;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(3);
+  });
+
+  test('Send and both orders same quantity partial filled -> reverse', async () => {
+    config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.8;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0.8;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(6);
+    expect(baRouter.send.mock.calls.length).toBe(2);
+    expect(baRouter.cancel.mock.calls.length).toBe(2);
+  });
+
+  test('Send and both orders unfilled -> reverse', async () => {
+    config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(6);
+    expect(baRouter.send.mock.calls.length).toBe(2);
     expect(baRouter.cancel.mock.calls.length).toBe(2);
   });
 
@@ -515,8 +813,10 @@ describe('Arbitrager', () => {
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
     let i = 1;
     const fillBuy = async order => {
+      order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
+        order.filledSize = 1;
       }
     };
     baRouter.refresh = jest
@@ -557,8 +857,10 @@ describe('Arbitrager', () => {
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
     let i = 1;
     baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
+        order.filledSize = 1;
       }
     });
     baRouter.send = jest
@@ -599,8 +901,10 @@ describe('Arbitrager', () => {
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
     let i = 1;
     baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
       if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
+        order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
@@ -635,8 +939,10 @@ describe('Arbitrager', () => {
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
     let i = 1;
     baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
+        order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
@@ -667,12 +973,200 @@ describe('Arbitrager', () => {
     expect(baRouter.cancel.mock.calls.length).toBe(2);
   });
 
+  test('Send and buy order filled and sell order partial filled -> proceed', async () => {
+    config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.3;
+      if (order.side === OrderSide.Buy) {
+        order.status = OrderStatus.Filled;
+        order.filledSize = 1;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(2);
+  });
+
+  test('Send and buy order unfilled and sell order partial filled -> proceed', async () => {
+    config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.3;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(3);
+  });
+
+  test('Send and both orders partial filled -> proceed', async () => {
+    config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.7;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0.2;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(7);
+    expect(baRouter.send.mock.calls.length).toBe(3);
+    expect(baRouter.cancel.mock.calls.length).toBe(3);
+  });
+
+  test('Send and both orders same quantity partial filled -> proceed', async () => {
+    config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0.8;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0.8;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(6);
+    expect(baRouter.send.mock.calls.length).toBe(2);
+    expect(baRouter.cancel.mock.calls.length).toBe(2);
+  });
+
+  test('Send and both orders unfilled -> proceed', async () => {
+    config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
+      if (order.side === OrderSide.Buy) {
+        order.filledSize = 0;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(baRouter.refresh.mock.calls.length).toBe(6);
+    expect(baRouter.send.mock.calls.length).toBe(2);
+    expect(baRouter.cancel.mock.calls.length).toBe(2);
+  });
+
   test('Send and only buy order filled -> invalid action', async () => {
     config.onSingleLeg = { action: 'Invalid', options: { limitMovePercent: 10 } };
     let i = 1;
     baRouter.refresh = jest.fn().mockImplementation(async order => {
+      order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
+        order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
