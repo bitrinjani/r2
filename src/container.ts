@@ -10,7 +10,8 @@ import {
   SpreadAnalyzer,
   ConfigValidator,
   BrokerAdapter,
-  LimitCheckerFactory
+  LimitCheckerFactory,
+  ActivePairStore
 } from './types';
 import JsonConfigStore from './JsonConfigStore';
 import QuoteAggregatorImpl from './QuoteAggregatorImpl';
@@ -22,6 +23,7 @@ import * as bitflyer from './Bitflyer';
 import * as coincheck from './Coincheck';
 import * as quoine from './Quoine';
 import LimitCheckerFactoryImpl from './LimitCheckerFactoryImpl';
+import ActivePairLevelStore from './ActivePairLevelStore';
 
 const container = new Container();
 container.bind<Arbitrager>(symbols.Arbitrager).to(ArbitragerImpl);
@@ -44,4 +46,7 @@ container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(coincheck.BrokerAdapterI
 container.bind<BrokerAdapter>(symbols.BrokerAdapter).to(quoine.BrokerAdapterImpl);
 container.bind<ConfigValidator>(symbols.ConfigValidator).to(ConfigValidatorImpl);
 container.bind<LimitCheckerFactory>(symbols.LimitCheckerFactory).to(LimitCheckerFactoryImpl);
+container
+  .bind<ActivePairStore>(symbols.ActivePairStore)
+  .toConstantValue(new ActivePairLevelStore(ActivePairLevelStore.path));
 export default container;

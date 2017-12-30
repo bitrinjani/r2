@@ -7,7 +7,8 @@ const symbols = {
   ConfigValidator: Symbol('ConfigValidator'),
   BrokerAdapterRouter: Symbol('BrokerAdapterRouter'),
   BrokerAdapter: Symbol('BrokerAdapter'),
-  LimitCheckerFactory: Symbol('LimitCheckerFactory')
+  LimitCheckerFactory: Symbol('LimitCheckerFactory'),
+  ActivePairStore: Symbol('ActivePairStore')
 };
 
 export default symbols;

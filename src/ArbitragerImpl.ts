@@ -14,7 +14,8 @@ import {
   QuoteSide,
   OrderSide,
   LimitCheckerFactory,
-  OrderPair
+  OrderPair,
+  ActivePairStore
 } from './types';
 import t from './intl';
 import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
@@ -26,18 +27,19 @@ import SingleLegHandler from './SingleLegHandler';
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {
   private readonly log = getLogger(this.constructor.name);
-  private activePairs: OrderPair[] = [];
   private lastSpreadAnalysisResult: SpreadAnalysisResult;
   private shouldStop: boolean = false;
   private readonly singleLegHandler: SingleLegHandler;
 
+  // TODO: avoid constructor over-injection
   constructor(
     @inject(symbols.QuoteAggregator) private readonly quoteAggregator: QuoteAggregator,
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     @inject(symbols.PositionService) private readonly positionService: PositionService,
     @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter,
     @inject(symbols.SpreadAnalyzer) private readonly spreadAnalyzer: SpreadAnalyzer,
-    @inject(symbols.LimitCheckerFactory) private readonly limitCheckerFactory: LimitCheckerFactory
+    @inject(symbols.LimitCheckerFactory) private readonly limitCheckerFactory: LimitCheckerFactory,
+    @inject(symbols.ActivePairStore) private readonly activePairStore: ActivePairStore
   ) {
     const onSingleLegConfig = configStore.config.onSingleLeg;
     this.singleLegHandler = new SingleLegHandler(this.brokerAdapterRouter, onSingleLegConfig);
@@ -151,7 +153,7 @@ export default class ArbitragerImpl implements Arbitrager {
           this.status = 'Closed';
         } else {
           this.status = 'Filled';
-          this.activePairs.push(orders);
+          await this.activePairStore.put(this.activePairStore.generateKey(), orders);
         }        
         this.printProfit(orders);
         break;
@@ -188,9 +190,11 @@ export default class ArbitragerImpl implements Arbitrager {
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
       return false;
     }
-    this.activePairs = this.activePairs.filter(pair => pair[0].size === pair[1].size);
-    this.printActivePairs();
-    for (const pair of this.activePairs.slice().reverse()) {
+    let activePairsMap = await this.activePairStore.getAll(); 
+    activePairsMap = activePairsMap.filter(kv => kv.value[0].size === kv.value[1].size);
+    this.printActivePairs(activePairsMap.map(kv => kv.value));
+    for (const { key, value } of activePairsMap.slice().reverse()) {
+      const pair = value;
       try {
         this.log.debug(`Analyzing pair: ${pair}...`);
         const result = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap, pair);
@@ -205,7 +209,7 @@ export default class ArbitragerImpl implements Arbitrager {
         ]) as number;
         this.log.debug(`effectiveMinExitTargetProfit: ${effectiveMinExitTargetProfit}`);
         if (targetProfit >= effectiveMinExitTargetProfit) {
-          this.activePairs = _.without(this.activePairs, pair);
+          await this.activePairStore.del(key);
           this.lastSpreadAnalysisResult = result;
           return true;
         }
@@ -259,12 +263,12 @@ export default class ArbitragerImpl implements Arbitrager {
     );
   }
 
-  private printActivePairs(): void {
-    if (this.activePairs.length === 0) {
+  private printActivePairs(activePairs: OrderPair[]): void {
+    if (activePairs.length === 0) {
       return;
     }
     this.log.info(t`OpenPairs`);
-    this.activePairs.forEach(pair => {
+    activePairs.forEach(pair => {
       this.log.info(`[${pair[0].toShortString()}, ${pair[1].toShortString()}]`);
     });
   }

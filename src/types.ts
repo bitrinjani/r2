@@ -213,3 +213,12 @@ export class ConfigRoot extends Castable {
 }
 
 export type OrderPair = [Order, Order];
+
+export interface ActivePairStore {
+  get(key: string): Promise<OrderPair>;
+  getAll(): Promise<{ key: string; value: OrderPair }[]>;
+  put(key: string, value: OrderPair): Promise<void>;
+  del(key: string): Promise<void>;
+  delAll(): Promise<{}>;
+  generateKey();
+}

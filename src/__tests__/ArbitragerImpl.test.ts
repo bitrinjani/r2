@@ -18,7 +18,10 @@ import LimitCheckerFactoryImpl from '../LimitCheckerFactoryImpl';
 import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
 import { delay } from '../util';
 import { options } from '../logger';
+import ActivePairLevelStore from '../ActivePairLevelStore';
 options.enabled = false;
+
+const activePairStore = new ActivePairLevelStore('src/__tests__/datastore/2');
 
 let quoteAggregator,
   config: ConfigRoot,
@@ -30,7 +33,7 @@ let quoteAggregator,
   quotes,
   limitCheckerFactory;
 
-beforeEach(() => {
+beforeEach(async () => {
   quoteAggregator = {
     start: jest.fn(),
     stop: jest.fn()
@@ -108,6 +111,8 @@ beforeEach(() => {
     new Quote(Broker.Quoine, QuoteSide.Ask, 3.5, 3),
     new Quote(Broker.Quoine, QuoteSide.Bid, 2.5, 4)
   ];
+
+  await activePairStore.delAll();
 });
 
 describe('Arbitrager', () => {
@@ -118,7 +123,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     await arbitrager.start();
     expect(quoteAggregator.onQuoteUpdated).not.toBeUndefined();
@@ -128,7 +134,8 @@ describe('Arbitrager', () => {
   });
 
   test('stop without start', async () => {
-    const arbitrager = new ArbitragerImpl(undefined, {config: {OnSingleLegConfig:{}});    
+    const arbitrager = new ArbitragerImpl(undefined, {config: {OnSingleLegConfig:{}}); 
+    arbitrager.activePairStore = activePairStore;   
     await arbitrager.stop();
     expect(arbitrager.status).toBe('Stopped');
   });
@@ -144,7 +151,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -172,7 +180,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -197,8 +206,9 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
-    );
+      limitCheckerFactory,
+      activePairStore
+    ); 
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated([]);
@@ -225,7 +235,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -253,7 +264,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -281,7 +293,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -308,7 +321,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -335,7 +349,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -363,7 +378,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -394,7 +410,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -429,7 +446,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -461,7 +479,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -499,7 +518,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -537,7 +557,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -574,7 +595,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -612,7 +634,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -650,7 +673,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -687,7 +711,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -724,7 +749,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -761,7 +787,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -798,7 +825,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -841,7 +869,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -885,7 +914,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -924,7 +954,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -962,7 +993,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1000,7 +1032,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1037,7 +1070,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1074,7 +1108,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1111,7 +1146,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1148,7 +1184,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1186,7 +1223,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1215,7 +1253,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1244,7 +1283,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1273,7 +1313,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1303,7 +1344,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1330,7 +1372,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1360,7 +1403,8 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
@@ -1386,17 +1430,18 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
     // closing
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Closed');
-    expect(arbitrager.activePairs.length).toBe(0);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(0);
   });
 
   test('Close filled orders with minExitTargetProfitPercent', async () => {
@@ -1417,17 +1462,18 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
     // closing
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Closed');
-    expect(arbitrager.activePairs.length).toBe(0);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(0);
   });
 
   test('Not close filled orders with minExitTargetProfitPercent', async () => {
@@ -1448,17 +1494,18 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
     // closing
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(2);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(2);
   });
 
   test('Close two filled orders', async () => {
@@ -1479,16 +1526,17 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(2);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(2);
 
     //closing
     const quotes2 = [
@@ -1499,10 +1547,10 @@ describe('Arbitrager', () => {
     ];
     await quoteAggregator.onQuoteUpdated(quotes2);
     expect(arbitrager.status).toBe('Closed');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
     await quoteAggregator.onQuoteUpdated(quotes2);
     expect(arbitrager.status).toBe('Closed');
-    expect(arbitrager.activePairs.length).toBe(0);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(0);
   });
 
   test('Closing filled orders with no lastResult in spread analyzer', async () => {
@@ -1523,17 +1571,18 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
     // closing
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Closed');
-    expect(arbitrager.activePairs.length).toBe(0);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(0);
   });
 
   test('Closing filled orders when spread analyzer throws', async () => {
@@ -1554,16 +1603,17 @@ describe('Arbitrager', () => {
       positionService,
       baRouter,
       spreadAnalyzer,
-      limitCheckerFactory
+      limitCheckerFactory,
+      activePairStore
     );
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.onQuoteUpdated(quotes);
     expect(arbitrager.status).toBe('Filled');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
     // closing
     await quoteAggregator.onQuoteUpdated([]);
     expect(arbitrager.status).toBe('Spread analysis failed');
-    expect(arbitrager.activePairs.length).toBe(1);
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
   });
 });

@@ -9,11 +9,12 @@
     "test": "jest --maxWorkers=1 --coverage && cat ./coverage/lcov.info | coveralls",
     "testfast": "jest",
     "coverage": "jest --coverage",
+    "clearPairs": "ts-node ./tools/clearPairs.ts",
     "getBalance": "ts-node ./tools/getBalance.ts",
     "closeCcPosition": "ts-node ./tools/closeCcPosition.ts",
     "closeBfPosition": "ts-node ./tools/closeBfPosition.ts",
     "closeQuPosition": "ts-node ./tools/closeQuPosition.ts",
-    "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run getBalance"
+    "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run clearPairs && npm run getBalance"
   },
   "dependencies": {
     "@bitr/castable": "^1.0.1",
@@ -29,6 +30,7 @@
     "i18next": "^10.0.1",
     "inversify": "^4.3.0",
     "jsonwebtoken": "^8.1.0",
+    "level": "^2.1.1",
     "lodash": "^4.17.4",
     "node-fetch": "^1.7.3",
     "pino": "^4.10.2",
