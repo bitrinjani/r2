@@ -162,7 +162,8 @@ export default class ArbitragerImpl implements Arbitrager {
         this.log.warn(t`MaxRetryCountReachedCancellingThePendingOrders`);
         const cancelTasks = orders.filter(o => !o.filled).map(o => this.brokerAdapterRouter.cancel(o));
         await Promise.all(cancelTasks);
-        if (orders.filter(o => o.filled).length === 1) {
+        if (orders.some(o => !o.filled) &&
+          _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0) {
           const subOrders = await this.singleLegHandler.handle(orders, exitFlag);
           if (subOrders.length !== 0 && subOrders.every(o => o.filled)) {
             this.printProfit(_.concat(orders, subOrders));

@@ -42,39 +42,40 @@ export default class SingleLegHandler {
   }
 
   private async reverseLeg(orders: OrderPair, options: ReverseOption): Promise<Order[]> {
-    const filledLeg = orders.filter(o => o.filled)[0];
-    const unfilledLeg = orders.filter(o => !o.filled)[0];
-    const sign = filledLeg.side === OrderSide.Buy ? -1 : 1;
-    const price = _.round(filledLeg.price * (1 + sign * options.limitMovePercent / 100));
-    const size = _.floor(filledLeg.filledSize - unfilledLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
-    this.log.info(t`ReverseFilledLeg`, filledLeg.toShortString(), price.toLocaleString(), size);
+    const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
+    const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
+    const sign = largeLeg.side === OrderSide.Buy ? -1 : 1;
+    const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
+    const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
+    this.log.info(t`ReverseFilledLeg`, largeLeg.toShortString(), price.toLocaleString(), size);
     const reversalOrder = new Order(
-      filledLeg.broker,
-      filledLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
+      largeLeg.broker,
+      largeLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
       size,
       price,
-      filledLeg.cashMarginType,
+      largeLeg.cashMarginType,
       OrderType.Limit,
-      filledLeg.leverageLevel
+      largeLeg.leverageLevel
     );
     await this.sendOrderWithTtl(reversalOrder, options.ttl);
     return [reversalOrder];
   }
 
   private async proceedLeg(orders: OrderPair, options: ProceedOption): Promise<Order[]> {
-    const unfilledLeg = orders.filter(o => !o.filled)[0];
-    const sign = unfilledLeg.side === OrderSide.Buy ? 1 : -1;
-    const price = _.round(unfilledLeg.price * (1 + sign * options.limitMovePercent / 100));
-    const size = _.floor(unfilledLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
-    this.log.info(t`ExecuteUnfilledLeg`, unfilledLeg.toShortString(), price.toLocaleString(), size);
+    const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
+    const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
+    const sign = smallLeg.side === OrderSide.Buy ? 1 : -1;
+    const price = _.round(smallLeg.price * (1 + sign * options.limitMovePercent / 100));
+    const size = _.floor(smallLeg.pendingSize - largeLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
+    this.log.info(t`ExecuteUnfilledLeg`, smallLeg.toShortString(), price.toLocaleString(), size);
     const proceedOrder = new Order(
-      unfilledLeg.broker,
-      unfilledLeg.side,
+      smallLeg.broker,
+      smallLeg.side,
       size,
       price,
-      unfilledLeg.cashMarginType,
+      smallLeg.cashMarginType,
       OrderType.Limit,
-      unfilledLeg.leverageLevel
+      smallLeg.leverageLevel
     );
     await this.sendOrderWithTtl(proceedOrder, options.ttl);
     return [proceedOrder];
