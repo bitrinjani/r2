@@ -2,6 +2,7 @@ import { OrderPair, ActivePairStore } from './types';
 import * as level from 'level';
 import Order from './Order';
 import { v1 as uuid } from 'uuid';
+import * as mkdirp from 'mkdirp';
 
 const keyName = 'ActivePair';
 const nilUuid = '00000000-0000-0000-0000-000000000000';
@@ -14,10 +15,11 @@ const queryAll = {
 };
 
 export default class ActivePairLevelStore implements ActivePairStore {
-  static path = 'datastore/main';
+  static path = `${process.cwd()}/datastore/main`;
   db: any;
 
   constructor(path: string) {
+    mkdirp(path);
     this.db = level(path, { keyEncoding: 'utf-8', valueEncoding: 'json' });
   }
 

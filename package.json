@@ -32,6 +32,7 @@
     "jsonwebtoken": "^8.1.0",
     "level": "^2.1.1",
     "lodash": "^4.17.4",
+    "mkdirp": "^0.5.1",
     "node-fetch": "^1.7.3",
     "pino": "^4.10.2",
     "reflect-metadata": "^0.1.10",

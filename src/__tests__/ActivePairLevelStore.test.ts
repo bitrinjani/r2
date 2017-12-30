@@ -5,7 +5,7 @@ import ActivePairLevelStore from '../ActivePairLevelStore';
 describe('ActivePairLevelStore', () => {
   let store;
   beforeAll(async () => {
-    store = new ActivePairLevelStore('src/__tests__/datastore/1');
+    store = new ActivePairLevelStore(`${__dirname}/datastore/1`);
     await store.delAll();
   });
 
