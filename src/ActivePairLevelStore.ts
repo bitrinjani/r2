@@ -19,7 +19,7 @@ export default class ActivePairLevelStore implements ActivePairStore {
   db: any;
 
   constructor(path: string) {
-    mkdirp(path);
+    mkdirp.sync(path);
     this.db = level(path, { keyEncoding: 'utf-8', valueEncoding: 'json' });
   }
 
