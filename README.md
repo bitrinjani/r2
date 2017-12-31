@@ -35,9 +35,11 @@ R2 works on any OS that supports Node.js, such as:
 #### Supported Exchanges
 R2 supports three exchanges operated in Japan.
 
-- Bitflyer (Cash)
-- Quoine (Leverage)
-- Coincheck (Cash, Leverage)
+|Exchange|Cash|Margin|
+|----|------|-----------|
+|bitFlyer|✔️| |
+|Quoine|✔️|✔️|
+|Coincheck|✔️|✔️|
 
 ## How it works
 1. Every 3 seconds, R2 concurrently fetches quotes from exchanges.
@@ -122,11 +124,11 @@ The onSingleLeg config specifies what action should be taken when only one leg i
 |Exchange|Supported option|
 |--------|----------------|
 |Bitflyer|Cash|
-|Quoine|NetOut|
+|Quoine|Cash, NetOut|
 |Coincheck|Cash, MarginOpen, NetOut|
 
-Quoine's NetOut is handled by Exchange API. Quoine can close multiple positions by one order.
-Coincheck's NetOut is handled by R2 because the exchange doesn't support netout operation. Coincheck's NetOut works as below.
+Quoine's NetOut is natively handled by Exchange API. Quoine can close multiple positions by one order.
+Coincheck's NetOut is artificially handled by R2 because the exchange doesn't support netout operation. Coincheck's NetOut works as below.
 1. The arbitrager finds leverage positions with the following conditions.
   - The opposite side of the sending order
   - Almost same amount as the sending order. 'Almost same' here means within 1% difference
