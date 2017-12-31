@@ -9,7 +9,9 @@ import {
   PriceLevelsResponse,
   TradingAccount,
   CloseAllResponse,
-  ClosingTrade
+  ClosingTrade,
+  AccountBalanceResponse,
+  AccountBalance
 } from './types';
 import * as jwt from 'jsonwebtoken';
 
@@ -38,6 +40,12 @@ export default class BrokerApi {
     const path = '/trading_accounts';
     const response = await this.get<TradingAccountsResponse>(path);
     return response.map(x => new TradingAccount(x));
+  }
+
+  async getAccountBalance(): Promise<AccountBalanceResponse> {
+    const path = '/accounts/balance';
+    const response = await this.get<AccountBalanceResponse>(path);
+    return response.map(x => new AccountBalance(x));
   }
 
   async getPriceLevels(): Promise<PriceLevelsResponse> {

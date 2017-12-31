@@ -1,7 +1,7 @@
 // tslint:disable:variable-name
 import { Castable, cast, element } from '@bitr/castable';
 
-export interface Order {
+export interface BrokerOrder {
   order_type: string;
   product_id: string;
   side: string;
@@ -12,7 +12,7 @@ export interface Order {
 }
 
 export interface SendOrderRequest {
-  order: Order;
+  order: BrokerOrder;
 }
 
 export class SendOrderResponse extends Castable {
@@ -145,4 +145,15 @@ export class ClosingTrade extends Castable {
   @cast created_at: number;
   @cast updated_at: number;
   @cast total_interest: number;
+}
+
+export class AccountBalance extends Castable {
+  @cast currency: string;
+  @cast balance: number;
+}
+
+export type AccountBalanceResponse = AccountBalance[];
+
+export interface CashMarginTypeStrategy {
+  getBtcPosition(): Promise<number>;
 }

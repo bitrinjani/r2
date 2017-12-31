@@ -31,14 +31,18 @@ export default class ConfigValidatorImpl implements ConfigValidator {
       const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.MarginOpen, CashMarginType.NetOut];
       this.throwIf(
         !_.includes(allowedCashMarginType, coincheck.cashMarginType),
-        'CashMarginType must be Cash or MarginOpen for Coincheck.'
+        'CashMarginType must be Cash, NetOut or MarginOpen for Coincheck.'
       );
       this.validateBrokerConfigCommon(coincheck);
     }
 
     const quoine = findBrokerConfig(config, Broker.Quoine);
     if (this.isEnabled(quoine)) {
-      this.throwIf(quoine.cashMarginType !== CashMarginType.NetOut, 'CashMarginType must be NetOut for Quoine.');
+      const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.NetOut];
+      this.throwIf(
+        !_.includes(allowedCashMarginType, quoine.cashMarginType),
+        'CashMarginType must be Cash or NetOut for Quoine.'
+      );
       this.validateBrokerConfigCommon(quoine);
     }
   }

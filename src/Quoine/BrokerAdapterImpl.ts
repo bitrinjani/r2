@@ -16,10 +16,12 @@ import symbols from '../symbols';
 import * as _ from 'lodash';
 import Order from '../Order';
 import Quote from '../Quote';
-import { PriceLevelsResponse, SendOrderRequest, OrdersResponse } from './types';
+import { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from './types';
 import Execution from '../Execution';
 import { timestampToDate, findBrokerConfig } from '../util';
 import Decimal from 'decimal.js';
+import CashStrategy from './CashStrategy';
+import NetOutStrategy from './NetOutStrategy';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
@@ -27,10 +29,15 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly log = getLogger('Quoine.BrokerAdapter');
   private readonly config: BrokerConfig;
   readonly broker = Broker.Quoine;
+  readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {
     this.config = findBrokerConfig(configStore.config, this.broker);
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
+    this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
+      [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
+      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)]
+    ]);
   }
 
   async send(order: Order): Promise<void> {
@@ -57,12 +64,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   async getBtcPosition(): Promise<number> {
-    const accounts = await this.brokerApi.getTradingAccounts();
-    const account = _.find(accounts, b => b.currency_pair_code === 'BTCJPY');
-    if (!account) {
-      throw new Error('Unable to find the account.');
+    const strategy = this.strategyMap.get(this.config.cashMarginType);
+    if (strategy === undefined) {
+      throw new Error(`Unable to find a strategy for ${this.config.cashMarginType}.`);
     }
-    return account.position;
+    return await strategy.getBtcPosition();
   }
 
   async fetchQuotes(): Promise<Quote[]> {
@@ -101,13 +107,16 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
         throw new Error('Not implemented.');
     }
 
-    let orderDirection: string | undefined;
+    let orderDirection: string | undefined;    
+    let leverageLevel: number | undefined;
     switch (order.cashMarginType) {
       case CashMarginType.Cash:
         orderDirection = undefined;
+        leverageLevel = undefined;
         break;
       case CashMarginType.NetOut:
         orderDirection = 'netout';
+        leverageLevel = order.leverageLevel;
         break;
       default:
         throw new Error('Not implemented.');
@@ -121,7 +130,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
         order_type: orderType,
         side: OrderSide[order.side].toLowerCase(),
         quantity: order.size,
-        leverage_level: order.leverageLevel
+        leverage_level: leverageLevel
       }
     };
   }
