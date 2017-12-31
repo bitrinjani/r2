@@ -77,7 +77,7 @@ onSingleLeg設定で裁定ペアの片側だけ約定したときの動作を指
 |取引所|サポートされるcashMarginType|
 |--------|----------------|
 |Bitflyer|Cash|
-|Quoine|NetOut|
+|Quoine|Cash, NetOut|
 |Coincheck|Cash, MarginOpen, NetOut*|
 
 *Coincheckのネットアウトは、取引所APIに存在しない取引タイプのため、アプリケーション内部でどのポジションをクローズするか判断しています。(Quoine APIはネットアウトをネイティブでサポートしています)
