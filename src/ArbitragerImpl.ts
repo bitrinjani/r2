@@ -190,8 +190,7 @@ export default class ArbitragerImpl implements Arbitrager {
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
       return false;
     }
-    let activePairsMap = await this.activePairStore.getAll(); 
-    activePairsMap = activePairsMap.filter(kv => kv.value[0].size === kv.value[1].size);
+    const activePairsMap = await this.activePairStore.getAll(); 
     this.printActivePairs(activePairsMap.map(kv => kv.value));
     for (const { key, value } of activePairsMap.slice().reverse()) {
       const pair = value;
