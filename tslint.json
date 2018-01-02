@@ -115,6 +115,7 @@
       "check-typecast"
     ],
     "import-name": false,
-    "ter-arrow-parens": false
+    "ter-arrow-parens": false,
+    "space-before-function-paren": false
   }
 }
