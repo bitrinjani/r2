@@ -19,9 +19,11 @@ import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
 import { delay } from '../util';
 import { options } from '../logger';
 import ActivePairLevelStore from '../ActivePairLevelStore';
+import { ChronoDB } from '@bitr/chronodb';
 options.enabled = false;
 
-const activePairStore = new ActivePairLevelStore('src/__tests__/datastore/2');
+const chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
+const activePairStore = new ActivePairLevelStore(chronoDB);
 
 let quoteAggregator,
   config: ConfigRoot,
@@ -115,6 +117,8 @@ beforeEach(async () => {
   await activePairStore.delAll();
 });
 
+afterAll(async () => await chronoDB.close());
+
 describe('Arbitrager', () => {
   test('start/stop', async () => {
     const arbitrager = new ArbitragerImpl(
@@ -134,8 +138,15 @@ describe('Arbitrager', () => {
   });
 
   test('stop without start', async () => {
-    const arbitrager = new ArbitragerImpl(undefined, {config: {OnSingleLegConfig:{}}); 
-    arbitrager.activePairStore = activePairStore;   
+    const arbitrager = new ArbitragerImpl(
+      undefined,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory,
+      activePairStore
+    );
     await arbitrager.stop();
     expect(arbitrager.status).toBe('Stopped');
   });
@@ -392,7 +403,7 @@ describe('Arbitrager', () => {
     let i = 1;
     baRouter.refresh = jest.fn().mockImplementation(order => {
       order.status = OrderStatus.Filled;
-    };
+    });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -420,6 +431,46 @@ describe('Arbitrager', () => {
     expect(baRouter.refresh.mock.calls.length).toBe(2);
     expect(baRouter.send.mock.calls.length).toBe(2);
     expect(baRouter.cancel.mock.calls.length).toBe(0);
+  });
+
+  test('Send and both orders filled with different send size', async () => {
+    let i = 1;
+    baRouter.refresh = jest.fn().mockImplementation(order => {
+      order.status = OrderStatus.Filled;
+    });
+    baRouter.send = jest.fn().mockImplementation(order => {
+      if (order.side === OrderSide.Sell) {
+        order.size += 0.0015;
+      }
+    });
+    config.maxRetryCount = 3;
+    spreadAnalyzer.analyze.mockImplementation(() => {
+      return {
+        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        invertedSpread: 100,
+        availableVolume: 1,
+        targetVolume: 1,
+        targetProfit: 100
+      };
+    });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory,
+      activePairStore
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('Filled');
+    expect(baRouter.refresh.mock.calls.length).toBe(2);
+    expect(baRouter.send.mock.calls.length).toBe(2);
+    expect(baRouter.cancel.mock.calls.length).toBe(0);
+    expect((await activePairStore.getAll()).length).toBe(0);
   });
 
   test('Send and only buy order filled', async () => {

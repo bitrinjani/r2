@@ -5,6 +5,7 @@ import container from './container';
 import symbols from './symbols';
 import { Arbitrager, QuoteAggregator, PositionService } from './types';
 import { Container } from 'inversify';
+import { closeChronoDB } from './chrono';
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
@@ -42,6 +43,7 @@ export default class AppRoot {
       if (this.quoteAggregator) {
         await this.quoteAggregator.stop();
       }
+      await closeChronoDB();
       this.log.info(t`SuccessfullyStoppedTheService`);
     } catch (ex) {
       this.log.error(ex.message);

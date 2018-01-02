@@ -147,14 +147,16 @@ export default class ArbitragerImpl implements Arbitrager {
 
       this.printOrderSummary(orders);
 
-      if (orders.every(o => o.filled)) {        
+      if (orders.every(o => o.filled)) {
         this.log.info(t`BothLegsAreSuccessfullyFilled`);
         if (exitFlag) {
           this.status = 'Closed';
         } else {
           this.status = 'Filled';
-          await this.activePairStore.put(this.activePairStore.generateKey(), orders);
-        }        
+          if (orders[0].size === orders[1].size) {
+            await this.activePairStore.put(orders);
+          }
+        }
         this.printProfit(orders);
         break;
       }
@@ -164,8 +166,10 @@ export default class ArbitragerImpl implements Arbitrager {
         this.log.warn(t`MaxRetryCountReachedCancellingThePendingOrders`);
         const cancelTasks = orders.filter(o => !o.filled).map(o => this.brokerAdapterRouter.cancel(o));
         await Promise.all(cancelTasks);
-        if (orders.some(o => !o.filled) &&
-          _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0) {
+        if (
+          orders.some(o => !o.filled) &&
+          _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0
+        ) {
           const subOrders = await this.singleLegHandler.handle(orders, exitFlag);
           if (subOrders.length !== 0 && subOrders.every(o => o.filled)) {
             this.printProfit(_.concat(orders, subOrders));
@@ -190,7 +194,7 @@ export default class ArbitragerImpl implements Arbitrager {
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
       return false;
     }
-    const activePairsMap = await this.activePairStore.getAll(); 
+    const activePairsMap = await this.activePairStore.getAll();
     this.printActivePairs(activePairsMap.map(kv => kv.value));
     for (const { key, value } of activePairsMap.slice().reverse()) {
       const pair = value;

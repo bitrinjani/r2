@@ -101,3 +101,8 @@ export function safeQueryStringStringify(o: any) {
   const noUndefinedFields = _.pickBy(o, _.negate(_.isUndefined));
   return querystring.stringify(noUndefinedFields);
 }
+
+export function revive<T>(T: Function, o: T): T {
+  const newObject = Object.create(T.prototype);
+  return Object.assign(newObject, o) as T;
+}

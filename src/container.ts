@@ -24,6 +24,7 @@ import * as coincheck from './Coincheck';
 import * as quoine from './Quoine';
 import LimitCheckerFactoryImpl from './LimitCheckerFactoryImpl';
 import ActivePairLevelStore from './ActivePairLevelStore';
+import { getChronoDB } from './chrono';
 
 const container = new Container();
 container.bind<Arbitrager>(symbols.Arbitrager).to(ArbitragerImpl);
@@ -48,5 +49,6 @@ container.bind<ConfigValidator>(symbols.ConfigValidator).to(ConfigValidatorImpl)
 container.bind<LimitCheckerFactory>(symbols.LimitCheckerFactory).to(LimitCheckerFactoryImpl);
 container
   .bind<ActivePairStore>(symbols.ActivePairStore)
-  .toConstantValue(new ActivePairLevelStore(ActivePairLevelStore.path));
+  .toConstantValue(new ActivePairLevelStore(getChronoDB()));
+
 export default container;

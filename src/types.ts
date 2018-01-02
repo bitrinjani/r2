@@ -219,8 +219,7 @@ export type OrderPairKeyValue = { key: string, value: OrderPair };
 export interface ActivePairStore {
   get(key: string): Promise<OrderPair>;
   getAll(): Promise<OrderPairKeyValue[]>;
-  put(key: string, value: OrderPair): Promise<void>;
+  put(value: OrderPair): Promise<string>;
   del(key: string): Promise<void>;
   delAll(): Promise<{}>;
-  generateKey();
 }

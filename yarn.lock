@@ -8,6 +8,16 @@
   dependencies:
     reflect-metadata "^0.1.10"
 
+"@bitr/chronodb@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@bitr/chronodb/-/chronodb-1.0.2.tgz#4b5d5e9c65bacb06430e715ebb3c18e4d3ad405d"
+  dependencies:
+    level "^2.1.1"
+    lodash "^4.17.4"
+    mkdirp "^0.5.1"
+    through2 "^2.0.3"
+    uuid "^3.1.0"
+
 "@types/chalk@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@types/chalk/-/chalk-2.2.0.tgz#b7f6e446f4511029ee8e3f43075fb5b73fbaa0ba"
@@ -3090,7 +3100,7 @@ throat@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/throat/-/throat-4.1.0.tgz#89037cbc92c56ab18926e6ba4cbb200e15672a6a"
 
-through2@^2.0.2:
+through2@^2.0.2, through2@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/through2/-/through2-2.0.3.tgz#0004569b37c7c74ba39c43f3ced78d1ad94140be"
   dependencies:
