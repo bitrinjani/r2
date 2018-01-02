@@ -23,7 +23,7 @@ import * as bitflyer from './Bitflyer';
 import * as coincheck from './Coincheck';
 import * as quoine from './Quoine';
 import LimitCheckerFactoryImpl from './LimitCheckerFactoryImpl';
-import ActivePairLevelStore from './ActivePairLevelStore';
+import { getActivePairStore } from './ActivePairLevelStore';
 import { getChronoDB } from './chrono';
 
 const container = new Container();
@@ -49,6 +49,6 @@ container.bind<ConfigValidator>(symbols.ConfigValidator).to(ConfigValidatorImpl)
 container.bind<LimitCheckerFactory>(symbols.LimitCheckerFactory).to(LimitCheckerFactoryImpl);
 container
   .bind<ActivePairStore>(symbols.ActivePairStore)
-  .toConstantValue(new ActivePairLevelStore(getChronoDB()));
+  .toConstantValue(getActivePairStore(getChronoDB()));
 
 export default container;

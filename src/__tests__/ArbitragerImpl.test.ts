@@ -18,12 +18,12 @@ import LimitCheckerFactoryImpl from '../LimitCheckerFactoryImpl';
 import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
 import { delay } from '../util';
 import { options } from '../logger';
-import ActivePairLevelStore from '../ActivePairLevelStore';
+import { getActivePairStore } from '../ActivePairLevelStore';
 import { ChronoDB } from '@bitr/chronodb';
 options.enabled = false;
 
 const chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
-const activePairStore = new ActivePairLevelStore(chronoDB);
+const activePairStore = getActivePairStore(chronoDB);
 
 let quoteAggregator,
   config: ConfigRoot,
