@@ -40,18 +40,9 @@ export function hmac(secret: string, text: string, algo: string = 'sha256'): str
     .digest('hex');
 }
 
-export const nonce: () => string = (function() {
-  let prev = 0;
-  return function() {
-    const n = Date.now();
-    if (n <= prev) {
-      prev += 1;
-      return prev.toString();
-    }
-    prev = n;
-    return prev.toString();
-  };
-})();
+export function nonce(): string  {
+  return (Date.now() * 1000000).toString();
+}
 
 export function timestampToDate(n: number): Date {
   return new Date(n * 1000);
