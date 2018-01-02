@@ -20,7 +20,7 @@ describe('NetOutStrategy', () => {
   test('send fails - not NetOut order', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck,
+      'Coincheck',
       OrderSide.Buy,
       0.005,
       300000,
@@ -36,7 +36,7 @@ describe('NetOutStrategy', () => {
   test('netout close_short', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck,
+      'Coincheck',
       OrderSide.Buy, 
       0.01, 
       840000, 
@@ -56,7 +56,7 @@ describe('NetOutStrategy', () => {
   test('netout request - open buy', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck,
+      'Coincheck',
       OrderSide.Buy, 
       0.02, 
       840000, 
@@ -73,7 +73,7 @@ describe('NetOutStrategy', () => {
   test('netout when no closable position', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck, 
+      'Coincheck', 
       OrderSide.Sell, 
       0.01, 
       830000, 
@@ -93,7 +93,7 @@ describe('NetOutStrategy', () => {
   test('netout market when no closable position', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck, 
+      'Coincheck', 
       OrderSide.Sell, 
       0.01, 
       830000, 
@@ -111,7 +111,7 @@ describe('NetOutStrategy', () => {
   test('netout non BTCJPY', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck, 
+      'Coincheck', 
       OrderSide.Sell, 
       0.01, 
       830000, 

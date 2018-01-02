@@ -127,15 +127,11 @@ export interface BrokerAdapterRouter {
   fetchQuotes(broker: Broker): Promise<Quote[]>;
 }
 
-export enum Broker {
-  None = 'None',
-  Bitflyer = 'Bitflyer',
-  Coincheck = 'Coincheck',
-  Quoine = 'Quoine'
-}
+export type Broker = string;
 
 export class BrokerConfig extends Castable {
   @cast broker: Broker;
+  @cast npmPath?: string;
   @cast enabled: boolean;
   @cast key: string;
   @cast secret: string;

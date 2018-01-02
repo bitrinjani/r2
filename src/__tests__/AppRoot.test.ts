@@ -1,38 +1,108 @@
 import { Container } from 'inversify';
 import AppRoot from '../AppRoot';
 import { options } from '../logger';
+import { getConfigRoot } from '../util';
+import symbols from '../symbols';
 options.enabled = false;
 
 describe('AppRoot', () => {
   test('start and stop', async () => {
-    const arbitrager = { start: jest.fn(), stop: jest.fn() };
-    const container = {
-      get: () => arbitrager
+    const service = { start: jest.fn(), stop: jest.fn() };
+    const container = new Container();
+    container.get = symbol => {
+      if (symbol === symbols.ConfigStore) {
+        return { config: { brokers: [{ broker: 'Bitflyer' }, { broker: 'Coincheck' }, { broker: 'Quoine' }] } };
+      }
+      return service;
     };
     const target = new AppRoot(container);
     await target.start();
-    expect(arbitrager.start).toBeCalled();
+    expect(service.start).toBeCalled();
     await target.stop();
-    expect(arbitrager.stop).toBeCalled();
+    expect(service.stop).toBeCalled();
+  });
+
+  test('unknown broker', async () => {
+    const service = { start: jest.fn(), stop: jest.fn() };
+    const container = new Container();
+    container.get = symbol => {
+      if (symbol === symbols.ConfigStore) {
+        return { config: { brokers: [{ broker: 'Unknown' }, { broker: 'Coincheck' }, { broker: 'Quoine' }] } };
+      }
+      return service;
+    };
+    const target = new AppRoot(container);
+    await target.start();
+    expect(service.start).not.toBeCalled();
+  });
+
+  test('unknown broker with npmPath', async () => {
+    const service = { start: jest.fn(), stop: jest.fn() };
+    const container = new Container();
+    container.get = symbol => {
+      if (symbol === symbols.ConfigStore) {
+        return {
+          config: {
+            brokers: [{ broker: 'Unknown', npmPath: 'Unknown' }, { broker: 'Coincheck' }, { broker: 'Quoine' }]
+          }
+        };
+      }
+      return service;
+    };
+    const target = new AppRoot(container);
+    await target.start();
+    expect(service.start).not.toBeCalled();
+  });
+
+  test('unknown broker with wrong npmPath', async () => {
+    const service = { start: jest.fn(), stop: jest.fn() };
+    const container = new Container();
+    container.get = symbol => {
+      if (symbol === symbols.ConfigStore) {
+        return {
+          config: {
+            brokers: [{ broker: 'Unknown', npmPath: '@bitr/castable' }, { broker: 'Coincheck' }, { broker: 'Quoine' }]
+          }
+        };
+      }
+      return service;
+    };
+    const target = new AppRoot(container);
+    await target.start();
+    expect(service.start).not.toBeCalled();
   });
 
   test('start throws', async () => {
-    const arbitrager = {
-      start: async () => { throw new Error('Mock start failed.'); }, stop: jest.fn()
+    const service = {
+      start: async () => {
+        throw new Error('Mock start failed.');
+      },
+      stop: jest.fn()
     };
-    const container = {
-      get: () => arbitrager
+    const container = new Container();
+    container.get = symbol => {
+      if (symbol === symbols.ConfigStore) {
+        return { config: { brokers: [{ broker: 'Bitflyer' }] } };
+      }
+      return service;
     };
     const target = new AppRoot(container);
     await target.start();
   });
 
   test('stop throws', async () => {
-    const arbitrager = {
-      start: jest.fn(), stop: async () => { throw new Error('Mock stop failed.'); }
-    };    
-    const container = {
-      get: () => arbitrager
+    const service = {
+      start: jest.fn(),
+      stop: async () => {
+        throw new Error('Mock stop failed.');
+      }
+    };
+    const container = new Container();
+    container.get = symbol => {
+      if (symbol === symbols.ConfigStore) {
+        return { config: { brokers: [{ broker: 'Bitflyer' }] } };
+      }
+      return service;
     };
     const target = new AppRoot(container);
     await target.start();
@@ -40,9 +110,13 @@ describe('AppRoot', () => {
   });
 
   test('stop with undefined arbitrager', async () => {
-    const arbitrager = { start: jest.fn(), stop: jest.fn() };
-    const container = {
-      get: () => arbitrager
+    const service = { start: jest.fn(), stop: jest.fn() };
+    const container = new Container();
+    container.get = symbol => {
+      if (symbol === symbols.ConfigStore) {
+        return { config: { brokers: [{ broker: 'Bitflyer' }] } };
+      }
+      return service;
     };
     const target = new AppRoot(container);
     await target.stop();

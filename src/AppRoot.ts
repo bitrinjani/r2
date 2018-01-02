@@ -3,7 +3,7 @@ import t from './intl';
 import 'reflect-metadata';
 import container from './container';
 import symbols from './symbols';
-import { Arbitrager, QuoteAggregator, PositionService } from './types';
+import { Arbitrager, QuoteAggregator, PositionService, BrokerAdapter, ConfigStore } from './types';
 import { Container } from 'inversify';
 import { closeChronoDB } from './chrono';
 
@@ -18,6 +18,7 @@ export default class AppRoot {
   async start(): Promise<void> {
     try {
       this.log.info(t`StartingTheService`);
+      await this.bindBrokers();
       this.quoteAggregator = this.ioc.get<QuoteAggregator>(symbols.QuoteAggregator);
       await this.quoteAggregator.start();
       this.positionService = this.ioc.get<PositionService>(symbols.PositionService);
@@ -48,6 +49,34 @@ export default class AppRoot {
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
+    }
+  }
+
+  private async bindBrokers(): Promise<void> {
+    const configStore = this.ioc.get<ConfigStore>(symbols.ConfigStore);
+    const brokerConfigs = configStore.config.brokers;
+    const bindTasks = brokerConfigs.map(async brokerConfig => {
+      const brokerName = brokerConfig.broker;
+      const brokerModule = brokerConfig.npmPath
+        ? await this.tryImport(brokerConfig.npmPath)
+        : (await this.tryImport(`./${brokerName}`)) || (await this.tryImport(`@bitr/${brokerName}`));
+      if (brokerModule === undefined) {
+        throw new Error(`Unabled to find ${brokerName} package.`);
+      }
+      this.ioc.bind<BrokerAdapter>(symbols.BrokerAdapter).to(brokerModule.BrokerAdapterImpl);
+    });
+    await Promise.all(bindTasks);
+  }
+
+  private async tryImport(path: string): Promise<any> {
+    try {
+      const module = await import(path);
+      if (module.BrokerAdapterImpl === undefined) {
+        return undefined;
+      }
+      return module;
+    } catch (ex) {
+      return undefined;
     }
   }
 }

@@ -7,7 +7,7 @@ export default class Quote {
 
   toString(): string {
     return (
-      `${padEnd(Broker[this.broker], 10)} ${QuoteSide[this.side]} ` +
+      `${padEnd(this.broker, 10)} ${this.side} ` +
       `${padStart(this.price.toLocaleString(), 7)} ${_.round(this.volume, 3)}`
     );
   }

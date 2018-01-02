@@ -6,8 +6,7 @@
   OrderType,
   OrderSide,
   CashMarginType,
-  QuoteSide,
-  Broker
+  QuoteSide
 } from '../types';
 import BrokerApi from './BrokerApi';
 import { getLogger } from '../logger';
@@ -28,7 +27,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
   private readonly log = getLogger('Quoine.BrokerAdapter');
   private readonly config: BrokerConfig;
-  readonly broker = Broker.Quoine;
+  readonly broker = 'Quoine';
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {

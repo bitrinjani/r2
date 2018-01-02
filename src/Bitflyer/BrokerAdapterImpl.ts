@@ -7,8 +7,7 @@
   TimeInForce,
   OrderSide,
   CashMarginType,
-  QuoteSide,
-  Broker
+  QuoteSide
 } from '../types';
 import { getLogger } from '../logger';
 import { injectable, inject } from 'inversify';
@@ -26,7 +25,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
   private readonly log = getLogger('Bitflyer.BrokerAdapter');
   private readonly config: BrokerConfig;
-  readonly broker = Broker.Bitflyer;
+  readonly broker = 'Bitflyer';
 
   constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {
     this.config = findBrokerConfig(configStore.config, this.broker);

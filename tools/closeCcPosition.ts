@@ -2,14 +2,13 @@
 
 import * as util from '../src/util';
 import CoincheckApi from '../src/Coincheck/BrokerApi';
-import { Broker } from '../src/types';
 import { options } from '../src/logger';
 
 options.enabled = false;
 
 async function main() {
   const config = util.getConfigRoot();
-  const ccConfig = util.findBrokerConfig(config, Broker.Coincheck);
+  const ccConfig = util.findBrokerConfig(config, 'Coincheck');
   const ccApi = new CoincheckApi(ccConfig.key, ccConfig.secret);
   const positions = await ccApi.getAllOpenLeveragePositions();
   for (const position of positions) {

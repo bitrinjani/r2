@@ -14,7 +14,7 @@ export default class BrokerPosition {
   toString(): string {
     const isOk = b => (b ? 'OK' : 'NG');
     return (
-      `${padEnd(Broker[this.broker], 10)}: ${padStart(_.round(this.btc, 3), 5)} BTC, ` +
+      `${padEnd(this.broker, 10)}: ${padStart(_.round(this.btc, 3), 5)} BTC, ` +
       `${t`LongAllowed`}: ${isOk(this.longAllowed)}, ` +
       `${t`ShortAllowed`}: ${isOk(this.shortAllowed)}`
     );

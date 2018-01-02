@@ -12,7 +12,7 @@ export default class Execution {
   }
 
   id: string = uuid();
-  broker: Broker = Broker.None;
+  broker: Broker = 'None';
   brokerOrderId: string;
   cashMarginType: CashMarginType;
   size: number;

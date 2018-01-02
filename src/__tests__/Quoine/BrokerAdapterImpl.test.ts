@@ -9,7 +9,7 @@ import { options } from '../../logger';
 options.enabled = false;
 
 const config = {
-  brokers: [{ broker: Broker.Quoine, key: 'key', secret: 'secret', cashMarginType: CashMarginType.NetOut }]
+  brokers: [{ broker: 'Quoine', key: 'key', secret: 'secret', cashMarginType: CashMarginType.NetOut }]
 };
 
 describe('Quoine BrokerAdapter', () => {
@@ -23,7 +23,7 @@ describe('Quoine BrokerAdapter', () => {
 
   test('send leverage buy limit', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = new Order(Broker.Quoine, OrderSide.Buy, 0.01, 783000, CashMarginType.NetOut, OrderType.Limit, 10);
+    const order = new Order('Quoine', OrderSide.Buy, 0.01, 783000, CashMarginType.NetOut, OrderType.Limit, 10);
     await target.send(order);
     expect(order.status).toBe(OrderStatus.New);
     expect(order.brokerOrderId).toBe('118573146');
@@ -31,10 +31,10 @@ describe('Quoine BrokerAdapter', () => {
 
   test('send cash buy limit', async () => {
     const config = {
-      brokers: [{ broker: Broker.Quoine, key: 'key', secret: 'secret', cashMarginType: CashMarginType.Cash }]
+      brokers: [{ broker: 'Quoine', key: 'key', secret: 'secret', cashMarginType: CashMarginType.Cash }]
     };
     const target = new BrokerAdapterImpl({ config });
-    const order = new Order(Broker.Quoine, OrderSide.Buy, 0.01, 783000, CashMarginType.Cash, OrderType.Limit, 10);
+    const order = new Order('Quoine', OrderSide.Buy, 0.01, 783000, CashMarginType.Cash, OrderType.Limit, 10);
     await target.send(order);
     expect(order.status).toBe(OrderStatus.New);
     expect(order.brokerOrderId).toBe('118573146');
@@ -42,7 +42,7 @@ describe('Quoine BrokerAdapter', () => {
 
   test('send wrong broker order', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = { broker: Broker.Bitflyer };
+    const order = { broker: 'Bitflyer' };
     try {
       await target.send(order);
     } catch (ex) {
@@ -53,7 +53,7 @@ describe('Quoine BrokerAdapter', () => {
 
   test('send wrong symbol', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = { broker: Broker.Quoine, symbol: 'ZZZ' };
+    const order = { broker: 'Quoine', symbol: 'ZZZ' };
     try {
       await target.send(order);
     } catch (ex) {
@@ -64,7 +64,7 @@ describe('Quoine BrokerAdapter', () => {
 
   test('send wrong order type', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = { broker: Broker.Quoine, symbol: 'BTCJPY', type: OrderType.StopLimit };
+    const order = { broker: 'Quoine', symbol: 'BTCJPY', type: OrderType.StopLimit };
     try {
       await target.send(order);
     } catch (ex) {
@@ -76,7 +76,7 @@ describe('Quoine BrokerAdapter', () => {
   test('send wrong margin type', async () => {
     const target = new BrokerAdapterImpl({ config });
     const order = {
-      broker: Broker.Quoine,
+      broker: 'Quoine',
       symbol: 'BTCJPY',
       type: OrderType.Market,
       cashMarginType: CashMarginType.MarginOpen
@@ -93,7 +93,7 @@ describe('Quoine BrokerAdapter', () => {
     const target = new BrokerAdapterImpl({ config });
     const result = await target.fetchQuotes();
     expect(result.length).toBe(42);
-    result.forEach(q => expect(q.broker).toBe(Broker.Quoine));
+    result.forEach(q => expect(q.broker).toBe('Quoine'));
   });
 
   test('fetchQuotes throws', async () => {
@@ -110,7 +110,7 @@ describe('Quoine BrokerAdapter', () => {
 
   test('getBtcPosition Cash', async () => {
     const config = {
-      brokers: [{ broker: Broker.Quoine, key: 'key', secret: 'secret', cashMarginType: CashMarginType.Cash }]
+      brokers: [{ broker: 'Quoine', key: 'key', secret: 'secret', cashMarginType: CashMarginType.Cash }]
     };
     const target = new BrokerAdapterImpl({ config });
     const result = await target.getBtcPosition();
@@ -119,7 +119,7 @@ describe('Quoine BrokerAdapter', () => {
 
   test('getBtcPosition strategy not found', async () => {
     const config = {
-      brokers: [{ broker: Broker.Quoine, key: 'key', secret: 'secret', cashMarginType: CashMarginType.MarginOpen }]
+      brokers: [{ broker: 'Quoine', key: 'key', secret: 'secret', cashMarginType: CashMarginType.MarginOpen }]
     };
     const target = new BrokerAdapterImpl({ config });
     try {

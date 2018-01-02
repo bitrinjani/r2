@@ -7,7 +7,7 @@ import Order from '../Order';
 import Quote from '../Quote';
 import BrokerApi from './BrokerApi';
 import Execution from '../Execution';
-import { CashMarginType, ConfigStore, BrokerConfig, Broker, BrokerAdapter, QuoteSide, OrderStatus } from '../types';
+import { CashMarginType, ConfigStore, BrokerConfig, BrokerAdapter, QuoteSide, OrderStatus } from '../types';
 import { OrderBooksResponse, CashMarginTypeStrategy } from './types';
 import { eRound, almostEqual, findBrokerConfig } from '../util';
 import CashStrategy from './CashStrategy';
@@ -19,7 +19,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
   private readonly log = getLogger('Coincheck.BrokerAdapter');
   private readonly config: BrokerConfig;
-  readonly broker = Broker.Coincheck;
+  readonly broker = 'Coincheck';
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {

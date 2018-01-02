@@ -45,21 +45,21 @@ beforeEach(async () => {
     minSize: 0.005,
     brokers: [
       {
-        broker: Broker.Bitflyer,
+        broker: 'Bitflyer',
         cashMarginType: CashMarginType.Cash,
         leverageLevel: 1,
         maxLongPosition: 100,
         maxShortPosition: 100
       },
       {
-        broker: Broker.Coincheck,
+        broker: 'Coincheck',
         cashMarginType: CashMarginType.MarginOpen,
         leverageLevel: 8,
         maxLongPosition: 100,
         maxShortPosition: 100
       },
       {
-        broker: Broker.Quoine,
+        broker: 'Quoine',
         cashMarginType: CashMarginType.NetOut,
         leverageLevel: 9,
         maxLongPosition: 100,
@@ -108,10 +108,10 @@ beforeEach(async () => {
   limitCheckerFactory = new LimitCheckerFactoryImpl(configStore, positionService);
 
   quotes = [
-    new Quote(Broker.Coincheck, QuoteSide.Ask, 3, 1),
-    new Quote(Broker.Coincheck, QuoteSide.Bid, 2, 2),
-    new Quote(Broker.Quoine, QuoteSide.Ask, 3.5, 3),
-    new Quote(Broker.Quoine, QuoteSide.Bid, 2.5, 4)
+    new Quote('Coincheck', QuoteSide.Ask, 3, 1),
+    new Quote('Coincheck', QuoteSide.Bid, 2, 2),
+    new Quote('Quoine', QuoteSide.Ask, 3.5, 3),
+    new Quote('Quoine', QuoteSide.Bid, 2.5, 4)
   ];
 
   await activePairStore.delAll();
@@ -176,8 +176,8 @@ describe('Arbitrager', () => {
   test('violate maxNetExposure', async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 400, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 400, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: -100,
         targetVolume: 1,
         targetProfit: -100
@@ -204,8 +204,8 @@ describe('Arbitrager', () => {
   test('Spread not inverted', async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 400, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 400, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: -100,
         targetVolume: 1,
         targetProfit: -100
@@ -232,8 +232,8 @@ describe('Arbitrager', () => {
     config.minTargetProfit = 1000;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -261,8 +261,8 @@ describe('Arbitrager', () => {
     config.minTargetProfitPercent = 18.4;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -290,8 +290,8 @@ describe('Arbitrager', () => {
     config.minTargetProfitPercent = 10;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -318,8 +318,8 @@ describe('Arbitrager', () => {
     config.maxTargetProfit = 99;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -346,8 +346,8 @@ describe('Arbitrager', () => {
     config.maxTargetProfitPercent = 15;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -375,8 +375,8 @@ describe('Arbitrager', () => {
     config.demoMode = true;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -407,8 +407,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -446,8 +446,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -483,8 +483,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -516,8 +516,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -555,8 +555,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -594,8 +594,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -632,8 +632,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -671,8 +671,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -710,8 +710,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -748,8 +748,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -786,8 +786,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -824,8 +824,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -862,8 +862,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -906,8 +906,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 1;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -952,8 +952,8 @@ describe('Arbitrager', () => {
       });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockReturnValue({
-      bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+      bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
       invertedSpread: 100,
       availableVolume: 1,
       targetVolume: 1,
@@ -991,8 +991,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1030,8 +1030,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1069,8 +1069,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1107,8 +1107,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1145,8 +1145,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1183,8 +1183,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1221,8 +1221,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1260,8 +1260,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1290,8 +1290,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1317,8 +1317,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1347,8 +1347,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1378,8 +1378,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1409,8 +1409,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1440,8 +1440,8 @@ describe('Arbitrager', () => {
     config.brokers[2].commissionPercent = 0.3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-        bestAsk: new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
+        bestBid: new Quote('Quoine', QuoteSide.Bid, 600, 4),
+        bestAsk: new Quote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1465,10 +1465,10 @@ describe('Arbitrager', () => {
 
   test('Close filled orders', async () => {
     const quotes = [
-      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
-      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+      new Quote('Quoine', QuoteSide.Ask, 700, 4),
+      new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      new Quote('Coincheck', QuoteSide.Ask, 500, 1),
+      new Quote('Coincheck', QuoteSide.Bid, 400, 1)
     ];
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
@@ -1497,10 +1497,10 @@ describe('Arbitrager', () => {
 
   test('Close filled orders with minExitTargetProfitPercent', async () => {
     const quotes = [
-      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
-      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+      new Quote('Quoine', QuoteSide.Ask, 700, 4),
+      new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      new Quote('Coincheck', QuoteSide.Ask, 500, 1),
+      new Quote('Coincheck', QuoteSide.Bid, 400, 1)
     ];
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
@@ -1529,10 +1529,10 @@ describe('Arbitrager', () => {
 
   test('Not close filled orders with minExitTargetProfitPercent', async () => {
     const quotes = [
-      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
-      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+      new Quote('Quoine', QuoteSide.Ask, 700, 4),
+      new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      new Quote('Coincheck', QuoteSide.Ask, 500, 1),
+      new Quote('Coincheck', QuoteSide.Bid, 400, 1)
     ];
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
@@ -1561,10 +1561,10 @@ describe('Arbitrager', () => {
 
   test('Close two filled orders', async () => {
     const quotes = [
-      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
-      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+      new Quote('Quoine', QuoteSide.Ask, 700, 4),
+      new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      new Quote('Coincheck', QuoteSide.Ask, 500, 1),
+      new Quote('Coincheck', QuoteSide.Bid, 400, 1)
     ];
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
@@ -1591,10 +1591,10 @@ describe('Arbitrager', () => {
 
     //closing
     const quotes2 = [
-      new Quote(Broker.Quoine, QuoteSide.Ask, 620, 4),
-      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      new Quote(Broker.Coincheck, QuoteSide.Bid, 450, 1)
+      new Quote('Quoine', QuoteSide.Ask, 620, 4),
+      new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      new Quote('Coincheck', QuoteSide.Ask, 500, 1),
+      new Quote('Coincheck', QuoteSide.Bid, 450, 1)
     ];
     await quoteAggregator.onQuoteUpdated(quotes2);
     expect(arbitrager.status).toBe('Closed');
@@ -1606,10 +1606,10 @@ describe('Arbitrager', () => {
 
   test('Closing filled orders with no lastResult in spread analyzer', async () => {
     const quotes = [
-      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
-      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+      new Quote('Quoine', QuoteSide.Ask, 700, 4),
+      new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      new Quote('Coincheck', QuoteSide.Ask, 500, 1),
+      new Quote('Coincheck', QuoteSide.Bid, 400, 1)
     ];
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
@@ -1638,10 +1638,10 @@ describe('Arbitrager', () => {
 
   test('Closing filled orders when spread analyzer throws', async () => {
     const quotes = [
-      new Quote(Broker.Quoine, QuoteSide.Ask, 700, 4),
-      new Quote(Broker.Quoine, QuoteSide.Bid, 600, 4),
-      new Quote(Broker.Coincheck, QuoteSide.Ask, 500, 1),
-      new Quote(Broker.Coincheck, QuoteSide.Bid, 400, 1)
+      new Quote('Quoine', QuoteSide.Ask, 700, 4),
+      new Quote('Quoine', QuoteSide.Bid, 600, 4),
+      new Quote('Coincheck', QuoteSide.Ask, 500, 1),
+      new Quote('Coincheck', QuoteSide.Bid, 400, 1)
     ];
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;

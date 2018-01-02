@@ -13,7 +13,7 @@ nocksetup();
 
 const config = {
   brokers: [
-    { broker: Broker.Coincheck, key: '', secret: '', cashMarginType: CashMarginType.MarginOpen }
+    { broker: 'Coincheck', key: '', secret: '', cashMarginType: CashMarginType.MarginOpen }
   ]
 } as ConfigRoot;
 
@@ -21,7 +21,7 @@ describe('Coincheck BrokerAdapter', () => {
   test('send with invalid cashMarginType', async () => {
     const target = new BrokerAdapterImpl({ config });
     const order = new Order(
-      Broker.Coincheck,
+      'Coincheck',
       OrderSide.Buy,
       0.005,
       300000,
@@ -38,7 +38,7 @@ describe('Coincheck BrokerAdapter', () => {
   test('send leverage buy limit', async () => {
     const target = new BrokerAdapterImpl({ config });
     const order = new Order(
-      Broker.Coincheck,
+      'Coincheck',
       OrderSide.Buy,
       0.005,
       300000,
@@ -51,7 +51,7 @@ describe('Coincheck BrokerAdapter', () => {
   test('getBtcPosition with invalid cashMarginType', async () => {
     const config = {
       brokers: [
-        { broker: Broker.Coincheck, key: '', secret: '', cashMarginType: 'Invalid' as CashMarginType }
+        { broker: 'Coincheck', key: '', secret: '', cashMarginType: 'Invalid' as CashMarginType }
       ]
     } as ConfigRoot;
     const target = new BrokerAdapterImpl({ config });
@@ -109,7 +109,7 @@ describe('Coincheck BrokerAdapter', () => {
     const target = new BrokerAdapterImpl({ config });
     const result = await target.fetchQuotes();
     expect(result.length).toBe(200);
-    result.forEach(q => expect(q.broker).toBe(Broker.Coincheck));
+    result.forEach(q => expect(q.broker).toBe('Coincheck'));
   });
 
   test('fetchQuotes throws', async () => {
@@ -120,7 +120,7 @@ describe('Coincheck BrokerAdapter', () => {
 
   test('send wrong broker order', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = { broker: Broker.Bitflyer };
+    const order = { broker: 'Bitflyer' };
     try {
       await target.send(order);
     } catch (ex) {

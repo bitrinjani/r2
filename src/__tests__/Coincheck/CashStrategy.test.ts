@@ -13,7 +13,7 @@ describe('CashStrategy', () => {
   test('send buy limit', async () => {
     const strategy = new CashStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck,
+      'Coincheck',
       OrderSide.Buy,
       0.005,
       300000,
@@ -26,7 +26,7 @@ describe('CashStrategy', () => {
   test('send fails - not Cash order', async () => {
     const strategy = new CashStrategy(new BrokerApi('', ''));
     const order = new Order(
-      Broker.Coincheck,
+      'Coincheck',
       OrderSide.Buy,
       0.005,
       300000,

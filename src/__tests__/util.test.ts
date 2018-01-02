@@ -48,7 +48,7 @@ test('readJsonFileSync with no BOM', () => {
 });
 
 test('findBrokerConfig with no config', () => {
-  expect(() => util.findBrokerConfig({brokers: []}, Broker.Bitflyer)).toThrow();
+  expect(() => util.findBrokerConfig({brokers: []}, 'Bitflyer')).toThrow();
 });
 
 test('safeQueryStringStringify', () => {

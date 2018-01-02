@@ -1,4 +1,4 @@
-﻿import { ConfigRoot, ConfigValidator, BrokerConfig, Broker, CashMarginType } from './types';
+﻿import { ConfigRoot, ConfigValidator, BrokerConfig, CashMarginType } from './types';
 import t from './intl';
 import * as _ from 'lodash';
 import { injectable } from 'inversify';
@@ -20,13 +20,13 @@ export default class ConfigValidatorImpl implements ConfigValidator {
     this.mustBePositive(config.priceMergeSize, 'priceMergeSize');
     this.mustBePositive(config.sleepAfterSend, 'sleepAfterSend');
 
-    const bitflyer = findBrokerConfig(config, Broker.Bitflyer);
+    const bitflyer = findBrokerConfig(config, 'Bitflyer');
     if (this.isEnabled(bitflyer)) {
       this.throwIf(bitflyer.cashMarginType !== CashMarginType.Cash, 'CashMarginType must be Cash for Bitflyer.');
       this.validateBrokerConfigCommon(bitflyer);
     }
 
-    const coincheck = findBrokerConfig(config, Broker.Coincheck);
+    const coincheck = findBrokerConfig(config, 'Coincheck');
     if (this.isEnabled(coincheck)) {
       const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.MarginOpen, CashMarginType.NetOut];
       this.throwIf(
@@ -36,7 +36,7 @@ export default class ConfigValidatorImpl implements ConfigValidator {
       this.validateBrokerConfigCommon(coincheck);
     }
 
-    const quoine = findBrokerConfig(config, Broker.Quoine);
+    const quoine = findBrokerConfig(config, 'Quoine');
     if (this.isEnabled(quoine)) {
       const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.NetOut];
       this.throwIf(

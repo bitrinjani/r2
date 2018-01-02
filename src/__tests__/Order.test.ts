@@ -4,7 +4,7 @@ import Execution from '../Execution';
 
 describe('Order', () => {
   test('averageFilledPrice', () => {
-    const target = new Order(Broker.Bitflyer, OrderSide.Buy, 0.01, 1000, CashMarginType.Cash, OrderType.Limit, 1);
+    const target = new Order('Bitflyer', OrderSide.Buy, 0.01, 1000, CashMarginType.Cash, OrderType.Limit, 1);
     const ex1 = new Execution(target);
     ex1.price = 1100;
     ex1.size = 0.004;

@@ -1,7 +1,6 @@
 // Ad-hoc script to flat bitFlyer BTC cash position.
 import * as util from '../src/util';
 import BitflyerApi from '../src/Bitflyer/BrokerApi';
-import { Broker } from '../src/types';
 import { Balance } from '../src/Bitflyer/types';
 import * as _ from 'lodash';
 import { options } from '../src/logger';
@@ -10,7 +9,7 @@ options.enabled = false;
 
 async function main() {
   const config = util.getConfigRoot();
-  const bfConfig = util.findBrokerConfig(config, Broker.Bitflyer);
+  const bfConfig = util.findBrokerConfig(config, 'Bitflyer');
   const bfApi = new BitflyerApi(bfConfig.key, bfConfig.secret);
   const bfBalance = await bfApi.getBalance();
   const bfBtc = (bfBalance.find(x => x.currency_code === 'BTC') as Balance).available;

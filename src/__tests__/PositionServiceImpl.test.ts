@@ -10,12 +10,12 @@ const config = {
   minSize: 0.01,
   positionRefreshInterval: 5000,
   brokers: [{
-    broker: Broker.Quoine,
+    broker: 'Quoine',
     enabled: true,
     maxLongPosition: 0.3,
     maxShortPosition: 0
   }, {
-    broker: Broker.Coincheck,
+    broker: 'Coincheck',
     enabled: true,
     maxLongPosition: 1,
     maxShortPosition: 0
@@ -24,7 +24,7 @@ const config = {
 
 const configStore = { config };
 const baRouter = {
-  getBtcPosition: broker => broker === Broker.Quoine ? 0.2 : -0.3
+  getBtcPosition: broker => broker === 'Quoine' ? 0.2 : -0.3
 };
 
 describe('Position Service', () => {
@@ -35,7 +35,7 @@ describe('Position Service', () => {
     const exposure = ps.netExposure;
     ps.print();
     await ps.stop();
-    const ccPos = _.find(positions, x => x.broker === Broker.Coincheck);
+    const ccPos = _.find(positions, x => x.broker === 'Coincheck');
     expect(positions.length).toBe(2);
     expect(exposure).toBe(-0.1);
     expect(ccPos.btc).toBe(-0.3);
@@ -43,7 +43,7 @@ describe('Position Service', () => {
     expect(ccPos.shortAllowed).toBe(false);
     expect(ccPos.allowedLongSize).toBe(1.3);
     expect(ccPos.allowedShortSize).toBe(0);
-    const qPos = _.find(positions, x => x.broker === Broker.Quoine);
+    const qPos = _.find(positions, x => x.broker === 'Quoine');
     expect(qPos.btc).toBe(0.2);
     expect(qPos.longAllowed).toBe(true);
     expect(qPos.shortAllowed).toBe(true);
@@ -62,7 +62,7 @@ describe('Position Service', () => {
 
   test('positions smaller than minSize', async () => {
     const baRouter = {
-      getBtcPosition: broker => broker === Broker.Quoine ? 0.000002 : -0.3
+      getBtcPosition: broker => broker === 'Quoine' ? 0.000002 : -0.3
     };
     const ps = new PositionServiceImpl(configStore, baRouter);
     await ps.start();
@@ -70,7 +70,7 @@ describe('Position Service', () => {
     const exposure = ps.netExposure;
     ps.print();
     await ps.stop();
-    const ccPos = _.find(positions, x => x.broker === Broker.Coincheck);
+    const ccPos = _.find(positions, x => x.broker === 'Coincheck');
     expect(positions.length).toBe(2);
     expect(exposure).toBe(-0.299998);
     expect(ccPos.btc).toBe(-0.3);
@@ -78,7 +78,7 @@ describe('Position Service', () => {
     expect(ccPos.shortAllowed).toBe(false);
     expect(ccPos.allowedLongSize).toBe(1.3);
     expect(ccPos.allowedShortSize).toBe(0);
-    const qPos = _.find(positions, x => x.broker === Broker.Quoine);
+    const qPos = _.find(positions, x => x.broker === 'Quoine');
     expect(qPos.btc).toBe(0.000002);
     expect(qPos.longAllowed).toBe(true);
     expect(qPos.shortAllowed).toBe(false);
