@@ -1,6 +1,6 @@
 import * as i18next from 'i18next';
 import { en, ja } from './stringResources';
-import { getConfigRoot } from './util';
+import { getConfigRoot } from './configUtil';
 
 i18next.init({
   lng: getConfigRoot().language,

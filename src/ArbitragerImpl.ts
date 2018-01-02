@@ -18,11 +18,12 @@ import {
   ActivePairStore
 } from './types';
 import t from './intl';
-import { padEnd, hr, delay, calculateCommission, findBrokerConfig } from './util';
+import { padEnd, hr, delay } from './util';
 import Quote from './Quote';
 import symbols from './symbols';
 import { fatalErrors } from './constants';
 import SingleLegHandler from './SingleLegHandler';
+import { findBrokerConfig } from './configUtil';
 
 @injectable()
 export default class ArbitragerImpl implements Arbitrager {
@@ -186,7 +187,7 @@ export default class ArbitragerImpl implements Arbitrager {
 
   private calcCommissionFromConfig(order: Order): number {
     const brokerConfig = findBrokerConfig(this.configStore.config, order.broker);
-    return calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
+    return Order.calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
   }
 
   private async findClosable(quotes: Quote[]): Promise<boolean> {

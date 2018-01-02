@@ -1,14 +1,14 @@
 // Ad-hoc script to close all leverage positions in Coincheck.
 
-import * as util from '../src/util';
 import CoincheckApi from '../src/Coincheck/BrokerApi';
 import { options } from '../src/logger';
+import { getConfigRoot, findBrokerConfig } from '../src/configUtil';
 
 options.enabled = false;
 
 async function main() {
-  const config = util.getConfigRoot();
-  const ccConfig = util.findBrokerConfig(config, 'Coincheck');
+  const config = getConfigRoot();
+  const ccConfig = findBrokerConfig(config, 'Coincheck');
   const ccApi = new CoincheckApi(ccConfig.key, ccConfig.secret);
   const positions = await ccApi.getAllOpenLeveragePositions();
   for (const position of positions) {

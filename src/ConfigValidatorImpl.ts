@@ -2,7 +2,7 @@
 import t from './intl';
 import * as _ from 'lodash';
 import { injectable } from 'inversify';
-import { findBrokerConfig } from './util';
+import { findBrokerConfig } from './configUtil';
 
 @injectable()
 export default class ConfigValidatorImpl implements ConfigValidator {

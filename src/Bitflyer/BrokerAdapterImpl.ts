@@ -18,7 +18,8 @@ import Quote from '../Quote';
 import BrokerApi from './BrokerApi';
 import { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from './types';
 import Execution from '../Execution';
-import { eRound, findBrokerConfig } from '../util';
+import { eRound } from '../util';
+import { findBrokerConfig } from '../configUtil';
 
 @injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {

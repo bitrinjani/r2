@@ -1,13 +1,10 @@
 import * as util from '../util';
 import { Broker } from '../types';
+import { findBrokerConfig } from '../configUtil';
 
 test('timestampToDate', () => {
   const dt = util.timestampToDate(1509586252);
   expect(dt.toISOString()).toBe('2017-11-02T01:30:52.000Z');
-});
-
-test('mkdir', () => {
-  expect(() => util.mkdir(1)).toThrow();
 });
 
 test('nonce', async () => {
@@ -48,7 +45,7 @@ test('readJsonFileSync with no BOM', () => {
 });
 
 test('findBrokerConfig with no config', () => {
-  expect(() => util.findBrokerConfig({brokers: []}, 'Bitflyer')).toThrow();
+  expect(() => findBrokerConfig({brokers: []}, 'Bitflyer')).toThrow();
 });
 
 test('safeQueryStringStringify', () => {

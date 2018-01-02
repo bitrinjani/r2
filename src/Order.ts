@@ -65,4 +65,8 @@ export default class Order {
   toString(): string {
     return JSON.stringify(this);
   }
+
+  static calculateCommission(price: number, volume: number, commissionPercent: number): number {
+    return commissionPercent !== undefined ? price * volume * (commissionPercent / 100) : 0;
+  }
 }

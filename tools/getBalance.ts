@@ -1,7 +1,7 @@
 // Ad-hoc script to get balances from exchanges and output the result in CSV format.
 
 import * as _ from 'lodash';
-import * as util from '../src/util';
+import { getConfigRoot, findBrokerConfig } from '../src/configUtil';
 import BitflyerApi from '../src/Bitflyer/BrokerApi';
 import CoincheckApi from '../src/Coincheck/BrokerApi';
 import QuoineApi from '../src/Quoine/BrokerApi';
@@ -12,10 +12,10 @@ import { options } from '../src/logger';
 options.enabled = false;
 
 async function main() {
-  const config = util.getConfigRoot();
-  const bfConfig = util.findBrokerConfig(config, 'Bitflyer');
-  const ccConfig = util.findBrokerConfig(config, 'Coincheck');
-  const quConfig = util.findBrokerConfig(config, 'Quoine');
+  const config = getConfigRoot();
+  const bfConfig = findBrokerConfig(config, 'Bitflyer');
+  const ccConfig = findBrokerConfig(config, 'Coincheck');
+  const quConfig = findBrokerConfig(config, 'Quoine');
 
   const bfApi = new BitflyerApi(bfConfig.key, bfConfig.secret);
   const ccApi = new CoincheckApi(ccConfig.key, ccConfig.secret);
