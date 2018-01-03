@@ -82,9 +82,9 @@ export default class ArbitragerImpl implements Arbitrager {
     this.log.info(t`LookingForOpportunity`);
     const { config } = this.configStore;
 
-    const exitFlag = await this.findClosable(quotes);
+    const closableOrdersKey = await this.findClosable(quotes);
     let spreadAnalysisResult: SpreadAnalysisResult;
-    if (exitFlag) {
+    if (closableOrdersKey) {
       spreadAnalysisResult = this.lastSpreadAnalysisResult;
     } else {
       try {
@@ -97,19 +97,20 @@ export default class ArbitragerImpl implements Arbitrager {
       }
     }
 
-    if (!exitFlag) {
+    if (!closableOrdersKey) {
       this.printSpreadAnalysisResult(spreadAnalysisResult);
     }
 
-    const limitChecker = this.limitCheckerFactory.create(spreadAnalysisResult, exitFlag);
+    const limitChecker = this.limitCheckerFactory.create(spreadAnalysisResult, closableOrdersKey);
     const limitCheckResult = limitChecker.check();
     if (!limitCheckResult.success) {
       this.status = limitCheckResult.reason;
       return;
     }
 
-    if (exitFlag) {
+    if (closableOrdersKey) {
       this.log.info(t`FoundClosableOrders`);
+      await this.activePairStore.del(closableOrdersKey);
     } else {
       this.log.info(t`FoundArbitrageOppotunity`);
     }
@@ -118,7 +119,7 @@ export default class ArbitragerImpl implements Arbitrager {
       const sendTasks = [bestAsk, bestBid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
       const orders = await Promise.all(sendTasks);
       this.status = 'Sent';
-      await this.checkOrderState(orders, exitFlag);
+      await this.checkOrderState(orders, closableOrdersKey);
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
@@ -132,7 +133,7 @@ export default class ArbitragerImpl implements Arbitrager {
     await delay(config.sleepAfterSend);
   }
 
-  private async checkOrderState(orders: OrderImpl[], exitFlag: boolean): Promise<void> {
+  private async checkOrderState(orders: OrderImpl[], closableOrdersKey: string): Promise<void> {
     const { config } = this.configStore;
     for (const i of _.range(1, config.maxRetryCount + 1)) {
       await delay(config.orderStatusCheckInterval);
@@ -150,7 +151,7 @@ export default class ArbitragerImpl implements Arbitrager {
 
       if (orders.every(o => o.filled)) {
         this.log.info(t`BothLegsAreSuccessfullyFilled`);
-        if (exitFlag) {
+        if (closableOrdersKey) {
           this.status = 'Closed';
         } else {
           this.status = 'Filled';
@@ -171,7 +172,7 @@ export default class ArbitragerImpl implements Arbitrager {
           orders.some(o => !o.filled) &&
           _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0
         ) {
-          const subOrders = await this.singleLegHandler.handle(orders as OrderPair, exitFlag);
+          const subOrders = await this.singleLegHandler.handle(orders as OrderPair, closableOrdersKey);
           if (subOrders.length !== 0 && subOrders.every(o => o.filled)) {
             this.printProfit(_.concat(orders, subOrders));
           }
@@ -193,7 +194,7 @@ export default class ArbitragerImpl implements Arbitrager {
   private async findClosable(quotes: Quote[]): Promise<boolean> {
     const { minExitTargetProfit, minExitTargetProfitPercent } = this.configStore.config;
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
-      return false;
+      return "";
     }
     const activePairsMap = await this.activePairStore.getAll();
     this.printActivePairs(activePairsMap.map(kv => kv.value));
@@ -213,15 +214,14 @@ export default class ArbitragerImpl implements Arbitrager {
         ]) as number;
         this.log.debug(`effectiveMinExitTargetProfit: ${effectiveMinExitTargetProfit}`);
         if (targetProfit >= effectiveMinExitTargetProfit) {
-          await this.activePairStore.del(key);
           this.lastSpreadAnalysisResult = result;
-          return true;
+          return key;
         }
       } catch (ex) {
         this.log.debug(ex.message);
       }
     }
-    return false;
+    return "";
   }
 
   private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<OrderImpl> {
