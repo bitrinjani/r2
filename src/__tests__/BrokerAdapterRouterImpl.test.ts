@@ -1,8 +1,8 @@
 import 'reflect-metadata';
-import Order from '../Order';
-import { CashMarginType, OrderType, OrderSide, Broker } from '../types';
+import { CashMarginType, OrderType, OrderSide, Broker, Order } from '../types';
 import BrokerAdapterRouterImpl from '../BrokerAdapterRouterImpl';
 import { options } from '../logger';
+import OrderImpl from '../OrderImpl';
 options.enabled = false;
 
 const baBitflyer = {
@@ -27,7 +27,7 @@ const brokerAdapters = [baBitflyer, baQuoine];
 const baRouter = new BrokerAdapterRouterImpl(brokerAdapters);
 describe('BrokerAdapterRouter', () => {
   test('send', async () => {
-    const order = new Order('Bitflyer', OrderSide.Buy, 0.001, 500000,
+    const order = new OrderImpl('Bitflyer', OrderSide.Buy, 0.001, 500000,
       CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.send(order);
     expect(baBitflyer.send.mock.calls.length).toBe(1);
@@ -41,7 +41,7 @@ describe('BrokerAdapterRouter', () => {
   });
 
   test('cancel', async () => {
-    const order = new Order('Bitflyer', OrderSide.Buy, 0.001, 500000,
+    const order = new OrderImpl('Bitflyer', OrderSide.Buy, 0.001, 500000,
       CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.cancel(order);
     expect(baBitflyer.cancel.mock.calls.length).toBe(1);
@@ -55,7 +55,7 @@ describe('BrokerAdapterRouter', () => {
   });
 
   test('refresh', async () => {
-    const order = new Order('Quoine', OrderSide.Buy, 0.001, 500000,
+    const order = new OrderImpl('Quoine', OrderSide.Buy, 0.001, 500000,
       CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.refresh(order);
     expect(baBitflyer.refresh.mock.calls.length).toBe(0);

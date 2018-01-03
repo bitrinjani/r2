@@ -1,12 +1,11 @@
 import * as _ from 'lodash';
 import { format } from 'util';
 import { v4 as uuid } from 'uuid';
-import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker } from './types';
-import Execution from './Execution';
+import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker, Order, Execution } from './types';
 import { eRound } from './util';
 import t from './intl';
 
-export default class Order {
+export default class OrderImpl implements Order {
   constructor(
     public broker: Broker,
     public side: OrderSide,

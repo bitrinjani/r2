@@ -6,18 +6,18 @@
   OrderType,
   OrderSide,
   CashMarginType,
-  QuoteSide
+  QuoteSide,
+  Order,
+  Execution,
+  Quote
 } from '../types';
 import BrokerApi from './BrokerApi';
 import { getLogger } from '../logger';
 import { injectable, inject } from 'inversify';
 import symbols from '../symbols';
 import * as _ from 'lodash';
-import Order from '../Order';
-import Quote from '../Quote';
 import { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from './types';
-import Execution from '../Execution';
-import { timestampToDate } from '../util';
+import { timestampToDate, toExecution, toQuote } from '../util';
 import { findBrokerConfig } from '../configUtil';
 import Decimal from 'decimal.js';
 import CashStrategy from './CashStrategy';
@@ -107,7 +107,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
         throw new Error('Not implemented.');
     }
 
-    let orderDirection: string | undefined;    
+    let orderDirection: string | undefined;
     let leverageLevel: number | undefined;
     switch (order.cashMarginType) {
       case CashMarginType.Cash:
@@ -145,11 +145,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       order.status = OrderStatus.PartiallyFilled;
     }
     order.executions = _.map(ordersResponse.executions, x => {
-      const e = new Execution(order);
+      const e = toExecution(order);
       e.price = Number(x.price);
       e.size = Number(x.quantity);
       e.execTime = timestampToDate(x.created_at);
-      return e;
+      return e as Execution;
     });
     order.lastUpdated = new Date();
   }
@@ -157,11 +157,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private mapToQuote(priceLevelsResponse: PriceLevelsResponse): Quote[] {
     const asks = _(priceLevelsResponse.sell_price_levels)
       .take(100)
-      .map(q => new Quote(this.broker, QuoteSide.Ask, Number(q[0]), Number(q[1])))
+      .map(q => toQuote(this.broker, QuoteSide.Ask, Number(q[0]), Number(q[1])))
       .value();
     const bids = _(priceLevelsResponse.buy_price_levels)
       .take(100)
-      .map(q => new Quote(this.broker, QuoteSide.Bid, Number(q[0]), Number(q[1])))
+      .map(q => toQuote(this.broker, QuoteSide.Bid, Number(q[0]), Number(q[1])))
       .value();
     return _.concat(asks, bids);
   }

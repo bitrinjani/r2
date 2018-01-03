@@ -1,7 +1,6 @@
 import { CashMarginTypeStrategy } from './types';
 import BrokerApi from './BrokerApi';
-import Order from '../Order';
-import { OrderStatus, OrderSide, CashMarginType } from '../types';
+import { Order, OrderStatus, OrderSide, CashMarginType } from '../types';
 import { eRound } from '../util';
 import * as _ from 'lodash';
 

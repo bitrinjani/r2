@@ -1,9 +1,9 @@
 ﻿import { injectable, inject } from 'inversify';
-import { QuoteAggregator, ConfigStore, BrokerConfig, QuoteSide, BrokerAdapterRouter, Broker } from './types';
+import { QuoteAggregator, ConfigStore, BrokerConfig, QuoteSide, BrokerAdapterRouter, Broker, Quote } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
-import Quote from './Quote';
 import symbols from './symbols';
+import QuoteImpl from './QuoteImpl';
 
 @injectable()
 export default class QuoteAggregatorImpl implements QuoteAggregator {
@@ -83,7 +83,7 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
       })
       .map(
         (value: Quote[], key) =>
-          new Quote(
+          new QuoteImpl(
             value[0].broker,
             value[0].side,
             Number(key.substring(0, key.indexOf('#'))),

@@ -1,8 +1,6 @@
-﻿import { BrokerAdapterRouter, Broker, BrokerAdapter, BrokerMap } from './types';
+﻿import { BrokerAdapterRouter, Broker, BrokerAdapter, BrokerMap, Order, Quote } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
-import Order from './Order';
-import Quote from './Quote';
 import { injectable, multiInject } from 'inversify';
 import symbols from './symbols';
 

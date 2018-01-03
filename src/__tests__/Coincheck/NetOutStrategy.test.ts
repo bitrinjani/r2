@@ -2,7 +2,7 @@ import { CashMarginType, OrderSide, OrderType, Broker, OrderStatus } from '../..
 import NetOutStrategy from '../../Coincheck/NetOutStrategy';
 import BrokerApi from '../../Coincheck/BrokerApi';
 import nocksetup from './nocksetup';
-import Order from '../../Order';
+import OrderImpl from '../../OrderImpl';
 import { NewOrderRequest } from '../../Coincheck/types';
 import * as nock from 'nock';
 import { options } from '../../logger';
@@ -19,7 +19,7 @@ describe('NetOutStrategy', () => {
 
   test('send fails - not NetOut order', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck',
       OrderSide.Buy,
       0.005,
@@ -35,7 +35,7 @@ describe('NetOutStrategy', () => {
 
   test('netout close_short', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck',
       OrderSide.Buy, 
       0.01, 
@@ -55,7 +55,7 @@ describe('NetOutStrategy', () => {
 
   test('netout request - open buy', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck',
       OrderSide.Buy, 
       0.02, 
@@ -72,7 +72,7 @@ describe('NetOutStrategy', () => {
 
   test('netout when no closable position', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck', 
       OrderSide.Sell, 
       0.01, 
@@ -92,7 +92,7 @@ describe('NetOutStrategy', () => {
 
   test('netout market when no closable position', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck', 
       OrderSide.Sell, 
       0.01, 
@@ -110,7 +110,7 @@ describe('NetOutStrategy', () => {
 
   test('netout non BTCJPY', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck', 
       OrderSide.Sell, 
       0.01, 

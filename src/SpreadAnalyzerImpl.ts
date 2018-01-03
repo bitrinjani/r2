@@ -1,15 +1,23 @@
 ﻿import { injectable, inject } from 'inversify';
-import { SpreadAnalyzer, ConfigStore, QuoteSide, SpreadAnalysisResult, BrokerMap, OrderPair, OrderSide } from './types';
+import {
+  SpreadAnalyzer,
+  ConfigStore,
+  QuoteSide,
+  SpreadAnalysisResult,
+  BrokerMap,
+  OrderSide,
+  Quote,
+  BrokerPosition,
+  OrderPair
+} from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
-import Quote from './Quote';
 import t from './intl';
-import BrokerPosition from './BrokerPosition';
 import symbols from './symbols';
 import Decimal from 'decimal.js';
 import { findBrokerConfig } from './configUtil';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
-import Order from './Order';
+import OrderImpl from './OrderImpl';
 
 @injectable()
 export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
@@ -36,9 +44,9 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
       .orderBy(['price'])
       .value();
     if (closingPair) {
-      const isOppositeSide = (o: Order, q: Quote) =>
+      const isOppositeSide = (o: OrderImpl, q: Quote) =>
         q.side === (o.side === OrderSide.Buy ? QuoteSide.Bid : QuoteSide.Ask);
-      const isSameBroker = (o: Order, q: Quote) => o.broker === q.broker;
+      const isSameBroker = (o: OrderImpl, q: Quote) => o.broker === q.broker;
       filteredQuotes = _(filteredQuotes)
         .filter(
           q =>
@@ -89,7 +97,7 @@ export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
   private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {
     return _(quotes).sumBy(q => {
       const brokerConfig = findBrokerConfig(this.configStore.config, q.broker);
-      return Order.calculateCommission(q.price, targetVolume, brokerConfig.commissionPercent);
+      return OrderImpl.calculateCommission(q.price, targetVolume, brokerConfig.commissionPercent);
     });
   }
 

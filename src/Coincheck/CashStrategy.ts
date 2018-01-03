@@ -1,7 +1,6 @@
 import { CashMarginTypeStrategy } from './types';
 import BrokerApi from './BrokerApi';
-import Order from '../Order';
-import { OrderStatus, OrderSide, OrderType, CashMarginType } from '../types';
+import { Order, OrderStatus, OrderSide, OrderType, CashMarginType } from '../types';
 
 export default class CashStrategy implements CashMarginTypeStrategy {
   constructor(private readonly brokerApi: BrokerApi) {}

@@ -7,18 +7,18 @@
   TimeInForce,
   OrderSide,
   CashMarginType,
-  QuoteSide
+  QuoteSide,
+  Order,
+  Execution,
+  Quote
 } from '../types';
 import { getLogger } from '../logger';
 import { injectable, inject } from 'inversify';
 import symbols from '../symbols';
 import * as _ from 'lodash';
-import Order from '../Order';
-import Quote from '../Quote';
 import BrokerApi from './BrokerApi';
 import { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from './types';
-import Execution from '../Execution';
-import { eRound } from '../util';
+import { eRound, toExecution } from '../util';
 import { findBrokerConfig } from '../configUtil';
 
 @injectable()
@@ -59,11 +59,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     this.setOrderFields(childOrder, order);
     const executions = await this.brokerApi.getExecutions({ child_order_acceptance_id: orderId });
     order.executions = _.map(executions, x => {
-      const e = new Execution(order);
+      const e = toExecution(order);
       e.size = x.size;
       e.price = x.price;
       e.execTime = new Date(x.exec_date);
-      return e;
+      return e as Execution;
     });
 
     order.lastUpdated = new Date();
@@ -175,11 +175,15 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private mapToQuote(boardResponse: BoardResponse): Quote[] {
     const asks = _(boardResponse.asks)
       .take(100)
-      .map(q => new Quote(this.broker, QuoteSide.Ask, Number(q.price), Number(q.size)))
+      .map(q => {
+        return { broker: this.broker, side: QuoteSide.Ask, price: Number(q.price), volume: Number(q.size) };
+      })
       .value();
     const bids = _(boardResponse.bids)
       .take(100)
-      .map(q => new Quote(this.broker, QuoteSide.Bid, Number(q.price), Number(q.size)))
+      .map(q => {
+        return { broker: this.broker, side: QuoteSide.Bid, price: Number(q.price), volume: Number(q.size) };
+      })
       .value();
     return _.concat(asks, bids);
   }

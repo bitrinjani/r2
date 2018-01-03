@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import BrokerAdapterImpl from '../../Quoine/BrokerAdapterImpl';
 import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType } from '../../types';
 import nocksetup from './nocksetup';
-import Order from '../../Order';
+import OrderImpl from '../../OrderImpl';
 import { options } from '../../logger';
 options.enabled = false;
 
@@ -23,7 +23,7 @@ describe('Quoine BrokerAdapter', () => {
 
   test('send leverage buy limit', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = new Order('Quoine', OrderSide.Buy, 0.01, 783000, CashMarginType.NetOut, OrderType.Limit, 10);
+    const order = new OrderImpl('Quoine', OrderSide.Buy, 0.01, 783000, CashMarginType.NetOut, OrderType.Limit, 10);
     await target.send(order);
     expect(order.status).toBe(OrderStatus.New);
     expect(order.brokerOrderId).toBe('118573146');
@@ -34,7 +34,7 @@ describe('Quoine BrokerAdapter', () => {
       brokers: [{ broker: 'Quoine', key: 'key', secret: 'secret', cashMarginType: CashMarginType.Cash }]
     };
     const target = new BrokerAdapterImpl({ config });
-    const order = new Order('Quoine', OrderSide.Buy, 0.01, 783000, CashMarginType.Cash, OrderType.Limit, 10);
+    const order = new OrderImpl('Quoine', OrderSide.Buy, 0.01, 783000, CashMarginType.Cash, OrderType.Limit, 10);
     await target.send(order);
     expect(order.status).toBe(OrderStatus.New);
     expect(order.brokerOrderId).toBe('118573146');

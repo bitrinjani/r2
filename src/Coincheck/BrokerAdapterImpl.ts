@@ -3,13 +3,20 @@ import { injectable, inject } from 'inversify';
 import { addMinutes } from 'date-fns';
 import symbols from '../symbols';
 import * as _ from 'lodash';
-import Order from '../Order';
-import Quote from '../Quote';
 import BrokerApi from './BrokerApi';
-import Execution from '../Execution';
-import { CashMarginType, ConfigStore, BrokerConfig, BrokerAdapter, QuoteSide, OrderStatus } from '../types';
+import {
+  Order,
+  Execution,
+  CashMarginType,
+  ConfigStore,
+  BrokerConfig,
+  BrokerAdapter,
+  QuoteSide,
+  OrderStatus,
+  Quote
+} from '../types';
 import { OrderBooksResponse, CashMarginTypeStrategy } from './types';
-import { eRound, almostEqual } from '../util';
+import { eRound, almostEqual, toExecution, toQuote } from '../util';
 import { findBrokerConfig } from '../configUtil';
 import CashStrategy from './CashStrategy';
 import MarginOpenStrategy from './MarginOpenStrategy';
@@ -55,11 +62,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private mapToQuote(orderBooksResponse: OrderBooksResponse): Quote[] {
     const asks = _(orderBooksResponse.asks)
       .take(100)
-      .map(q => new Quote(this.broker, QuoteSide.Ask, q[0], q[1]))
+      .map(q => toQuote(this.broker, QuoteSide.Ask, q[0], q[1]))
       .value();
     const bids = _(orderBooksResponse.bids)
       .take(100)
-      .map(q => new Quote(this.broker, QuoteSide.Bid, q[0], q[1]))
+      .map(q => toQuote(this.broker, QuoteSide.Bid, q[0], q[1]))
       .value();
     return _.concat(asks, bids);
   }
@@ -108,11 +115,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       return;
     }
     order.executions = transactions.map(x => {
-      const execution = new Execution(order);
+      const execution = toExecution(order);
       execution.execTime = x.created_at;
       execution.price = x.rate;
       execution.size = Math.abs(x.funds.btc);
-      return execution;
+      return execution as Execution;
     });
     order.filledSize = eRound(_.sumBy(order.executions, x => x.size));
     order.status = almostEqual(order.filledSize, order.size, 1) ? OrderStatus.Filled : OrderStatus.Canceled;

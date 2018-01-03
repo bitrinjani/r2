@@ -1,14 +1,14 @@
 import {
-  OrderPair,
   OnSingleLegConfig,
   ReverseOption,
   ProceedOption,
   OrderSide,
   OrderType,
-  BrokerAdapterRouter
+  BrokerAdapterRouter,
+  OrderPair
 } from './types';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
-import Order from './Order';
+import OrderImpl from './OrderImpl';
 import * as _ from 'lodash';
 import { getLogger } from './logger/index';
 import t from './intl';
@@ -22,7 +22,7 @@ export default class SingleLegHandler {
     private readonly onSingleLegConfig: OnSingleLegConfig
   ) {}
 
-  async handle(orders: OrderPair, exitFlag: Boolean): Promise<Order[]> {
+  async handle(orders: OrderPair, exitFlag: Boolean): Promise<OrderImpl[]> {
     if (this.onSingleLegConfig === undefined) {
       return [];
     }
@@ -41,14 +41,14 @@ export default class SingleLegHandler {
     }
   }
 
-  private async reverseLeg(orders: OrderPair, options: ReverseOption): Promise<Order[]> {
+  private async reverseLeg(orders: OrderPair, options: ReverseOption): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
     const sign = largeLeg.side === OrderSide.Buy ? -1 : 1;
     const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
     this.log.info(t`ReverseFilledLeg`, largeLeg.toShortString(), price.toLocaleString(), size);
-    const reversalOrder = new Order(
+    const reversalOrder = new OrderImpl(
       largeLeg.broker,
       largeLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
       size,
@@ -61,14 +61,14 @@ export default class SingleLegHandler {
     return [reversalOrder];
   }
 
-  private async proceedLeg(orders: OrderPair, options: ProceedOption): Promise<Order[]> {
+  private async proceedLeg(orders: OrderPair, options: ProceedOption): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
     const sign = smallLeg.side === OrderSide.Buy ? 1 : -1;
     const price = _.round(smallLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(smallLeg.pendingSize - largeLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
     this.log.info(t`ExecuteUnfilledLeg`, smallLeg.toShortString(), price.toLocaleString(), size);
-    const proceedOrder = new Order(
+    const proceedOrder = new OrderImpl(
       smallLeg.broker,
       smallLeg.side,
       size,
@@ -81,7 +81,7 @@ export default class SingleLegHandler {
     return [proceedOrder];
   }
 
-  private async sendOrderWithTtl(order: Order, ttl: number) {
+  private async sendOrderWithTtl(order: OrderImpl, ttl: number) {
     try {
       this.log.info(t`SendingOrderTtl`, ttl);
       await this.brokerAdapterRouter.send(order);

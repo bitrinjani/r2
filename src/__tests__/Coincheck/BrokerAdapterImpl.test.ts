@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import BrokerAdapterImpl from '../../Coincheck/BrokerAdapterImpl';
 import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType, ConfigRoot } from '../../types';
 import nocksetup from './nocksetup';
-import Order from '../../Order';
+import OrderImpl from '../../OrderImpl';
 import { NewOrderRequest } from '../../Coincheck/types';
 import { options } from '../../logger';
 options.enabled = false;
@@ -20,7 +20,7 @@ const config = {
 describe('Coincheck BrokerAdapter', () => {
   test('send with invalid cashMarginType', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck',
       OrderSide.Buy,
       0.005,
@@ -37,7 +37,7 @@ describe('Coincheck BrokerAdapter', () => {
 
   test('send leverage buy limit', async () => {
     const target = new BrokerAdapterImpl({ config });
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck',
       OrderSide.Buy,
       0.005,

@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify';
-import { PositionService, BrokerAdapterRouter, ConfigStore, BrokerConfig, BrokerMap } from './types';
+import { PositionService, BrokerAdapterRouter, ConfigStore, BrokerConfig, BrokerMap, BrokerPosition } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Decimal from 'decimal.js';
-import BrokerPosition from './BrokerPosition';
+import BrokerPositionImpl from './BrokerPositionImpl';
 import { hr, eRound } from './util';
 import symbols from './symbols';
 
@@ -63,7 +63,7 @@ export default class PositionServiceImpl implements PositionService {
       const promises = brokerConfigs.map(brokerConfig => this.getBrokerPosition(brokerConfig, config.minSize));
       const brokerPositions = await Promise.all(promises);
       this._positionMap = _(brokerPositions)
-        .map(p => [p.broker, p])
+        .map((p: BrokerPosition) => [p.broker, p])
         .fromPairs()
         .value();
     } catch (ex) {
@@ -85,7 +85,7 @@ export default class PositionServiceImpl implements PositionService {
       0,
       new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()
     ]) as number;
-    const pos = new BrokerPosition();
+    const pos = new BrokerPositionImpl();
     pos.broker = brokerConfig.broker;
     pos.btc = currentBtc;
     pos.allowedLongSize = allowedLongSize;

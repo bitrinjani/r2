@@ -2,8 +2,9 @@ import 'reflect-metadata';
 import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
 import { Broker, QuoteSide, ConfigStore } from '../types';
 import * as _ from 'lodash';
-import Quote from '../Quote';
+import Quote from '../types';
 import { options } from '../logger';
+import { toQuote } from '../util';
 options.enabled = false;
 
 const config = require('./config_test.json');
@@ -25,10 +26,10 @@ const positionMap = {
 };
 
 let quotes = [
-  new Quote('Coincheck', QuoteSide.Ask, 3, 1),
-  new Quote('Coincheck', QuoteSide.Bid, 2, 2),
-  new Quote('Quoine', QuoteSide.Ask, 3.5, 3),
-  new Quote('Quoine', QuoteSide.Bid, 2.5, 4)
+  toQuote('Coincheck', QuoteSide.Ask, 3, 1),
+  toQuote('Coincheck', QuoteSide.Bid, 2, 2),
+  toQuote('Quoine', QuoteSide.Ask, 3.5, 3),
+  toQuote('Quoine', QuoteSide.Bid, 2.5, 4)
 ];
 
 describe('Spread Analyzer', () => {
@@ -48,10 +49,10 @@ describe('Spread Analyzer', () => {
 
   test('analyze positive profit', async () => {
     quotes = [
-      new Quote('Coincheck', QuoteSide.Ask, 300000, 1),
-      new Quote('Coincheck', QuoteSide.Bid, 200000, 2),
-      new Quote('Quoine', QuoteSide.Ask, 350000, 3),
-      new Quote('Quoine', QuoteSide.Bid, 360000, 4)
+      toQuote('Coincheck', QuoteSide.Ask, 300000, 1),
+      toQuote('Coincheck', QuoteSide.Bid, 200000, 2),
+      toQuote('Quoine', QuoteSide.Ask, 350000, 3),
+      toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
     const target = new SpreadAnalyzerImpl(configStore);
     const result = await target.analyze(quotes, positionMap);
@@ -68,11 +69,11 @@ describe('Spread Analyzer', () => {
 
   test('analyze positive profit with too small quotes', async () => {
     quotes = [
-      new Quote('Coincheck', QuoteSide.Ask, 300000, 1),
-      new Quote('Coincheck', QuoteSide.Bid, 200000, 2),
-      new Quote('Coincheck', QuoteSide.Ask, 100000, 0.0099),
-      new Quote('Quoine', QuoteSide.Ask, 350000, 3),
-      new Quote('Quoine', QuoteSide.Bid, 360000, 4)
+      toQuote('Coincheck', QuoteSide.Ask, 300000, 1),
+      toQuote('Coincheck', QuoteSide.Bid, 200000, 2),
+      toQuote('Coincheck', QuoteSide.Ask, 100000, 0.0099),
+      toQuote('Quoine', QuoteSide.Ask, 350000, 3),
+      toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
     const target = new SpreadAnalyzerImpl(configStore);
     const result = await target.analyze(quotes, positionMap);
@@ -90,10 +91,10 @@ describe('Spread Analyzer', () => {
   test('analyze positive profit with commission', async () => {
     config.brokers[2].commissionPercent = 0.05;
     quotes = [
-      new Quote('Coincheck', QuoteSide.Ask, 300000, 1),
-      new Quote('Coincheck', QuoteSide.Bid, 200000, 2),
-      new Quote('Quoine', QuoteSide.Ask, 350000, 3),
-      new Quote('Quoine', QuoteSide.Bid, 360000, 4)
+      toQuote('Coincheck', QuoteSide.Ask, 300000, 1),
+      toQuote('Coincheck', QuoteSide.Bid, 200000, 2),
+      toQuote('Quoine', QuoteSide.Ask, 350000, 3),
+      toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
     const target = new SpreadAnalyzerImpl(configStore);
     const result = await target.analyze(quotes, positionMap);
@@ -121,8 +122,8 @@ describe('Spread Analyzer', () => {
 
   test('analyze with no best bid', async () => {
     quotes = [
-      new Quote('Coincheck', QuoteSide.Ask, 3, 1),
-      new Quote('Quoine', QuoteSide.Ask, 3.5, 3)
+      toQuote('Coincheck', QuoteSide.Ask, 3, 1),
+      toQuote('Quoine', QuoteSide.Ask, 3.5, 3)
     ];
     const target = new SpreadAnalyzerImpl(configStore);
     try {
@@ -136,8 +137,8 @@ describe('Spread Analyzer', () => {
 
   test('analyze with no best ask', async () => {
     quotes = [
-      new Quote('Coincheck', QuoteSide.Bid, 3, 1),
-      new Quote('Quoine', QuoteSide.Bid, 3.5, 3)
+      toQuote('Coincheck', QuoteSide.Bid, 3, 1),
+      toQuote('Quoine', QuoteSide.Bid, 3.5, 3)
     ];
     const target = new SpreadAnalyzerImpl(configStore);
     try {
@@ -151,8 +152,8 @@ describe('Spread Analyzer', () => {
 
   test('invalid closingPairs', async () => {
     quotes = [
-      new Quote('Coincheck', QuoteSide.Bid, 3, 1),
-      new Quote('Quoine', QuoteSide.Bid, 3.5, 3)
+      toQuote('Coincheck', QuoteSide.Bid, 3, 1),
+      toQuote('Quoine', QuoteSide.Bid, 3.5, 3)
     ];
     const target = new SpreadAnalyzerImpl(configStore);
     try {

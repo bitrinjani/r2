@@ -1,6 +1,6 @@
 // tslint:disable:variable-name
 import { Castable, cast, element } from '@bitr/castable';
-import Order from '../Order';
+import { Order } from '../types';
 
 export class AccountsBalanceResponse extends Castable {
   @cast success: boolean;

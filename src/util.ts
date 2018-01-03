@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as querystring from 'querystring';
+import { Execution, Order, Broker, QuoteSide } from './types';
 
 interface ToStringable {
   toString(): string;
@@ -72,4 +73,18 @@ function removeBom(s: string): string {
 export function readJsonFileSync(filepath: string): any {
   const content = fs.readFileSync(filepath, 'utf-8');
   return JSON.parse(removeBom(content));
+}
+
+export function toExecution(order: Order): Partial<Execution> {
+  return {
+    broker: order.broker,
+    brokerOrderId: order.brokerOrderId,
+    cashMarginType: order.cashMarginType,
+    side: order.side,
+    symbol: order.symbol
+  };
+}
+
+export function toQuote(broker: Broker, side: QuoteSide, price: number, volume: number) {
+  return { broker, side, price, volume };
 }

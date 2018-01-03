@@ -1,9 +1,9 @@
-import { Broker } from './types';
+import { Broker, BrokerPosition } from './types';
 import * as _ from 'lodash';
 import t from './intl';
 import { padStart, padEnd } from './util';
 
-export default class BrokerPosition {
+export default class BrokerPositionImpl implements BrokerPosition {
   broker: Broker;
   longAllowed: boolean;
   shortAllowed: boolean;

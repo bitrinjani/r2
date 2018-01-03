@@ -2,7 +2,7 @@ import { CashMarginType, OrderSide, OrderType, Broker, OrderStatus } from '../..
 import CashStrategy from '../../Coincheck/CashStrategy';
 import BrokerApi from '../../Coincheck/BrokerApi';
 import nocksetup from './nocksetup';
-import Order from '../../Order';
+import OrderImpl from '../../OrderImpl';
 import * as nock from 'nock';
 import { options } from '../../logger';
 options.enabled = false;
@@ -12,7 +12,7 @@ nocksetup();
 describe('CashStrategy', () => {
   test('send buy limit', async () => {
     const strategy = new CashStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck',
       OrderSide.Buy,
       0.005,
@@ -25,7 +25,7 @@ describe('CashStrategy', () => {
 
   test('send fails - not Cash order', async () => {
     const strategy = new CashStrategy(new BrokerApi('', ''));
-    const order = new Order(
+    const order = new OrderImpl(
       'Coincheck',
       OrderSide.Buy,
       0.005,

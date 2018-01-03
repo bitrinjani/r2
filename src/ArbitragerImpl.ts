@@ -1,7 +1,7 @@
 ﻿import { getLogger } from './logger';
 import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
-import Order from './Order';
+import OrderImpl from './OrderImpl';
 import {
   BrokerAdapterRouter,
   ConfigStore,
@@ -14,12 +14,12 @@ import {
   QuoteSide,
   OrderSide,
   LimitCheckerFactory,
-  OrderPair,
-  ActivePairStore
+  ActivePairStore,
+  Quote,
+  OrderPair
 } from './types';
 import t from './intl';
 import { padEnd, hr, delay } from './util';
-import Quote from './Quote';
 import symbols from './symbols';
 import { fatalErrors } from './constants';
 import SingleLegHandler from './SingleLegHandler';
@@ -116,7 +116,7 @@ export default class ArbitragerImpl implements Arbitrager {
     try {
       const { bestBid, bestAsk, targetVolume } = spreadAnalysisResult;
       const sendTasks = [bestAsk, bestBid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
-      const orders = (await Promise.all(sendTasks)) as OrderPair;
+      const orders = await Promise.all(sendTasks);
       this.status = 'Sent';
       await this.checkOrderState(orders, exitFlag);
     } catch (ex) {
@@ -132,7 +132,7 @@ export default class ArbitragerImpl implements Arbitrager {
     await delay(config.sleepAfterSend);
   }
 
-  private async checkOrderState(orders: OrderPair, exitFlag: boolean): Promise<void> {
+  private async checkOrderState(orders: OrderImpl[], exitFlag: boolean): Promise<void> {
     const { config } = this.configStore;
     for (const i of _.range(1, config.maxRetryCount + 1)) {
       await delay(config.orderStatusCheckInterval);
@@ -155,7 +155,7 @@ export default class ArbitragerImpl implements Arbitrager {
         } else {
           this.status = 'Filled';
           if (orders[0].size === orders[1].size) {
-            await this.activePairStore.put(orders);
+            await this.activePairStore.put(orders as OrderPair);
           }
         }
         this.printProfit(orders);
@@ -171,7 +171,7 @@ export default class ArbitragerImpl implements Arbitrager {
           orders.some(o => !o.filled) &&
           _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0
         ) {
-          const subOrders = await this.singleLegHandler.handle(orders, exitFlag);
+          const subOrders = await this.singleLegHandler.handle(orders as OrderPair, exitFlag);
           if (subOrders.length !== 0 && subOrders.every(o => o.filled)) {
             this.printProfit(_.concat(orders, subOrders));
           }
@@ -181,13 +181,13 @@ export default class ArbitragerImpl implements Arbitrager {
     }
   }
 
-  private calcProfit(orders: Order[], commission: number) {
+  private calcProfit(orders: OrderImpl[], commission: number) {
     return _(orders).sumBy(o => (o.side === OrderSide.Sell ? 1 : -1) * o.filledNotional) - commission;
   }
 
-  private calcCommissionFromConfig(order: Order): number {
+  private calcCommissionFromConfig(order: OrderImpl): number {
     const brokerConfig = findBrokerConfig(this.configStore.config, order.broker);
-    return Order.calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
+    return OrderImpl.calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
   }
 
   private async findClosable(quotes: Quote[]): Promise<boolean> {
@@ -224,12 +224,12 @@ export default class ArbitragerImpl implements Arbitrager {
     return false;
   }
 
-  private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<Order> {
+  private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<OrderImpl> {
     this.log.info(t`SendingOrderTargettingQuote`, quote);
     const brokerConfig = findBrokerConfig(this.configStore.config, quote.broker);
     const { cashMarginType, leverageLevel } = brokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
-    const order = new Order(
+    const order = new OrderImpl(
       quote.broker,
       orderSide,
       targetVolume,
@@ -242,7 +242,7 @@ export default class ArbitragerImpl implements Arbitrager {
     return order;
   }
 
-  private printOrderSummary(orders: Order[]) {
+  private printOrderSummary(orders: OrderImpl[]) {
     orders.forEach(o => {
       if (o.filled) {
         this.log.info(o.toExecSummary());
@@ -277,7 +277,7 @@ export default class ArbitragerImpl implements Arbitrager {
     });
   }
 
-  private printProfit(orders: Order[]): void {
+  private printProfit(orders: OrderImpl[]): void {
     const commission = _(orders).sumBy(o => this.calcCommissionFromConfig(o));
     const profit = this.calcProfit(orders, commission);
     this.log.info(t`ProfitIs`, _.round(profit));
