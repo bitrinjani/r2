@@ -23,7 +23,7 @@ export interface Order {
   price: number;
   cashMarginType: CashMarginType;
   type: OrderType;
-  leverageLevel: number;
+  leverageLevel?: number;
   id: string;
   symbol: string;
   timeInForce: TimeInForce;

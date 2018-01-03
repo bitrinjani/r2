@@ -1,7 +1,20 @@
 import { Castable, cast, element } from '@bitr/castable';
 import { CashMarginType } from './index';
 
-export class BrokerConfig extends Castable {
+export interface BrokerConfigType {
+  broker: string;
+  npmPath?: string;
+  enabled: boolean;
+  key: string;
+  secret: string;
+  maxLongPosition: number;
+  maxShortPosition: number;
+  cashMarginType: CashMarginType;
+  leverageLevel: number;
+  commissionPercent: number;
+}
+
+export class BrokerConfig extends Castable implements BrokerConfigType {
   @cast broker: string;
   @cast npmPath?: string;
   @cast enabled: boolean;

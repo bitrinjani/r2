@@ -2,7 +2,7 @@
 import * as nock from 'nock';
 import * as _ from 'lodash';
 import BrokerAdapterImpl from '../../Bitflyer/BrokerAdapterImpl';
-import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType, TimeInForce } from '../../types';
+import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType, TimeInForce, BrokerConfigType } from '../../types';
 import nocksetup from './nocksetup';
 import OrderImpl from '../../OrderImpl';
 import { options } from '../../logger';
@@ -13,19 +13,17 @@ afterAll(() => {
   nock.restore();
 });
 
-const config = {
-  brokers: [{ broker: 'Bitflyer', key: '', secret: '', cashMarginType: CashMarginType.Cash }]
-};
+const brokerConfig = { broker: 'Bitflyer', key: '', secret: '', cashMarginType: CashMarginType.Cash } as BrokerConfigType;
 
 describe('Bitflyer BrokerAdapter', () => {
   test('getBtcPosition', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const result = await target.getBtcPosition();
     expect(result).toBe(0.01084272);
   });
 
   test('getBtcPosition throws', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     try {
       const result = await target.getBtcPosition();
     } catch (ex) {
@@ -36,20 +34,20 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('fetchQuotes', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const result = await target.fetchQuotes();
     expect(result.length).toBe(4);
     result.forEach(q => expect(q.broker).toBe('Bitflyer'));
   });
 
   test('fetchQuotes throws', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const result = await target.fetchQuotes();
     expect(result.length).toBe(0);
   });
 
   test('send wrong broker order', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = { broker: 'Coincheck' };
     try {
       await target.send(order);
@@ -60,8 +58,8 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('send wrong cashMarginType', async () => {
-    const target = new BrokerAdapterImpl({ config });
-    const order = { broker: 'Bitflyer', cashMarginType: CashMarginType.MarginClose, symbol: 'ZZZ' };
+    const target = new BrokerAdapterImpl(brokerConfig);
+    const order = { broker: 'Bitflyer', cashMarginType: CashMarginType.MarginOpen, symbol: 'ZZZ' };
     try {
       await target.send(order);
     } catch (ex) {
@@ -71,7 +69,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('send wrong symbol order', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = { broker: 'Bitflyer', cashMarginType: CashMarginType.Cash, symbol: 'ZZZ' };
     try {
       await target.send(order);
@@ -82,7 +80,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('send StopLimit order', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       broker: 'Bitflyer',
       cashMarginType: CashMarginType.Cash,
@@ -98,7 +96,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('send wrong time in force', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       broker: 'Bitflyer',
       cashMarginType: CashMarginType.Cash,
@@ -115,14 +113,14 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('cancel', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = { symbol: 'BTCJPY', brokerOrderId: 'JRF20150707-033333-099999' };
     await target.cancel(order);
     expect(order.status).toBe(OrderStatus.Canceled);
   });
 
   test('cancel wrong symbol', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = { symbol: 'MOCK' };
     try {
       await target.cancel(order);
@@ -133,7 +131,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('send buy limit', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = new OrderImpl(
       'Bitflyer',
       OrderSide.Buy,
@@ -149,7 +147,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('send buy limit Fok', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = new OrderImpl(
       'Bitflyer',
       OrderSide.Buy,
@@ -166,7 +164,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('send buy limit Ioc', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = new OrderImpl(
       'Bitflyer',
       OrderSide.Buy,
@@ -183,7 +181,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('refresh', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTCJPY',
       type: 'Limit',
@@ -206,7 +204,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('refresh Expired', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTCJPY',
       type: 'Limit',
@@ -229,7 +227,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('refresh Canceled', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTCJPY',
       type: 'Limit',
@@ -252,7 +250,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('refresh Partially filled', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTCJPY',
       type: 'Limit',
@@ -275,7 +273,7 @@ describe('Bitflyer BrokerAdapter', () => {
   });
 
   test('refresh unknown order id', async () => {
-    const target = new BrokerAdapterImpl({ config });
+    const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTCJPY',
       type: 'Limit',

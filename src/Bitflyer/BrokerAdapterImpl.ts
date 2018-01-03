@@ -1,7 +1,5 @@
 ﻿import {
   BrokerAdapter,
-  BrokerConfig,
-  ConfigStore,
   OrderStatus,
   OrderType,
   TimeInForce,
@@ -10,26 +8,21 @@
   QuoteSide,
   Order,
   Execution,
-  Quote
+  Quote,
+  BrokerConfigType
 } from '../types';
 import { getLogger } from '../logger';
-import { injectable, inject } from 'inversify';
-import symbols from '../symbols';
 import * as _ from 'lodash';
 import BrokerApi from './BrokerApi';
 import { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from './types';
 import { eRound, toExecution } from '../util';
-import { findBrokerConfig } from '../configUtil';
 
-@injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
   private readonly log = getLogger('Bitflyer.BrokerAdapter');
-  private readonly config: BrokerConfig;
   readonly broker = 'Bitflyer';
 
-  constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {
-    this.config = findBrokerConfig(configStore.config, this.broker);
+  constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
   }
 

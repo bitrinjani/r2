@@ -1,37 +1,30 @@
 ﻿import { getLogger } from '../logger';
-import { injectable, inject } from 'inversify';
 import { addMinutes } from 'date-fns';
-import symbols from '../symbols';
 import * as _ from 'lodash';
 import BrokerApi from './BrokerApi';
 import {
   Order,
   Execution,
   CashMarginType,
-  ConfigStore,
-  BrokerConfig,
   BrokerAdapter,
   QuoteSide,
   OrderStatus,
-  Quote
+  Quote,
+  BrokerConfigType
 } from '../types';
 import { OrderBooksResponse, CashMarginTypeStrategy } from './types';
 import { eRound, almostEqual, toExecution, toQuote } from '../util';
-import { findBrokerConfig } from '../configUtil';
 import CashStrategy from './CashStrategy';
 import MarginOpenStrategy from './MarginOpenStrategy';
 import NetOutStrategy from './NetOutStrategy';
 
-@injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
   private readonly log = getLogger('Coincheck.BrokerAdapter');
-  private readonly config: BrokerConfig;
   readonly broker = 'Coincheck';
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
-
-  constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {
-    this.config = findBrokerConfig(configStore.config, this.broker);
+  
+  constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
       [CashMarginType.Cash, new CashStrategy(this.brokerApi)],

@@ -63,7 +63,8 @@ export default class AppRoot {
       if (brokerModule === undefined) {
         throw new Error(`Unabled to find ${brokerName} package.`);
       }
-      this.ioc.bind<BrokerAdapter>(symbols.BrokerAdapter).to(brokerModule.BrokerAdapterImpl);
+      const brokerAdapter = brokerModule.create(brokerConfig);
+      this.ioc.bind<BrokerAdapter>(symbols.BrokerAdapter).toConstantValue(brokerAdapter);
     });
     await Promise.all(bindTasks);
   }
@@ -71,7 +72,7 @@ export default class AppRoot {
   private async tryImport(path: string): Promise<any> {
     try {
       const module = await import(path);
-      if (module.BrokerAdapterImpl === undefined) {
+      if (module.create === undefined) {
         return undefined;
       }
       return module;

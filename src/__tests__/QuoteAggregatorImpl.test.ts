@@ -10,20 +10,24 @@ options.enabled = false;
 const config = {
   iterationInterval: 3000,
   priceMergeSize: 100,
-  brokers: [{
-    broker: 'Bitflyer',
-    enabled: true
-  }, {
-    broker: 'Quoine',
-    enabled: true,
-    maxLongPosition: 0.3,
-    maxShortPosition: 0.3
-  }, {
-    broker: 'Coincheck',
-    enabled: true,
-    maxLongPosition: 1,
-    maxShortPosition: 0
-  }]
+  brokers: [
+    {
+      broker: 'Bitflyer',
+      enabled: true
+    },
+    {
+      broker: 'Quoine',
+      enabled: true,
+      maxLongPosition: 0.3,
+      maxShortPosition: 0.3
+    },
+    {
+      broker: 'Coincheck',
+      enabled: true,
+      maxLongPosition: 1,
+      maxShortPosition: 0
+    }
+  ]
 };
 const configStore = { config };
 
@@ -32,17 +36,19 @@ describe('Quote Aggregator', () => {
     configStore.config.iterationInterval = 10;
     const bitflyerBa = {
       broker: 'Bitflyer',
-      fetchQuotes: () => Promise.resolve([
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.1 }
-      ])
+      fetchQuotes: () =>
+        Promise.resolve([
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.1 }
+        ])
     };
     const coincheckBa = {
       broker: 'Coincheck',
-      fetchQuotes: () => Promise.resolve([
-        { broker: 'Coincheck', side: QuoteSide.Bid, price: 490001, volume: 0.02 },
-        { broker: 'Coincheck', side: QuoteSide.Bid, price: 490000, volume: 0.2 }
-      ])
+      fetchQuotes: () =>
+        Promise.resolve([
+          { broker: 'Coincheck', side: QuoteSide.Bid, price: 490001, volume: 0.02 },
+          { broker: 'Coincheck', side: QuoteSide.Bid, price: 490000, volume: 0.2 }
+        ])
     };
     const quoineBa = {
       broker: 'Quoine',
@@ -51,8 +57,9 @@ describe('Quote Aggregator', () => {
     const baList = [bitflyerBa, coincheckBa, quoineBa];
     const baRouter = new BrokerAdapterRouterImpl(baList);
     const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
-    aggregator.onQuoteUpdated = async (quotes) => {
+    aggregator.onQuoteUpdated = async quotes => {
       expect(quotes.length).toBe(3);
+      console.log(quotes[0].toString());
     };
     await aggregator.start();
     await delay(0);
@@ -64,17 +71,19 @@ describe('Quote Aggregator', () => {
     config.brokers[0].enabled = false;
     const bitflyerBa = {
       broker: 'Bitflyer',
-      fetchQuotes: () => Promise.resolve([
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.01 }
-      ])
+      fetchQuotes: () =>
+        Promise.resolve([
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.01 }
+        ])
     };
     const coincheckBa = {
       broker: 'Coincheck',
-      fetchQuotes: () => Promise.resolve([
-        { broker: 'Coincheck', side: QuoteSide.Bid, price: 490001, volume: 0.02 },
-        { broker: 'Coincheck', side: QuoteSide.Bid, price: 490000, volume: 0.2 }
-      ])
+      fetchQuotes: () =>
+        Promise.resolve([
+          { broker: 'Coincheck', side: QuoteSide.Bid, price: 490001, volume: 0.02 },
+          { broker: 'Coincheck', side: QuoteSide.Bid, price: 490000, volume: 0.2 }
+        ])
     };
     const quoineBa = {
       broker: 'Quoine',
@@ -83,7 +92,7 @@ describe('Quote Aggregator', () => {
     const baList = [bitflyerBa, coincheckBa, quoineBa];
     const baRouter = new BrokerAdapterRouterImpl(baList);
     const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
-    aggregator.onQuoteUpdated = async (quotes) => {
+    aggregator.onQuoteUpdated = async quotes => {
       expect(quotes.length).toBe(1);
     };
     await aggregator.start();
@@ -95,10 +104,11 @@ describe('Quote Aggregator', () => {
     configStore.config.iterationInterval = 12;
     const bitflyerBa = {
       broker: 'Bitflyer',
-      fetchQuotes: () => Promise.resolve([
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.01 }
-      ])
+      fetchQuotes: () =>
+        Promise.resolve([
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.01 }
+        ])
     };
     const quoineBa = {
       broker: 'Quoine',
@@ -123,10 +133,11 @@ describe('Quote Aggregator', () => {
     configStore.config.iterationInterval = 12;
     const bitflyerBa = {
       broker: 'Bitflyer',
-      fetchQuotes: () => Promise.resolve([
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-        { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.01 }
-      ])
+      fetchQuotes: () =>
+        Promise.resolve([
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500000, volume: 0.1 },
+          { broker: 'Bitflyer', side: QuoteSide.Ask, price: 500001, volume: 0.01 }
+        ])
     };
     const quoineBa = {
       broker: 'Quoine',
@@ -176,7 +187,9 @@ describe('Quote Aggregator', () => {
     };
     const quoineBa = {
       broker: 'Quoine',
-      fetchQuotes: async () => { throw new Error('Mock fetchQuotes failed.'); }
+      fetchQuotes: async () => {
+        throw new Error('Mock fetchQuotes failed.');
+      }
     };
     const coincheckBa = {
       broker: 'Coincheck',

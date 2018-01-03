@@ -1,7 +1,5 @@
 ﻿import {
   BrokerAdapter,
-  BrokerConfig,
-  ConfigStore,
   OrderStatus,
   OrderType,
   OrderSide,
@@ -9,30 +7,25 @@
   QuoteSide,
   Order,
   Execution,
-  Quote
+  Quote,
+  BrokerConfigType
 } from '../types';
 import BrokerApi from './BrokerApi';
 import { getLogger } from '../logger';
-import { injectable, inject } from 'inversify';
-import symbols from '../symbols';
 import * as _ from 'lodash';
 import { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from './types';
 import { timestampToDate, toExecution, toQuote } from '../util';
-import { findBrokerConfig } from '../configUtil';
 import Decimal from 'decimal.js';
 import CashStrategy from './CashStrategy';
 import NetOutStrategy from './NetOutStrategy';
 
-@injectable()
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
   private readonly log = getLogger('Quoine.BrokerAdapter');
-  private readonly config: BrokerConfig;
   readonly broker = 'Quoine';
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
-  constructor(@inject(symbols.ConfigStore) configStore: ConfigStore) {
-    this.config = findBrokerConfig(configStore.config, this.broker);
+  constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
       [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
