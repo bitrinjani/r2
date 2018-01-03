@@ -22,11 +22,11 @@ export default class SingleLegHandler {
     private readonly onSingleLegConfig: OnSingleLegConfig
   ) {}
 
-  async handle(orders: OrderPair, exitFlag: Boolean): Promise<OrderImpl[]> {
+  async handle(orders: OrderPair, closableOrdersKey: string): Promise<OrderImpl[]> {
     if (this.onSingleLegConfig === undefined) {
       return [];
     }
-    const action = exitFlag ? this.onSingleLegConfig.actionOnExit : this.onSingleLegConfig.action;
+    const action = closableOrdersKey ? this.onSingleLegConfig.actionOnExit : this.onSingleLegConfig.action;
     if (action === undefined || action === 'Cancel') {
       return [];
     }

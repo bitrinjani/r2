@@ -1667,4 +1667,50 @@ describe('Arbitrager', () => {
     expect(arbitrager.status).toBe('Spread analysis failed');
     expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
   });
+
+  test('Not close filled orders with maxTargetVolumePercent', async () => {
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfit = -1000;
+    config.maxTargetVolumePercent = 50.0;
+    spreadAnalyzer.analyze = jest
+      .fn()
+      .mockImplementationOnce(() => {
+        return {
+          bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 3),
+          bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+          invertedSpread: 100,
+          availableVolume: 2,
+          targetVolume: 1,
+          targetProfit: 100
+      })
+      .mockImplementationOnce(() => {
+        return {
+          bestBid: toQuote('Quoine', QuoteSide.Bid, 700, 2),
+          bestAsk: toQuote('Coincheck', QuoteSide.Ask, 400, 1),
+          invertedSpread: 300,
+          availableVolume: 1,
+          targetVolume: 1,
+          targetProfit: 100
+      });
+    const arbitrager = new ArbitragerImpl(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory,
+      activePairStore
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
+    // closing
+    await quoteAggregator.onQuoteUpdated([]);
+    expect(arbitrager.status).toBe('Too large Volume');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
+  });
 });

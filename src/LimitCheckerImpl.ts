@@ -11,9 +11,9 @@ export default class LimitCheckerImpl implements LimitChecker {
     configStore: ConfigStore,
     positionService: PositionService,
     spreadAnalysisResult: SpreadAnalysisResult,
-    exitFlag: boolean
+    closableOrdersKey: string
   ) {
-    if (exitFlag) {
+    if (closableOrdersKey) {
       this.limits = [
         new MaxNetExposureLimit(configStore, positionService),
         new MaxTargetProfitLimit(configStore, spreadAnalysisResult),
