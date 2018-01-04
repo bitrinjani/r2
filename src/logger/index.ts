@@ -2,22 +2,14 @@ import * as _ from 'lodash';
 import * as pino from 'pino';
 import * as util from 'util';
 
-export const options = { enabled: true };
+export const options = { enabled: process.env.NODE_ENV === 'test' ? false : true };
 
 const logger = pino({ level: 'debug' });
 const cache = new Map();
-const noop = () => {
-  return;
-};
 
 export function getLogger(name: string) {
   if (!options.enabled) {
-    return {
-      debug: noop,
-      info: noop,
-      warn: noop,
-      error: noop
-    };
+    return new Proxy({}, { get: () => _.noop });
   }
   const label = _.trimEnd(name, 'Impl');
   if (cache.has(label)) {

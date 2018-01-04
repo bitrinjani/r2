@@ -26,7 +26,7 @@ test('almostEqual', () => {
   expect(util.almostEqual(1, 1, 1)).toBe(true);
   expect(util.almostEqual(1, 0.99, 2)).toBe(true);
   expect(util.almostEqual(1.00001, 0.99, 2)).toBe(true);
-  expect(util.almostEqual(1.50001, 0.99, 70)).toBe(true);  
+  expect(util.almostEqual(1.50001, 0.99, 70)).toBe(true);
   expect(util.almostEqual(1, -1, 1)).toBe(false);
   expect(util.almostEqual(1, -0.99, 2)).toBe(false);
   expect(util.almostEqual(1.00001, 0.99, 1)).toBe(false);
@@ -45,22 +45,11 @@ test('readJsonFileSync with no BOM', () => {
 });
 
 test('findBrokerConfig with no config', () => {
-  expect(() => findBrokerConfig({brokers: []}, 'Bitflyer')).toThrow();
+  expect(() => findBrokerConfig({ brokers: [] }, 'Bitflyer')).toThrow();
 });
 
 test('safeQueryStringStringify', () => {
   const o = { a: 1, b: undefined };
   const result = util.safeQueryStringStringify(o);
   expect(result).toBe('a=1');
-});
-
-import * as logger from '../logger';
-test('logger', () => {
-  const log = logger.getLogger('');
-  log.warn();
-  log.info();
-  log.error();
-  log.debug();
-  const log2 = logger.getLogger('');
-  expect(log).toBe(log2);
 });
