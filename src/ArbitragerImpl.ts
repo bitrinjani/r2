@@ -191,7 +191,7 @@ export default class ArbitragerImpl implements Arbitrager {
     return OrderImpl.calculateCommission(order.averageFilledPrice, order.filledSize, brokerConfig.commissionPercent);
   }
 
-  private async findClosable(quotes: Quote[]): Promise<boolean> {
+  private async findClosable(quotes: Quote[]): Promise<string> {
     const { minExitTargetProfit, minExitTargetProfitPercent } = this.configStore.config;
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
       return "";

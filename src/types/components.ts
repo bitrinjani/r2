@@ -55,7 +55,7 @@ export interface LimitCheckResult {
 }
 
 export interface LimitCheckerFactory {
-  create(spreadAnalysisResult: SpreadAnalysisResult, exit: boolean): LimitChecker;
+  create(spreadAnalysisResult: SpreadAnalysisResult, exit: string): LimitChecker;
 }
 
 export interface Arbitrager {
