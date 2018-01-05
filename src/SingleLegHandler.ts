@@ -4,7 +4,6 @@ import {
   ProceedOption,
   OrderSide,
   OrderType,
-  BrokerAdapterRouter,
   OrderPair
 } from './types';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
@@ -13,6 +12,7 @@ import * as _ from 'lodash';
 import { getLogger } from './logger/index';
 import t from './intl';
 import { delay } from './util';
+import BrokerAdapterRouter from './BrokerAdapterRouter';
 
 export default class SingleLegHandler {
   private readonly log = getLogger(this.constructor.name);

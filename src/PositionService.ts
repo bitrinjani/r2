@@ -1,14 +1,15 @@
 import { injectable, inject } from 'inversify';
-import { PositionService, BrokerAdapterRouter, ConfigStore, BrokerConfig, BrokerMap, BrokerPosition } from './types';
+import { ConfigStore, BrokerConfig, BrokerMap, BrokerPosition } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import Decimal from 'decimal.js';
 import BrokerPositionImpl from './BrokerPositionImpl';
 import { hr, eRound } from './util';
 import symbols from './symbols';
+import BrokerAdapterRouter from './BrokerAdapterRouter';
 
 @injectable()
-export default class PositionServiceImpl implements PositionService {
+export default class PositionService {
   private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRefreshing: boolean;
@@ -16,7 +17,7 @@ export default class PositionServiceImpl implements PositionService {
 
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
-    @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter
+    private readonly brokerAdapterRouter: BrokerAdapterRouter
   ) {}
 
   async start(): Promise<void> {

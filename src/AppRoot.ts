@@ -3,9 +3,12 @@ import t from './intl';
 import 'reflect-metadata';
 import container from './container';
 import symbols from './symbols';
-import { Arbitrager, QuoteAggregator, PositionService, BrokerAdapter, ConfigStore } from './types';
+import { BrokerAdapter, ConfigStore } from './types';
 import { Container } from 'inversify';
 import { closeChronoDB } from './chrono';
+import QuoteAggregator from './QuoteAggregator';
+import PositionService from './PositionService';
+import Arbitrager from './Arbitrager';
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
@@ -19,11 +22,11 @@ export default class AppRoot {
     try {
       this.log.info(t`StartingTheService`);
       await this.bindBrokers();
-      this.quoteAggregator = this.ioc.get<QuoteAggregator>(symbols.QuoteAggregator);
+      this.quoteAggregator = this.ioc.get(QuoteAggregator);
       await this.quoteAggregator.start();
-      this.positionService = this.ioc.get<PositionService>(symbols.PositionService);
+      this.positionService = this.ioc.get(PositionService);
       await this.positionService.start();
-      this.arbitrager = this.ioc.get<Arbitrager>(symbols.Arbitrager);
+      this.arbitrager = this.ioc.get(Arbitrager);
       await this.arbitrager.start();
       this.log.info(t`SuccessfullyStartedTheService`);
     } catch (ex) {

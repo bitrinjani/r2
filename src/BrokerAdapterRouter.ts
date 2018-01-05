@@ -1,11 +1,11 @@
-﻿import { BrokerAdapterRouter, Broker, BrokerAdapter, BrokerMap, Order, Quote } from './types';
+﻿import { Broker, BrokerAdapter, BrokerMap, Order, Quote } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import { injectable, multiInject } from 'inversify';
 import symbols from './symbols';
 
 @injectable()
-export default class BrokerAdapterRouterImpl implements BrokerAdapterRouter {
+export default class BrokerAdapterRouter {
   private readonly log = getLogger(this.constructor.name);
   private brokerAdapterMap: BrokerMap<BrokerAdapter>;
 

@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import QuoteAggregatorImpl from '../QuoteAggregatorImpl';
+import QuoteAggregator from '../QuoteAggregator';
 import { Broker, QuoteSide, QuoteAggregator } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
-import BrokerAdapterRouterImpl from '../BrokerAdapterRouterImpl';
+import BrokerAdapterRouter from '../BrokerAdapterRouter';
 import { options } from '../logger';
 options.enabled = false;
 
@@ -55,8 +55,8 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, coincheckBa, quoineBa];
-    const baRouter = new BrokerAdapterRouterImpl(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
+    const baRouter = new BrokerAdapterRouter(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     aggregator.onQuoteUpdated = async quotes => {
       expect(quotes.length).toBe(3);
       console.log(quotes[0].toString());
@@ -90,8 +90,8 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, coincheckBa, quoineBa];
-    const baRouter = new BrokerAdapterRouterImpl(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
+    const baRouter = new BrokerAdapterRouter(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     aggregator.onQuoteUpdated = async quotes => {
       expect(quotes.length).toBe(1);
     };
@@ -119,8 +119,8 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouterImpl(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
+    const baRouter = new BrokerAdapterRouter(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const fn = jest.fn();
     aggregator.onQuoteUpdated = fn;
     await aggregator.start();
@@ -148,8 +148,8 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouterImpl(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
+    const baRouter = new BrokerAdapterRouter(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     aggregator.onQuoteUpdated = undefined;
     await aggregator.start();
     await delay(0);
@@ -171,8 +171,8 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouterImpl(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
+    const baRouter = new BrokerAdapterRouter(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     aggregator.isRunning = true;
     await aggregator.start();
     await aggregator.stop();
@@ -196,8 +196,8 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouterImpl(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregatorImpl(configStore, baRouter);
+    const baRouter = new BrokerAdapterRouter(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     await aggregator.start();
     await aggregator.stop();
     expect(aggregator.quotes.length).toBe(0);
@@ -205,6 +205,6 @@ describe('Quote Aggregator', () => {
 });
 
 test('stop without start', () => {
-  const aggregator = new QuoteAggregatorImpl(configStore, []);
+  const aggregator = new QuoteAggregator(configStore, []);
   aggregator.stop();
 });

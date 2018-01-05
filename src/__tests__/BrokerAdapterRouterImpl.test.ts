@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { CashMarginType, OrderType, OrderSide, Broker, Order } from '../types';
-import BrokerAdapterRouterImpl from '../BrokerAdapterRouterImpl';
+import BrokerAdapterRouter from '../BrokerAdapterRouter';
 import { options } from '../logger';
 import OrderImpl from '../OrderImpl';
 options.enabled = false;
@@ -24,7 +24,7 @@ const baQuoine = {
 };
 
 const brokerAdapters = [baBitflyer, baQuoine];
-const baRouter = new BrokerAdapterRouterImpl(brokerAdapters);
+const baRouter = new BrokerAdapterRouter(brokerAdapters);
 describe('BrokerAdapterRouter', () => {
   test('send', async () => {
     const order = new OrderImpl('Bitflyer', OrderSide.Buy, 0.001, 500000,

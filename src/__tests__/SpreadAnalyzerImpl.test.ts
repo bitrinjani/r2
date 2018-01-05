@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
+import SpreadAnalyzer from '../SpreadAnalyzer';
 import { Broker, QuoteSide, ConfigStore } from '../types';
 import * as _ from 'lodash';
 import Quote from '../types';
@@ -34,7 +34,7 @@ let quotes = [
 
 describe('Spread Analyzer', () => {
   test('analyze', async () => {
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap);
     expect(result.bestAsk.broker).toBe('Coincheck');
     expect(result.bestAsk.price).toBe(3);
@@ -54,7 +54,7 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Ask, 350000, 3),
       toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap);
     expect(result.bestAsk.broker).toBe('Coincheck');
     expect(result.bestAsk.price).toBe(300000);
@@ -75,7 +75,7 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Ask, 350000, 3),
       toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap);
     expect(result.bestAsk.broker).toBe('Coincheck');
     expect(result.bestAsk.price).toBe(300000);
@@ -96,7 +96,7 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Ask, 350000, 3),
       toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap);
     expect(result.bestAsk.broker).toBe('Coincheck');
     expect(result.bestAsk.price).toBe(300000);
@@ -110,7 +110,7 @@ describe('Spread Analyzer', () => {
   });
 
   test('analyze with no position map', async () => {
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     try {
       const result = await target.analyze(quotes, {});
     } catch (ex) {
@@ -125,7 +125,7 @@ describe('Spread Analyzer', () => {
       toQuote('Coincheck', QuoteSide.Ask, 3, 1),
       toQuote('Quoine', QuoteSide.Ask, 3.5, 3)
     ];
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     try {
       const result = await target.analyze(quotes, positionMap);
     } catch (ex) {
@@ -140,7 +140,7 @@ describe('Spread Analyzer', () => {
       toQuote('Coincheck', QuoteSide.Bid, 3, 1),
       toQuote('Quoine', QuoteSide.Bid, 3.5, 3)
     ];
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     try {
       const result = await target.analyze(quotes, positionMap);
     } catch (ex) {
@@ -155,7 +155,7 @@ describe('Spread Analyzer', () => {
       toQuote('Coincheck', QuoteSide.Bid, 3, 1),
       toQuote('Quoine', QuoteSide.Bid, 3.5, 3)
     ];
-    const target = new SpreadAnalyzerImpl(configStore);
+    const target = new SpreadAnalyzer(configStore);
     try {
       const result = await target.analyze(quotes, positionMap, [{size: 0.001}, {size: 0.002}]);
     } catch (ex) {

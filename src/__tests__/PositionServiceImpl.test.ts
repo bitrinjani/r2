@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import PositionServiceImpl from '../PositionServiceImpl';
+import PositionService from '../PositionService';
 import { Broker } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
@@ -29,7 +29,7 @@ const baRouter = {
 
 describe('Position Service', () => {
   test('positions', async () => {
-    const ps = new PositionServiceImpl(configStore, baRouter);
+    const ps = new PositionService(configStore, baRouter);
     await ps.start();
     const positions = _.values(ps.positionMap);
     const exposure = ps.netExposure;
@@ -53,7 +53,7 @@ describe('Position Service', () => {
 
   test('positions throws', async () => {
     const baRouterThrows = { getBtcPosition: async () => { throw new Error('Mock refresh error.'); } };
-    const ps = new PositionServiceImpl(configStore, baRouterThrows);
+    const ps = new PositionService(configStore, baRouterThrows);
     await ps.start();
     expect(ps.positionMap).toBeUndefined();
     expect(ps.netExposure).toBe(0);
@@ -64,7 +64,7 @@ describe('Position Service', () => {
     const baRouter = {
       getBtcPosition: broker => broker === 'Quoine' ? 0.000002 : -0.3
     };
-    const ps = new PositionServiceImpl(configStore, baRouter);
+    const ps = new PositionService(configStore, baRouter);
     await ps.start();
     const positions = _.values(ps.positionMap);
     const exposure = ps.netExposure;
@@ -88,7 +88,7 @@ describe('Position Service', () => {
 
   test('already refreshing block', async () => {
     config.positionRefreshInterval = 1;
-    const ps = new PositionServiceImpl(configStore, baRouter);
+    const ps = new PositionService(configStore, baRouter);
     ps.isRefreshing = true;
     await ps.start();
     await ps.stop();
@@ -97,7 +97,7 @@ describe('Position Service', () => {
 
   test('setInterval triggered', async () => {
     config.positionRefreshInterval = 10;
-    const ps = new PositionServiceImpl(configStore, baRouter);
+    const ps = new PositionService(configStore, baRouter);
     await ps.start();
     await delay(10);
     await ps.stop();
@@ -106,7 +106,7 @@ describe('Position Service', () => {
   });
 
   test('stop without start', async () => {
-    const ps = new PositionServiceImpl(configStore, baRouter);
+    const ps = new PositionService(configStore, baRouter);
     ps.stop(); 
   };
 });

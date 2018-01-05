@@ -1,11 +1,11 @@
-﻿import { ConfigRoot, ConfigValidator, BrokerConfig, CashMarginType } from './types';
+﻿import { ConfigRoot, BrokerConfig, CashMarginType } from './types';
 import t from './intl';
 import * as _ from 'lodash';
 import { injectable } from 'inversify';
 import { findBrokerConfig } from './configUtil';
 
 @injectable()
-export default class ConfigValidatorImpl implements ConfigValidator {
+export default class ConfigValidator {
   validate(config: ConfigRoot): void {
     const enabledBrokers = config.brokers.filter(b => b.enabled);
     this.throwIf(enabledBrokers.length < 2, t`AtLeastTwoBrokersMustBeEnabled`);

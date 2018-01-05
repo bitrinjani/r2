@@ -1,12 +1,13 @@
 ﻿import { injectable, inject } from 'inversify';
-import { QuoteAggregator, ConfigStore, BrokerConfig, QuoteSide, BrokerAdapterRouter, Broker, Quote } from './types';
+import { ConfigStore, BrokerConfig, QuoteSide, Broker, Quote } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import symbols from './symbols';
 import QuoteImpl from './QuoteImpl';
+import BrokerAdapterRouter from './BrokerAdapterRouter';
 
 @injectable()
-export default class QuoteAggregatorImpl implements QuoteAggregator {
+export default class QuoteAggregator  {
   private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRunning: boolean;
@@ -14,7 +15,7 @@ export default class QuoteAggregatorImpl implements QuoteAggregator {
 
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
-    @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter
+    private readonly brokerAdapterRouter: BrokerAdapterRouter
   ) {}
 
   async start(): Promise<void> {

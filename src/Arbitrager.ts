@@ -3,17 +3,11 @@ import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
 import OrderImpl from './OrderImpl';
 import {
-  BrokerAdapterRouter,
   ConfigStore,
-  PositionService,
-  QuoteAggregator,
-  SpreadAnalyzer,
-  Arbitrager,
   SpreadAnalysisResult,
   OrderType,
   QuoteSide,
   OrderSide,
-  LimitCheckerFactory,
   ActivePairStore,
   Quote,
   OrderPair
@@ -24,9 +18,14 @@ import symbols from './symbols';
 import { fatalErrors } from './constants';
 import SingleLegHandler from './SingleLegHandler';
 import { findBrokerConfig } from './configUtil';
+import QuoteAggregator from './QuoteAggregator';
+import PositionService from './PositionService';
+import SpreadAnalyzer from './SpreadAnalyzer';
+import LimitCheckerFactory from './LimitCheckerFactory';
+import BrokerAdapterRouter from './BrokerAdapterRouter';
 
 @injectable()
-export default class ArbitragerImpl implements Arbitrager {
+export default class Arbitrager {
   private readonly log = getLogger(this.constructor.name);
   private lastSpreadAnalysisResult: SpreadAnalysisResult;
   private shouldStop: boolean = false;
@@ -34,12 +33,12 @@ export default class ArbitragerImpl implements Arbitrager {
 
   // TODO: avoid constructor over-injection
   constructor(
-    @inject(symbols.QuoteAggregator) private readonly quoteAggregator: QuoteAggregator,
+    private readonly quoteAggregator: QuoteAggregator,
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
-    @inject(symbols.PositionService) private readonly positionService: PositionService,
-    @inject(symbols.BrokerAdapterRouter) private readonly brokerAdapterRouter: BrokerAdapterRouter,
-    @inject(symbols.SpreadAnalyzer) private readonly spreadAnalyzer: SpreadAnalyzer,
-    @inject(symbols.LimitCheckerFactory) private readonly limitCheckerFactory: LimitCheckerFactory,
+    private readonly positionService: PositionService,
+    private readonly brokerAdapterRouter: BrokerAdapterRouter,
+    private readonly spreadAnalyzer: SpreadAnalyzer,
+    private readonly limitCheckerFactory: LimitCheckerFactory,
     @inject(symbols.ActivePairStore) private readonly activePairStore: ActivePairStore
   ) {
     const onSingleLegConfig = configStore.config.onSingleLeg;
@@ -60,7 +59,7 @@ export default class ArbitragerImpl implements Arbitrager {
     this.status = 'Stopping';
     this.log.info('Stopping Arbitrager...');
     if (this.quoteAggregator) {
-      this.quoteAggregator.onQuoteUpdated = undefined;
+      this.quoteAggregator.onQuoteUpdated = () => Promise.resolve();
     }
     this.log.info('Stopped Arbitrager.');
     this.status = 'Stopped';
@@ -194,7 +193,7 @@ export default class ArbitragerImpl implements Arbitrager {
   private async findClosable(quotes: Quote[]): Promise<string> {
     const { minExitTargetProfit, minExitTargetProfitPercent } = this.configStore.config;
     if (minExitTargetProfit === undefined && minExitTargetProfitPercent === undefined) {
-      return "";
+      return '';
     }
     const activePairsMap = await this.activePairStore.getAll();
     this.printActivePairs(activePairsMap.map(kv => kv.value));
@@ -221,7 +220,7 @@ export default class ArbitragerImpl implements Arbitrager {
         this.log.debug(ex.message);
       }
     }
-    return "";
+    return '';
   }
 
   private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<OrderImpl> {

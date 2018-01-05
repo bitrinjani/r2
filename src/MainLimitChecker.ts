@@ -1,9 +1,10 @@
-import { LimitChecker, LimitCheckResult, PositionService, ConfigStore, SpreadAnalysisResult } from './types';
+import { LimitCheckResult, ConfigStore, SpreadAnalysisResult, LimitChecker } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import t from './intl';
+import PositionService from './PositionService';
 
-export default class LimitCheckerImpl implements LimitChecker {
+export default class MainLimitChecker implements LimitChecker {
   private readonly log = getLogger(this.constructor.name);
   private limits: LimitChecker[];
 

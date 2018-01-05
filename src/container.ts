@@ -1,45 +1,38 @@
 import { Container } from 'inversify';
 import symbols from './symbols';
-import ArbitragerImpl from './ArbitragerImpl';
+import Arbitrager from './Arbitrager';
 import {
-  Arbitrager,
   ConfigStore,
-  QuoteAggregator,
-  PositionService,
-  BrokerAdapterRouter,
-  SpreadAnalyzer,
-  ConfigValidator,
-  LimitCheckerFactory,
   ActivePairStore
 } from './types';
 import JsonConfigStore from './JsonConfigStore';
-import QuoteAggregatorImpl from './QuoteAggregatorImpl';
-import PositionServiceImpl from './PositionServiceImpl';
-import BrokerAdapterRouterImpl from './BrokerAdapterRouterImpl';
-import SpreadAnalyzerImpl from './SpreadAnalyzerImpl';
-import ConfigValidatorImpl from './ConfigValidatorImpl';
-import LimitCheckerFactoryImpl from './LimitCheckerFactoryImpl';
+import QuoteAggregator from './QuoteAggregator';
+import PositionService from './PositionService';
+import BrokerAdapterRouter from './BrokerAdapterRouter';
+import SpreadAnalyzer from './SpreadAnalyzer';
+import ConfigValidator from './ConfigValidator';
+import LimitCheckerFactory from './LimitCheckerFactory';
 import { getActivePairStore } from './ActivePairLevelStore';
 import { getChronoDB } from './chrono';
 
 const container = new Container();
-container.bind<Arbitrager>(symbols.Arbitrager).to(ArbitragerImpl);
+container.bind<Arbitrager>(Arbitrager).toSelf();
 container
   .bind<ConfigStore>(symbols.ConfigStore)
   .to(JsonConfigStore)
   .inSingletonScope();
 container
-  .bind<QuoteAggregator>(symbols.QuoteAggregator)
-  .to(QuoteAggregatorImpl)
+  .bind<QuoteAggregator>(QuoteAggregator)
+  .toSelf()
   .inSingletonScope();
 container
-  .bind<PositionService>(symbols.PositionService)
-  .to(PositionServiceImpl)
+  .bind<PositionService>(PositionService)
+  .toSelf()
   .inSingletonScope();
-container.bind<BrokerAdapterRouter>(symbols.BrokerAdapterRouter).to(BrokerAdapterRouterImpl);
-container.bind<SpreadAnalyzer>(symbols.SpreadAnalyzer).to(SpreadAnalyzerImpl);
-container.bind<ConfigValidator>(symbols.ConfigValidator).to(ConfigValidatorImpl);
-container.bind<LimitCheckerFactory>(symbols.LimitCheckerFactory).to(LimitCheckerFactoryImpl);
+container.bind<BrokerAdapterRouter>(BrokerAdapterRouter).toSelf();
+container.bind<SpreadAnalyzer>(SpreadAnalyzer).toSelf();
+container.bind<ConfigValidator>(ConfigValidator).toSelf();
+container.bind<LimitCheckerFactory>(LimitCheckerFactory).toSelf();
 container
   .bind<ActivePairStore>(symbols.ActivePairStore)
   .toConstantValue(getActivePairStore(getChronoDB()));

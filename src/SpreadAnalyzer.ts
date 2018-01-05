@@ -1,6 +1,5 @@
 ﻿import { injectable, inject } from 'inversify';
 import {
-  SpreadAnalyzer,
   ConfigStore,
   QuoteSide,
   SpreadAnalysisResult,
@@ -20,7 +19,7 @@ import { LOT_MIN_DECIMAL_PLACE } from './constants';
 import OrderImpl from './OrderImpl';
 
 @injectable()
-export default class SpreadAnalyzerImpl implements SpreadAnalyzer {
+export default class SpreadAnalyzer {
   private readonly log = getLogger(this.constructor.name);
 
   constructor(@inject(symbols.ConfigStore) private readonly configStore: ConfigStore) {}

@@ -12,10 +12,10 @@ import {
   OrderSide,
   OnSingleLegConfig
 } from '../types';
-import ArbitragerImpl from '../ArbitragerImpl';
+import Arbitrager from '../Arbitrager';
 import Quote from '../types';
-import LimitCheckerFactoryImpl from '../LimitCheckerFactoryImpl';
-import SpreadAnalyzerImpl from '../SpreadAnalyzerImpl';
+import LimitCheckerFactory from '../LimitCheckerFactory';
+import SpreadAnalyzer from '../SpreadAnalyzer';
 import { delay, toQuote } from '../util';
 import { options } from '../logger';
 import { getActivePairStore } from '../ActivePairLevelStore';
@@ -105,7 +105,7 @@ beforeEach(async () => {
     analyze: jest.fn()
   };
 
-  limitCheckerFactory = new LimitCheckerFactoryImpl(configStore, positionService);
+  limitCheckerFactory = new LimitCheckerFactory(configStore, positionService);
 
   quotes = [
     toQuote('Coincheck', QuoteSide.Ask, 3, 1),
@@ -121,7 +121,7 @@ afterAll(async () => await chronoDB.close());
 
 describe('Arbitrager', () => {
   test('start/stop', async () => {
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -138,7 +138,7 @@ describe('Arbitrager', () => {
   });
 
   test('stop without start', async () => {
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       undefined,
       configStore,
       positionService,
@@ -156,7 +156,7 @@ describe('Arbitrager', () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       throw new Error();
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -185,7 +185,7 @@ describe('Arbitrager', () => {
     });
     config.maxNetExposure = 0.1;
     positionService.netExposure = 0.2;
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -211,7 +211,7 @@ describe('Arbitrager', () => {
         targetProfit: -100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -240,7 +240,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -269,7 +269,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -298,7 +298,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -326,7 +326,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -354,7 +354,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -383,7 +383,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -415,7 +415,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -454,7 +454,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -491,7 +491,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -524,7 +524,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -563,7 +563,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -602,7 +602,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -640,7 +640,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -679,7 +679,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -718,7 +718,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -756,7 +756,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -794,7 +794,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -832,7 +832,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -870,7 +870,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -914,7 +914,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -959,7 +959,7 @@ describe('Arbitrager', () => {
       targetVolume: 1,
       targetProfit: 100
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -999,7 +999,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1038,7 +1038,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1077,7 +1077,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1115,7 +1115,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1153,7 +1153,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1191,7 +1191,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1229,7 +1229,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1268,7 +1268,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1298,7 +1298,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1328,7 +1328,7 @@ describe('Arbitrager', () => {
     baRouter.send = () => {
       throw new Error('Mock refresh error.');
     };
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1358,7 +1358,7 @@ describe('Arbitrager', () => {
     baRouter.send = () => {
       throw new Error('Mock error: insufficient balance');
     };
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1389,7 +1389,7 @@ describe('Arbitrager', () => {
     baRouter.refresh = () => {
       throw new Error('Mock refresh error.');
     };
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1417,7 +1417,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1448,7 +1448,7 @@ describe('Arbitrager', () => {
         targetProfit: 100
       };
     });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1474,8 +1474,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
-    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
-    const arbitrager = new ArbitragerImpl(
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1506,8 +1506,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfitPercent = -80;
-    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
-    const arbitrager = new ArbitragerImpl(
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1538,8 +1538,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfitPercent = -20;
-    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
-    const arbitrager = new ArbitragerImpl(
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1570,8 +1570,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -200;
-    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
-    const arbitrager = new ArbitragerImpl(
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1615,8 +1615,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
-    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
-    const arbitrager = new ArbitragerImpl(
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1647,8 +1647,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
-    const spreadAnalyzer = new SpreadAnalyzerImpl(configStore);
-    const arbitrager = new ArbitragerImpl(
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
@@ -1694,7 +1694,7 @@ describe('Arbitrager', () => {
           targetVolume: 1,
           targetProfit: 100
       });
-    const arbitrager = new ArbitragerImpl(
+    const arbitrager = new Arbitrager(
       quoteAggregator,
       configStore,
       positionService,
