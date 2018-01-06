@@ -6,6 +6,7 @@ import OrderImpl from '../../OrderImpl';
 import { NewOrderRequest } from '../../Coincheck/types';
 import * as nock from 'nock';
 import { options } from '../../logger';
+import { createOrder } from '../helper';
 options.enabled = false;
 
 nocksetup();
@@ -19,7 +20,7 @@ describe('NetOutStrategy', () => {
 
   test('send fails - not NetOut order', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy,
       0.005,
@@ -35,7 +36,7 @@ describe('NetOutStrategy', () => {
 
   test('netout close_short', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy, 
       0.01, 
@@ -55,7 +56,7 @@ describe('NetOutStrategy', () => {
 
   test('netout request - open buy', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy, 
       0.02, 
@@ -72,7 +73,7 @@ describe('NetOutStrategy', () => {
 
   test('netout when no closable position', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck', 
       OrderSide.Sell, 
       0.01, 
@@ -92,7 +93,7 @@ describe('NetOutStrategy', () => {
 
   test('netout market when no closable position', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck', 
       OrderSide.Sell, 
       0.01, 
@@ -110,7 +111,7 @@ describe('NetOutStrategy', () => {
 
   test('netout non BTCJPY', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck', 
       OrderSide.Sell, 
       0.01, 

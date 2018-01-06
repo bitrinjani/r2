@@ -6,6 +6,7 @@ import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType, TimeInForce,
 import nocksetup from './nocksetup';
 import OrderImpl from '../../OrderImpl';
 import { options } from '../../logger';
+import { createOrder } from '../helper';
 options.enabled = false;
 
 nocksetup();
@@ -132,7 +133,7 @@ describe('Bitflyer BrokerAdapter', () => {
 
   test('send buy limit', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = new OrderImpl(
+    const order = createOrder(
       'Bitflyer',
       OrderSide.Buy,
       0.1,
@@ -148,7 +149,7 @@ describe('Bitflyer BrokerAdapter', () => {
 
   test('send buy limit Fok', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = new OrderImpl(
+    const order = createOrder(
       'Bitflyer',
       OrderSide.Buy,
       0.1,
@@ -165,7 +166,7 @@ describe('Bitflyer BrokerAdapter', () => {
 
   test('send buy limit Ioc', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = new OrderImpl(
+    const order = createOrder(
       'Bitflyer',
       OrderSide.Buy,
       0.1,

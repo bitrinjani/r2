@@ -228,15 +228,15 @@ export default class Arbitrager {
     const brokerConfig = findBrokerConfig(this.configStore.config, quote.broker);
     const { cashMarginType, leverageLevel } = brokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
-    const order = new OrderImpl(
-      quote.broker,
-      orderSide,
-      targetVolume,
-      quote.price,
+    const order = new OrderImpl({
+      broker: quote.broker,
+      side: orderSide,
+      size: targetVolume,
+      price: quote.price,
       cashMarginType,
-      orderType,
+      type: orderType,
       leverageLevel
-    );
+    });
     await this.brokerAdapterRouter.send(order);
     return order;
   }

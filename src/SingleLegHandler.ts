@@ -1,11 +1,4 @@
-import {
-  OnSingleLegConfig,
-  ReverseOption,
-  ProceedOption,
-  OrderSide,
-  OrderType,
-  OrderPair
-} from './types';
+import { OnSingleLegConfig, ReverseOption, ProceedOption, OrderSide, OrderType, OrderPair } from './types';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
 import OrderImpl from './OrderImpl';
 import * as _ from 'lodash';
@@ -48,15 +41,15 @@ export default class SingleLegHandler {
     const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
     this.log.info(t`ReverseFilledLeg`, largeLeg.toShortString(), price.toLocaleString(), size);
-    const reversalOrder = new OrderImpl(
-      largeLeg.broker,
-      largeLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
+    const reversalOrder = new OrderImpl({
+      broker: largeLeg.broker,
+      side: largeLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
       size,
       price,
-      largeLeg.cashMarginType,
-      OrderType.Limit,
-      largeLeg.leverageLevel
-    );
+      cashMarginType: largeLeg.cashMarginType,
+      type: OrderType.Limit,
+      leverageLevel: largeLeg.leverageLevel
+    });
     await this.sendOrderWithTtl(reversalOrder, options.ttl);
     return [reversalOrder];
   }
@@ -68,15 +61,15 @@ export default class SingleLegHandler {
     const price = _.round(smallLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(smallLeg.pendingSize - largeLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
     this.log.info(t`ExecuteUnfilledLeg`, smallLeg.toShortString(), price.toLocaleString(), size);
-    const proceedOrder = new OrderImpl(
-      smallLeg.broker,
-      smallLeg.side,
+    const proceedOrder = new OrderImpl({
+      broker: smallLeg.broker,
+      side: smallLeg.side,
       size,
       price,
-      smallLeg.cashMarginType,
-      OrderType.Limit,
-      smallLeg.leverageLevel
-    );
+      cashMarginType: smallLeg.cashMarginType,
+      type: OrderType.Limit,
+      leverageLevel: smallLeg.leverageLevel
+    });
     await this.sendOrderWithTtl(proceedOrder, options.ttl);
     return [proceedOrder];
   }

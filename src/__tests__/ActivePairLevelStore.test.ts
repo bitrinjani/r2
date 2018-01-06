@@ -1,7 +1,8 @@
 import OrderImpl from '../OrderImpl';
-import { OrderStatus, OrderSide, CashMarginType, OrderType, Broker } from '../types';
-import { getActivePairStore, OrderPair } from '../ActivePairLevelStore';
+import { OrderStatus, OrderSide, CashMarginType, OrderType, Broker, OrderPair } from '../types';
+import { getActivePairStore } from '../ActivePairLevelStore';
 import { ChronoDB } from '@bitr/chronodb';
+import { createOrder } from './helper';
 
 describe('ActivePairLevelStore', () => {
   let store;
@@ -18,18 +19,10 @@ describe('ActivePairLevelStore', () => {
   });
 
   test('put, get, getAll', async () => {
-    const buyLeg = new OrderImpl('Dummy1' as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
+    const buyLeg = createOrder('Dummy1' as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
     buyLeg.filledSize = 0.1;
     buyLeg.status = OrderStatus.Filled;
-    const sellLeg = new OrderImpl(
-      'Dummy2' as Broker,
-      OrderSide.Sell,
-      0.1,
-      110,
-      CashMarginType.Cash,
-      OrderType.Limit,
-      10
-    );
+    const sellLeg = createOrder('Dummy2' as Broker, OrderSide.Sell, 0.1, 110, CashMarginType.Cash, OrderType.Limit, 10);
     sellLeg.filledSize = 0.1;
     sellLeg.status = OrderStatus.Filled;
     const pair: OrderPair = [buyLeg, sellLeg];
@@ -42,18 +35,10 @@ describe('ActivePairLevelStore', () => {
   });
 
   test('del', async () => {
-    const buyLeg = new OrderImpl('Dummy1' as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
+    const buyLeg = createOrder('Dummy1' as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
     buyLeg.filledSize = 0.1;
     buyLeg.status = OrderStatus.Filled;
-    const sellLeg = new OrderImpl(
-      'Dummy2' as Broker,
-      OrderSide.Sell,
-      0.1,
-      110,
-      CashMarginType.Cash,
-      OrderType.Limit,
-      10
-    );
+    const sellLeg = createOrder('Dummy2' as Broker, OrderSide.Sell, 0.1, 110, CashMarginType.Cash, OrderType.Limit, 10);
     sellLeg.filledSize = 0.1;
     sellLeg.status = OrderStatus.Filled;
     const pair: OrderPair = [buyLeg, sellLeg];

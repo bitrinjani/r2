@@ -5,6 +5,7 @@ import BrokerApi from '../../Coincheck/BrokerApi';
 import OrderImpl from '../../OrderImpl';
 import * as nock from 'nock';
 import { options } from '../../logger';
+import { createOrder } from '../helper';
 options.enabled = false;
 
 nocksetup();
@@ -12,7 +13,7 @@ nocksetup();
 describe('MarginOpenStrategy', () => {
   test('send leverage buy limit', async () => {
     const strategy = new MarginOpenStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy,
       0.005,
@@ -25,7 +26,7 @@ describe('MarginOpenStrategy', () => {
 
   test('send fails - not MarginOpen order', async () => {
     const strategy = new MarginOpenStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy,
       0.005,
@@ -41,7 +42,7 @@ describe('MarginOpenStrategy', () => {
 
   test('send fails', async () => {
     const strategy = new MarginOpenStrategy(new BrokerApi('', ''));
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy,
       0.005,

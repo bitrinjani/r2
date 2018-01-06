@@ -1,6 +1,7 @@
 import * as util from '../util';
-import { Broker } from '../types';
+import { Broker, OrderSide, CashMarginType, OrderType } from '../types';
 import { findBrokerConfig } from '../configUtil';
+import OrderImpl from '../OrderImpl';
 
 test('timestampToDate', () => {
   const dt = util.timestampToDate(1509586252);
@@ -53,3 +54,4 @@ test('safeQueryStringStringify', () => {
   const result = util.safeQueryStringStringify(o);
   expect(result).toBe('a=1');
 });
+

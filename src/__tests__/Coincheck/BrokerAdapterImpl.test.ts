@@ -7,6 +7,7 @@ import nocksetup from './nocksetup';
 import OrderImpl from '../../OrderImpl';
 import { NewOrderRequest } from '../../Coincheck/types';
 import { options } from '../../logger';
+import { createOrder } from '../helper';
 options.enabled = false;
 
 nocksetup();
@@ -21,7 +22,7 @@ const brokerConfig = {
 describe('Coincheck BrokerAdapter', () => {
   test('send with invalid cashMarginType', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy,
       0.005,
@@ -41,7 +42,7 @@ describe('Coincheck BrokerAdapter', () => {
 
   test('send leverage buy limit', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = new OrderImpl(
+    const order = createOrder(
       'Coincheck',
       OrderSide.Buy,
       0.005,

@@ -3,6 +3,7 @@ import { CashMarginType, OrderType, OrderSide, Broker, Order } from '../types';
 import BrokerAdapterRouter from '../BrokerAdapterRouter';
 import { options } from '../logger';
 import OrderImpl from '../OrderImpl';
+import { createOrder } from './helper';
 options.enabled = false;
 
 const baBitflyer = {
@@ -27,8 +28,7 @@ const brokerAdapters = [baBitflyer, baQuoine];
 const baRouter = new BrokerAdapterRouter(brokerAdapters);
 describe('BrokerAdapterRouter', () => {
   test('send', async () => {
-    const order = new OrderImpl('Bitflyer', OrderSide.Buy, 0.001, 500000,
-      CashMarginType.Cash, OrderType.Limit, 0);
+    const order = createOrder('Bitflyer', OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.send(order);
     expect(baBitflyer.send.mock.calls.length).toBe(1);
     expect(baQuoine.send.mock.calls.length).toBe(0);
@@ -41,8 +41,7 @@ describe('BrokerAdapterRouter', () => {
   });
 
   test('cancel', async () => {
-    const order = new OrderImpl('Bitflyer', OrderSide.Buy, 0.001, 500000,
-      CashMarginType.Cash, OrderType.Limit, 0);
+    const order = createOrder('Bitflyer', OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.cancel(order);
     expect(baBitflyer.cancel.mock.calls.length).toBe(1);
     expect(baQuoine.cancel.mock.calls.length).toBe(0);
@@ -55,8 +54,7 @@ describe('BrokerAdapterRouter', () => {
   });
 
   test('refresh', async () => {
-    const order = new OrderImpl('Quoine', OrderSide.Buy, 0.001, 500000,
-      CashMarginType.Cash, OrderType.Limit, 0);
+    const order = createOrder('Quoine', OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.refresh(order);
     expect(baBitflyer.refresh.mock.calls.length).toBe(0);
     expect(baQuoine.refresh.mock.calls.length).toBe(1);

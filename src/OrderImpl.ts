@@ -5,17 +5,28 @@ import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker,
 import { eRound } from './util';
 import t from './intl';
 
-export default class OrderImpl implements Order {
-  constructor(
-    public broker: Broker,
-    public side: OrderSide,
-    public size: number,
-    public price: number,
-    public cashMarginType: CashMarginType,
-    public type: OrderType,
-    public leverageLevel: number
-  ) {}
+export interface Init {
+  broker: Broker;
+  side: OrderSide;
+  size: number;
+  price: number;
+  cashMarginType: CashMarginType;
+  type: OrderType;
+  leverageLevel: number;
+}
 
+export default class OrderImpl implements Order {
+  constructor(init: Init) {
+    Object.assign(this, init);
+  }
+
+  broker: Broker;
+  side: OrderSide;
+  size: number;
+  price: number;
+  cashMarginType: CashMarginType;
+  type: OrderType;
+  leverageLevel: number;
   id: string = uuid();
   symbol: string = 'BTCJPY';
   timeInForce: TimeInForce = TimeInForce.None;
