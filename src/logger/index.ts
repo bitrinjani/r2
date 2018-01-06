@@ -4,12 +4,19 @@ import * as util from 'util';
 
 export const options = { enabled: process.env.NODE_ENV === 'test' ? false : true };
 
+export interface Logger {
+  debug: (s: string, ...args: any[]) => void;
+  info: (s: string, ...args: any[]) => void;
+  warn: (s: string, ...args: any[]) => void;
+  error: (s: string, ...args: any[]) => void;
+}
+
 const logger = pino({ level: 'debug' });
 const cache = new Map();
 
-export function getLogger(name: string) {
+export function getLogger(name: string): Logger {
   if (!options.enabled) {
-    return new Proxy({}, { get: () => _.noop });
+    return new Proxy({}, { get: () => _.noop }) as Logger;
   }
   const label = _.trimEnd(name, 'Impl');
   if (cache.has(label)) {
