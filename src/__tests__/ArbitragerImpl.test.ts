@@ -1,12 +1,9 @@
 // tslint:disable
 import {
-  QuoteAggregator,
   Broker,
   QuoteSide,
   ConfigRoot,
   ConfigStore,
-  PositionService,
-  BrokerAdapterRouter,
   CashMarginType,
   OrderStatus,
   OrderSide,
@@ -20,6 +17,9 @@ import { delay, toQuote } from '../util';
 import { options } from '../logger';
 import { getActivePairStore } from '../ActivePairLevelStore';
 import { ChronoDB } from '@bitr/chronodb';
+import QuoteAggregator from '../QuoteAggregator';
+import PositionService from '../PositionService';
+import BrokerAdapterRouter from '../BrokerAdapterRouter';
 options.enabled = false;
 
 const chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
@@ -39,7 +39,7 @@ beforeEach(async () => {
   quoteAggregator = {
     start: jest.fn(),
     stop: jest.fn()
-  } as QuoteAggregator;
+  };
   config = {
     maxNetExposure: 10.0,
     minSize: 0.005,
@@ -91,7 +91,7 @@ beforeEach(async () => {
     print: jest.fn(),
     isStarted: true,
     netExposure: 0
-  } as PositionService;
+  };
 
   baRouter = {
     send: jest.fn(),
@@ -99,7 +99,7 @@ beforeEach(async () => {
     cancel: jest.fn(),
     getBtcPosition: jest.fn(),
     fetchQuotes: jest.fn()
-  } as BrokerAdapterRouter;
+  };
 
   spreadAnalyzer = {
     analyze: jest.fn()
@@ -134,6 +134,7 @@ describe('Arbitrager', () => {
     expect(quoteAggregator.onQuoteUpdated).not.toBeUndefined();
     expect(arbitrager.status).toBe('Started');
     await arbitrager.stop();
+    expect(() => quoteAggregator.onQuoteUpdated([])).not.toThrow();
     expect(arbitrager.status).toBe('Stopped');
   });
 
