@@ -26,6 +26,20 @@ npm install
 npm start
 ```
 
+or
+
+1. Install [Docker](https://docs.docker.com/engine/installation/)
+2. Clone this repository.
+  ```bash
+  git clone https://github.com/bitrinjani/r2.git
+  ```
+3. Run `docker build` and `docker run`.
+  ```
+  cd r2
+  docker build -t r2:latest .
+  docker run --rm -it r2:latest
+  ```
+
 ### Prerequisites
 R2 works on any OS that supports Node.js, such as:
 - Windows
