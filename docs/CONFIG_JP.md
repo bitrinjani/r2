@@ -16,6 +16,7 @@
 |maxTargetProfitPercent|number|[Optional] 最大目標収益割合。期待収益の裁定取引の円換算(取引価格*数量)に対する割合(%)がこれよりい大きい場合、取引を行わない。取引所が不正な価格を提示した場合の安全弁。maxTargetProfitとmaxTargetProfitPercentの両方が設定されている場合、両方を下回らない限り取引を行わない。|
 |minExitTargetProfit|number|裁定ポジション解消取引に対する最小目標収益。マイナスの値は裁定ポジション解消のコストを表す。この値より大きい収益(小さいコスト)が望める場合、ポジション解消取引を出す。|
 |minExitTargetProfitPercent|number|[Optional] 裁定ポジション解消取引に対する最小目標収益の割合(%)。minExitTargetProfitと同時に設定されると、両方を上回らないかぎりポジション解消取引を出さない。|
+|exitNetProfitRatio|number|[Optional] オープン時の利益に対し、クローズによって何%の利益を確定するか指定する。このパーセンテージ分だけオープン時からスプレッドが縮小した時、そのオープンペアをクローズする。例えば、オープン時の利益が200かつexitNetProfitRatio=20とすると、クローズのコストが160を下回ったときにR2はクローズオーダーを送信し、40の利益を確定しようとする。(オープンによる収益200, クローズによる費用160 -> 利益40)|
 |iterationInterval|Millisecond|裁定プロセスのインターバル。この値が3000に設定されている場合、3秒に一回板情報を取得し裁定機会を探る。|
 |positionRefreshInterval|Millisecond|ポジション更新インターバル。|
 |sleepAfterSend|Millisecond|裁定取引完了後、このミリ秒だけ休止する。|
