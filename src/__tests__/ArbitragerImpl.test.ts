@@ -7,7 +7,9 @@ import {
   CashMarginType,
   OrderStatus,
   OrderSide,
-  OnSingleLegConfig
+  OnSingleLegConfig,
+  Order,
+  Execution
 } from '../types';
 import Arbitrager from '../Arbitrager';
 import Quote from '../types';
@@ -20,6 +22,7 @@ import { ChronoDB } from '@bitr/chronodb';
 import QuoteAggregator from '../QuoteAggregator';
 import PositionService from '../PositionService';
 import BrokerAdapterRouter from '../BrokerAdapterRouter';
+import OrderImpl from '../OrderImpl';
 options.enabled = false;
 
 const chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
@@ -49,21 +52,24 @@ beforeEach(async () => {
         cashMarginType: CashMarginType.Cash,
         leverageLevel: 1,
         maxLongPosition: 100,
-        maxShortPosition: 100
+        maxShortPosition: 100,
+        commissionPercent: 0
       },
       {
         broker: 'Coincheck',
         cashMarginType: CashMarginType.MarginOpen,
         leverageLevel: 8,
         maxLongPosition: 100,
-        maxShortPosition: 100
+        maxShortPosition: 100,
+        commissionPercent: 0
       },
       {
         broker: 'Quoine',
         cashMarginType: CashMarginType.NetOut,
         leverageLevel: 9,
         maxLongPosition: 100,
-        maxShortPosition: 100
+        maxShortPosition: 100,
+        commissionPercent: 0
       }
     ]
   } as ConfigRoot;
@@ -1713,5 +1719,115 @@ describe('Arbitrager', () => {
     await quoteAggregator.onQuoteUpdated([]);
     expect(arbitrager.status).toBe('Too large Volume');
     expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
+  });
+
+  test('Close filled orders with exitNetProfitRatio', async () => {
+    const quotes = [
+      toQuote('Quoine', QuoteSide.Ask, 700, 4),
+      toQuote('Quoine', QuoteSide.Bid, 600, 4),
+      toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+      toQuote('Coincheck', QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation((order: Order) => {
+      order.status = OrderStatus.Filled; 
+      order.filledSize = order.size;
+      order.executions = [{price: order.price, size: order.size} as Execution];
+    });
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.exitNetProfitRatio = -200;
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory,
+      activePairStore
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
+    // closing
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Closed');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(0);
+  });
+
+  test('Not close filled orders with exitNetProfitRatio', async () => {
+    const quotes = [
+      toQuote('Quoine', QuoteSide.Ask, 700, 4),
+      toQuote('Quoine', QuoteSide.Bid, 600, 4),
+      toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+      toQuote('Coincheck', QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation((order: Order) => {
+      order.status = OrderStatus.Filled; 
+      order.filledSize = order.size;
+      order.executions = [{price: order.price, size: order.size} as Execution];
+    });
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.exitNetProfitRatio = -199;
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory,
+      activePairStore
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
+    // Not closing
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(2);
+  });
+  
+  test('Not close filled orders with exitNetProfitRatio and commission', async () => {
+    const quotes = [
+      toQuote('Quoine', QuoteSide.Ask, 700, 4),
+      toQuote('Quoine', QuoteSide.Bid, 600, 4),
+      toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+      toQuote('Coincheck', QuoteSide.Bid, 400, 1)
+    ];
+    baRouter.refresh.mockImplementation((order: Order) => {
+      order.status = OrderStatus.Filled; 
+      order.filledSize = order.size;
+      order.executions = [{price: order.price, size: order.size} as Execution];
+    });
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.exitNetProfitRatio = 399;
+    config.brokers[0].commissionPercent = 0.15;
+    config.brokers[1].commissionPercent = 0.15;
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const arbitrager = new Arbitrager(
+      quoteAggregator,
+      configStore,
+      positionService,
+      baRouter,
+      spreadAnalyzer,
+      limitCheckerFactory,
+      activePairStore
+    );
+    positionService.isStarted = true;
+    await arbitrager.start();
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(1);
+    // Not closing
+    await quoteAggregator.onQuoteUpdated(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await arbitrager.activePairStore.getAll()).length).toBe(2);
   });
 });

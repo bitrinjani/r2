@@ -32,7 +32,7 @@ export default class OrderImpl implements Order {
   timeInForce: TimeInForce = TimeInForce.None;
   brokerOrderId: string;
   status: OrderStatus = OrderStatus.PendingNew;
-  filledSize: number;
+  filledSize: number = 0;
   creationTime: Date = new Date();
   sentTime: Date;
   lastUpdated: Date;

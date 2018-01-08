@@ -78,6 +78,7 @@ export class ConfigRoot extends Castable {
   @cast minExitTargetProfit: number;
   @cast minTargetProfitPercent: number;
   @cast minExitTargetProfitPercent: number;
+  @cast exitNetProfitRatio: number;
   @cast maxTargetProfit: number;
   @cast maxTargetProfitPercent: number;
   @cast maxTargetVolumePercent: number;
