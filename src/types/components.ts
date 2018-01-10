@@ -34,6 +34,7 @@ export interface LimitChecker {
 export interface LimitCheckResult {
   success: boolean;
   reason: string;
+  message: string;
 }
 
 export interface ConfigStore {

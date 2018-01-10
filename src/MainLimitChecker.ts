@@ -1,8 +1,15 @@
-import { LimitCheckResult, ConfigStore, SpreadAnalysisResult, LimitChecker } from './types';
+import {
+  LimitCheckResult,
+  ConfigStore,
+  SpreadAnalysisResult,
+  LimitChecker,
+  OrderPair
+} from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
 import t from './intl';
 import PositionService from './PositionService';
+import OrderImpl from './OrderImpl';
 
 export default class MainLimitChecker implements LimitChecker {
   private readonly log = getLogger(this.constructor.name);
@@ -12,10 +19,11 @@ export default class MainLimitChecker implements LimitChecker {
     configStore: ConfigStore,
     positionService: PositionService,
     spreadAnalysisResult: SpreadAnalysisResult,
-    closableOrdersKey: string
+    orderPair?: OrderPair
   ) {
-    if (closableOrdersKey) {
+    if (orderPair) {
       this.limits = [
+        new MinExitTargetProfitLimit(configStore, spreadAnalysisResult, orderPair),
         new MaxNetExposureLimit(configStore, positionService),
         new MaxTargetProfitLimit(configStore, spreadAnalysisResult),
         new MaxTargetVolumeLimit(configStore, spreadAnalysisResult),
@@ -35,62 +43,96 @@ export default class MainLimitChecker implements LimitChecker {
 
   check(): LimitCheckResult {
     for (const limit of this.limits) {
-      this.log.debug(`checking ${limit.constructor.name}...`);
       const result = limit.check();
-      this.log.debug(`The result is %o.`, result);
+      this.log.debug(`${limit.constructor.name} ${result.success ? 'passed' : 'violated'}`);
       if (!result.success) {
         return result;
       }
     }
-    return { success: true, reason: '' };
+    return { success: true, reason: '', message: '' };
+  }
+}
+
+class MinExitTargetProfitLimit implements LimitChecker {
+  private readonly log = getLogger(this.constructor.name);
+
+  constructor(
+    private readonly configStore: ConfigStore,
+    private readonly spreadAnalysisResult: SpreadAnalysisResult,
+    private readonly orderPair: OrderPair
+  ) {}
+
+  check(): LimitCheckResult {
+    const success = this.isExitProfitLargeEnough();
+    if (success) {
+      return { success, reason: '', message: '' };
+    }
+    const reason = 'Too small exit profit';
+    const message = t`TargetProfitIsSmallerThanMinProfit`;
+    return { success, reason, message };
+  }
+
+  private isExitProfitLargeEnough(): boolean {
+    const effectiveValue = this.getEffectiveMinExitTargetProfit();
+    this.log.debug(`effectiveMinExitTargetProfit: ${effectiveValue}`);
+    return this.spreadAnalysisResult.targetProfit >= effectiveValue;
+  }
+
+  private getEffectiveMinExitTargetProfit() {
+    const pair = this.orderPair;
+    const { bestBid, bestAsk, targetVolume } = this.spreadAnalysisResult;
+    const targetVolumeNotional = _.mean([bestAsk.price, bestBid.price]) * targetVolume;
+    const { minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio } = this.configStore.config;
+    const openProfit = OrderImpl.calcProfit(pair, this.configStore.config).profit;
+    return _.max([
+      minExitTargetProfit,
+      minExitTargetProfitPercent !== undefined
+        ? _.round(minExitTargetProfitPercent / 100 * targetVolumeNotional)
+        : Number.MIN_SAFE_INTEGER,
+      exitNetProfitRatio !== undefined ? openProfit * (exitNetProfitRatio / 100 - 1) : Number.MIN_SAFE_INTEGER
+    ]) as number;
   }
 }
 
 class MaxNetExposureLimit implements LimitChecker {
-  private readonly log = getLogger('MaxNetExposureLimit');
-
   constructor(private readonly configStore: ConfigStore, private readonly positionService: PositionService) {}
 
-  check() {
+  check(): LimitCheckResult {
     const success = Math.abs(this.positionService.netExposure) <= this.configStore.config.maxNetExposure;
     if (success) {
-      return { success, reason: '' };
+      return { success, reason: '', message: '' };
     }
     const reason = 'Max exposure breached';
-    this.log.info(t`NetExposureIsLargerThanMaxNetExposure`);
-    return { success, reason };
+    const message = t`NetExposureIsLargerThanMaxNetExposure`;
+    return { success, reason, message };
   }
 }
 
 class InvertedSpreadLimit implements LimitChecker {
-  private readonly log = getLogger('InvertedSpreadLimit');
-
   constructor(private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
 
   check() {
     const success = this.spreadAnalysisResult.invertedSpread > 0;
     if (success) {
-      return { success, reason: '' };
+      return { success, reason: '', message: '' };
     }
     const reason = 'Spread not inverted';
-    this.log.info(t`NoArbitrageOpportunitySpreadIsNotInverted`);
-    return { success, reason };
+    const message = t`NoArbitrageOpportunitySpreadIsNotInverted`;
+    return { success, reason, message };
   }
 }
 
 class MinTargetProfitLimit implements LimitChecker {
-  private readonly log = getLogger('TargetProfitLimit');
-
   constructor(private readonly configStore: ConfigStore, private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
 
   check() {
     const success = this.isTargetProfitLargeEnough();
     if (success) {
-      return { success, reason: '' };
+      return { success, reason: '', message: '' };
     }
     const reason = 'Too small profit';
-    this.log.info(t`TargetProfitIsSmallerThanMinProfit`);
-    return { success, reason };
+    const message = t`TargetProfitIsSmallerThanMinProfit`;
+    return { success, reason, message };
   }
 
   private isTargetProfitLargeEnough(): boolean {
@@ -108,18 +150,16 @@ class MinTargetProfitLimit implements LimitChecker {
 }
 
 class MaxTargetProfitLimit implements LimitChecker {
-  private readonly log = getLogger('MaxTargetProfitLimit');
-
   constructor(private readonly configStore: ConfigStore, private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
 
   check() {
     const success = this.isProfitSmallerThanLimit();
     if (success) {
-      return { success, reason: '' };
+      return { success, reason: '', message: '' };
     }
     const reason = 'Too large profit';
-    this.log.info(t`TargetProfitIsLargerThanMaxProfit`);
-    return { success, reason };
+    const message = t`TargetProfitIsLargerThanMaxProfit`;
+    return { success, reason, message };
   }
 
   private isProfitSmallerThanLimit(): boolean {
@@ -136,18 +176,16 @@ class MaxTargetProfitLimit implements LimitChecker {
 }
 
 class MaxTargetVolumeLimit implements LimitChecker {
-  private readonly log = getLogger('MaxTargetVolumeLimit');
-
   constructor(private readonly configStore: ConfigStore, private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
 
   check() {
     const success = this.isVolumeSmallerThanLimit();
     if (success) {
-      return { success, reason: '' };
+      return { success, reason: '', message: '' };
     }
     const reason = 'Too large Volume';
-    this.log.info(t`TargetVolumeIsLargerThanMaxTargetVolumePercent`);
-    return { success, reason };
+    const message = t`TargetVolumeIsLargerThanMaxTargetVolumePercent`;
+    return { success, reason, message };
   }
 
   private isVolumeSmallerThanLimit(): boolean {
@@ -163,17 +201,15 @@ class MaxTargetVolumeLimit implements LimitChecker {
 }
 
 class DemoModeLimit implements LimitChecker {
-  private readonly log = getLogger('DemoModeLimit');
-
   constructor(private readonly configStore: ConfigStore) {}
 
   check() {
     const success = !this.configStore.config.demoMode;
     if (success) {
-      return { success, reason: '' };
+      return { success, reason: '', message: '' };
     }
     const reason = 'Demo mode';
-    this.log.info(t`ThisIsDemoModeNotSendingOrders`);
-    return { success, reason };
+    const message = t`ThisIsDemoModeNotSendingOrders`;
+    return { success, reason, message };
   }
 }

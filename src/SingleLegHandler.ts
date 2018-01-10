@@ -1,4 +1,4 @@
-import { OnSingleLegConfig, ReverseOption, ProceedOption, OrderSide, OrderType, OrderPair } from './types';
+import { OnSingleLegConfig, ReverseOption, ProceedOption, OrderSide, OrderType, OrderPair, ConfigStore } from './types';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
 import OrderImpl from './OrderImpl';
 import * as _ from 'lodash';
@@ -6,20 +6,26 @@ import { getLogger } from './logger/index';
 import t from './intl';
 import { delay } from './util';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
+import { injectable, inject } from 'inversify';
+import symbols from './symbols';
 
+@injectable()
 export default class SingleLegHandler {
   private readonly log = getLogger(this.constructor.name);
+  private readonly onSingleLegConfig: OnSingleLegConfig;
 
   constructor(
     private readonly brokerAdapterRouter: BrokerAdapterRouter,
-    private readonly onSingleLegConfig: OnSingleLegConfig
-  ) {}
+    @inject(symbols.ConfigStore) configStore: ConfigStore
+  ) {
+    this.onSingleLegConfig = configStore.config.onSingleLeg;
+  }
 
-  async handle(orders: OrderPair, closableOrdersKey: string): Promise<OrderImpl[]> {
+  async handle(orders: OrderPair, closable: boolean): Promise<OrderImpl[]> {
     if (this.onSingleLegConfig === undefined) {
       return [];
     }
-    const action = closableOrdersKey ? this.onSingleLegConfig.actionOnExit : this.onSingleLegConfig.action;
+    const action = closable ? this.onSingleLegConfig.actionOnExit : this.onSingleLegConfig.action;
     if (action === undefined || action === 'Cancel') {
       return [];
     }
@@ -90,4 +96,4 @@ export default class SingleLegHandler {
       this.log.warn(ex.message);
     }
   }
-}
+} /* istanbul ignore next */

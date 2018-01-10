@@ -1,4 +1,4 @@
-import { Container } from 'inversify';
+import { Container, decorate, injectable } from 'inversify';
 import symbols from './symbols';
 import Arbitrager from './Arbitrager';
 import {
@@ -14,6 +14,12 @@ import ConfigValidator from './ConfigValidator';
 import LimitCheckerFactory from './LimitCheckerFactory';
 import { getActivePairStore } from './ActivePairLevelStore';
 import { getChronoDB } from './chrono';
+import OppotunitySearcher from './OpportunitySearcher';
+import PairTrader from './PairTrader';
+import SingleLegHandler from './SingleLegHandler';
+import { EventEmitter } from 'events';
+
+decorate(injectable(), EventEmitter);
 
 const container = new Container();
 container.bind<Arbitrager>(Arbitrager).toSelf();
@@ -33,6 +39,9 @@ container.bind<BrokerAdapterRouter>(BrokerAdapterRouter).toSelf();
 container.bind<SpreadAnalyzer>(SpreadAnalyzer).toSelf();
 container.bind<ConfigValidator>(ConfigValidator).toSelf();
 container.bind<LimitCheckerFactory>(LimitCheckerFactory).toSelf();
+container.bind<OppotunitySearcher>(OppotunitySearcher).toSelf();
+container.bind<PairTrader>(PairTrader).toSelf();
+container.bind<SingleLegHandler>(SingleLegHandler).toSelf();
 container
   .bind<ActivePairStore>(symbols.ActivePairStore)
   .toConstantValue(getActivePairStore(getChronoDB()));
