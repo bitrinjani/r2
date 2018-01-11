@@ -5,5 +5,6 @@ export const fatalErrors = [
   'Too Many Requests',
   'Service Unavailable',
   '所持金額が足りません',
-  'not_enough_free_balance'
+  'not_enough_free_balance',
+  'Conditions and Trading Rules before continuing'
 ];
