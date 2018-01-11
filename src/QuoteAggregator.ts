@@ -5,9 +5,10 @@ import * as _ from 'lodash';
 import symbols from './symbols';
 import QuoteImpl from './QuoteImpl';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
+import { DateTime, Interval } from 'luxon';
 
 @injectable()
-export default class QuoteAggregator  {
+export default class QuoteAggregator {
   private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRunning: boolean;
@@ -71,9 +72,26 @@ export default class QuoteAggregator  {
 
   private getEnabledBrokers(): Broker[] {
     return _(this.configStore.config.brokers)
-      .filter((b: BrokerConfig) => b.enabled)
+      .filter(b => b.enabled)
+      .filter(b => this.timeFilter(b))
       .map(b => b.broker)
       .value();
+  }
+
+  private timeFilter(brokerConfig: BrokerConfig): boolean {
+    if (_.isEmpty(brokerConfig.noTradePeriods)) {
+      return true;
+    }
+    const current = DateTime.local();
+    const outOfPeriod = period => {
+      const interval = Interval.fromISO(`${period[0]}/${period[1]}`);
+      if (!interval.isValid) {
+        this.log.warn('Invalid noTradePeriods. Ignoring the config.');
+        return true;
+      }
+      return !interval.contains(current);
+    };
+    return brokerConfig.noTradePeriods.every(outOfPeriod);
   }
 
   private fold(quotes: Quote[], step: number): Quote[] {

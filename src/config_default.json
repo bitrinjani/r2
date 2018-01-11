@@ -5,7 +5,7 @@
   "maxSize": 0.01,
   "minSize": 0.01,
   "minTargetProfitPercent": 1.0,
-  "exitNetProfitRatio": 20, 
+  "exitNetProfitRatio": 20,
   "maxTargetVolumePercent": 50.0,
   "iterationInterval": 3000,
   "positionRefreshInterval": 5000,
@@ -40,7 +40,8 @@
       "maxLongPosition": 0.03,
       "maxShortPosition": 0,
       "cashMarginType": "Cash",
-      "commissionPercent": 0
+      "commissionPercent": 0,
+      "noTradePeriods": [["04:00", "04:15"]]
     },
     {
       "broker": "Quoine",

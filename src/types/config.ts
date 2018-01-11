@@ -25,6 +25,7 @@ export class BrokerConfig extends Castable implements BrokerConfigType {
   @cast cashMarginType: CashMarginType;
   @cast leverageLevel: number;
   @cast commissionPercent: number;
+  @cast @element(Array, String) noTradePeriods: string[][];
 }
 
 export class SlackConfig extends Castable {
