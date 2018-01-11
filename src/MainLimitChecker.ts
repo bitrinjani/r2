@@ -9,7 +9,7 @@ import { getLogger } from './logger';
 import * as _ from 'lodash';
 import t from './intl';
 import PositionService from './PositionService';
-import OrderImpl from './OrderImpl';
+import { calcProfit } from './pnl';
 
 export default class MainLimitChecker implements LimitChecker {
   private readonly log = getLogger(this.constructor.name);
@@ -83,7 +83,7 @@ class MinExitTargetProfitLimit implements LimitChecker {
     const { bestBid, bestAsk, targetVolume } = this.spreadAnalysisResult;
     const targetVolumeNotional = _.mean([bestAsk.price, bestBid.price]) * targetVolume;
     const { minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio } = this.configStore.config;
-    const openProfit = OrderImpl.calcProfit(pair, this.configStore.config).profit;
+    const openProfit = calcProfit(pair, this.configStore.config).profit;
     return _.max([
       minExitTargetProfit,
       minExitTargetProfitPercent !== undefined

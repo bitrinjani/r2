@@ -9,12 +9,10 @@ import {
   OrderStatus,
   Broker,
   Order,
-  Execution,
-  ConfigRoot
+  Execution
 } from './types';
 import { eRound } from './util';
 import t from './intl';
-import { findBrokerConfig } from './configUtil';
 
 export interface Init {
   broker: Broker;
@@ -85,18 +83,5 @@ export default class OrderImpl implements Order {
 
   toString(): string {
     return JSON.stringify(this);
-  }
-
-  static calculateCommission(price: number, volume: number, commissionPercent: number): number {
-    return commissionPercent !== undefined ? price * volume * (commissionPercent / 100) : 0;
-  }
-
-  static calcProfit(orders: OrderImpl[], config: ConfigRoot): { profit: number; commission: number } {
-    const commission = _(orders).sumBy(o => {
-      const brokerConfig = findBrokerConfig(config, o.broker);
-      return OrderImpl.calculateCommission(o.averageFilledPrice, o.filledSize, brokerConfig.commissionPercent);
-    });
-    const profit = _(orders).sumBy(o => (o.side === OrderSide.Sell ? 1 : -1) * o.filledNotional) - commission;
-    return { profit, commission };
   }
 }

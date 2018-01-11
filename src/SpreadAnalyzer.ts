@@ -17,6 +17,7 @@ import Decimal from 'decimal.js';
 import { findBrokerConfig } from './configUtil';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
 import OrderImpl from './OrderImpl';
+import { calcCommission } from './pnl';
 
 @injectable()
 export default class SpreadAnalyzer {
@@ -96,7 +97,7 @@ export default class SpreadAnalyzer {
   private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {
     return _(quotes).sumBy(q => {
       const brokerConfig = findBrokerConfig(this.configStore.config, q.broker);
-      return OrderImpl.calculateCommission(q.price, targetVolume, brokerConfig.commissionPercent);
+      return calcCommission(q.price, targetVolume, brokerConfig.commissionPercent);
     });
   }
 

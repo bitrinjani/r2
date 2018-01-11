@@ -19,6 +19,7 @@ import SingleLegHandler from './SingleLegHandler';
 import { findBrokerConfig } from './configUtil';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import { EventEmitter } from 'events';
+import { calcProfit } from './pnl';
 
 @injectable()
 export default class PairTrader extends EventEmitter {
@@ -124,7 +125,7 @@ export default class PairTrader extends EventEmitter {
   }
 
   private printProfit(orders: OrderImpl[]): void {
-    const { profit, commission } = OrderImpl.calcProfit(orders, this.configStore.config);
+    const { profit, commission } = calcProfit(orders, this.configStore.config);
     this.log.info(t`ProfitIs`, _.round(profit));
     if (commission !== 0) {
       this.log.info(t`CommissionIs`, _.round(commission));
