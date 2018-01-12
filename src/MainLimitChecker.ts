@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 import t from './intl';
 import PositionService from './PositionService';
 import { calcProfit } from './pnl';
+import * as fs from 'fs';
 
 export default class MainLimitChecker implements LimitChecker {
   private readonly log = getLogger(this.constructor.name);
@@ -136,7 +137,10 @@ class MinTargetProfitLimit implements LimitChecker {
   }
 
   private isTargetProfitLargeEnough(): boolean {
-    const config = this.configStore.config;
+    const { config } = this.configStore;
+    if (fs.existsSync('./src/opt/minTargetProfitPercent.txt')) {
+      config.minTargetProfitPercent = Number(fs.readFileSync('./src/opt/minTargetProfitPercent.txt', 'utf-8'));
+    }
     const { bestBid, bestAsk, targetVolume, targetProfit } = this.spreadAnalysisResult;
     const targetVolumeNotional = _.mean([bestAsk.price, bestBid.price]) * targetVolume;
     const effectiveMinTargetProfit = _.max([
