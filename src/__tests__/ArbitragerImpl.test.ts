@@ -189,8 +189,8 @@ describe('Arbitrager', () => {
   test('violate maxNetExposure', async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 400, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 400, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: -100,
         targetVolume: 1,
         targetProfit: -100
@@ -217,8 +217,8 @@ describe('Arbitrager', () => {
   test('Spread not inverted', async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 400, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 400, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: -100,
         targetVolume: 1,
         targetProfit: -100
@@ -245,8 +245,8 @@ describe('Arbitrager', () => {
     config.minTargetProfit = 1000;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -274,8 +274,8 @@ describe('Arbitrager', () => {
     config.minTargetProfitPercent = 18.4;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -303,8 +303,8 @@ describe('Arbitrager', () => {
     config.minTargetProfitPercent = 10;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -331,8 +331,8 @@ describe('Arbitrager', () => {
     config.maxTargetProfit = 99;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -359,8 +359,8 @@ describe('Arbitrager', () => {
     config.maxTargetProfitPercent = 15;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -388,8 +388,8 @@ describe('Arbitrager', () => {
     config.demoMode = true;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -420,8 +420,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -461,8 +461,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -501,8 +501,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -534,8 +534,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -573,8 +573,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -612,8 +612,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -650,8 +650,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -689,8 +689,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -728,8 +728,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -766,8 +766,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -804,8 +804,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -842,8 +842,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -880,8 +880,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -926,8 +926,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 1;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -972,8 +972,8 @@ describe('Arbitrager', () => {
       });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockReturnValue({
-      bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-      bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+      bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+      ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
       invertedSpread: 100,
       availableVolume: 1,
       targetVolume: 1,
@@ -1011,8 +1011,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1050,8 +1050,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1089,8 +1089,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1127,8 +1127,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1165,8 +1165,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1203,8 +1203,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1241,8 +1241,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1280,8 +1280,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1310,8 +1310,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1337,8 +1337,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1367,8 +1367,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1398,8 +1398,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1429,8 +1429,8 @@ describe('Arbitrager', () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1460,8 +1460,8 @@ describe('Arbitrager', () => {
     config.brokers[2].commissionPercent = 0.3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
-        bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+        bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
+        ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1698,8 +1698,8 @@ describe('Arbitrager', () => {
       .fn()
       .mockImplementationOnce(() => {
         return {
-          bestBid: toQuote('Quoine', QuoteSide.Bid, 600, 3),
-          bestAsk: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+          bid: toQuote('Quoine', QuoteSide.Bid, 600, 3),
+          ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
           invertedSpread: 100,
           availableVolume: 2,
           targetVolume: 1,
@@ -1708,8 +1708,8 @@ describe('Arbitrager', () => {
       })
       .mockImplementation(() => {
         return {
-          bestBid: toQuote('Quoine', QuoteSide.Bid, 700, 2),
-          bestAsk: toQuote('Coincheck', QuoteSide.Ask, 400, 1),
+          bid: toQuote('Quoine', QuoteSide.Bid, 700, 2),
+          ask: toQuote('Coincheck', QuoteSide.Ask, 400, 1),
           invertedSpread: 300,
           availableVolume: 1,
           targetVolume: 1,

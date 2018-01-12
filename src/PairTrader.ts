@@ -39,8 +39,8 @@ export default class PairTrader extends EventEmitter {
   }
 
   async trade(spreadAnalysisResult: SpreadAnalysisResult, closable: boolean): Promise<void> {
-    const { bestBid, bestAsk, targetVolume } = spreadAnalysisResult;
-    const sendTasks = [bestAsk, bestBid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
+    const { bid, ask, targetVolume } = spreadAnalysisResult;
+    const sendTasks = [ask, bid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
     const orders = await Promise.all(sendTasks);
     this.status = 'Sent';
     await this.checkOrderState(orders, closable);

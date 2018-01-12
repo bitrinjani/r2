@@ -7,7 +7,8 @@ import {
   OrderSide,
   Quote,
   BrokerPosition,
-  OrderPair
+  OrderPair,
+  SpreadStat
 } from './types';
 import { getLogger } from './logger';
 import * as _ from 'lodash';
@@ -56,34 +57,29 @@ export default class SpreadAnalyzer {
         .filter(q => new Decimal(q.volume).gte(closingPair[0].size))
         .value();
     }
-    const bestAsk = _(filteredQuotes)
-      .filter(q => q.side === QuoteSide.Ask)
-      .first();
-    const bestBid = _(filteredQuotes)
-      .filter(q => q.side === QuoteSide.Bid)
-      .last();
-    if (bestBid === undefined) {
+    const { ask, bid } = this.getBest(filteredQuotes);
+    if (bid === undefined) {
       throw new Error(t`NoBestBidWasFound`);
-    } else if (bestAsk === undefined) {
+    } else if (ask === undefined) {
       throw new Error(t`NoBestAskWasFound`);
     }
 
-    const invertedSpread = bestBid.price - bestAsk.price;
-    const availableVolume = _.floor(_.min([bestBid.volume, bestAsk.volume]) as number, LOT_MIN_DECIMAL_PLACE);
-    const allowedShortSize = positionMap[bestBid.broker].allowedShortSize;
-    const allowedLongSize = positionMap[bestAsk.broker].allowedLongSize;
+    const invertedSpread = bid.price - ask.price;
+    const availableVolume = _.floor(_.min([bid.volume, ask.volume]) as number, LOT_MIN_DECIMAL_PLACE);
+    const allowedShortSize = positionMap[bid.broker].allowedShortSize;
+    const allowedLongSize = positionMap[ask.broker].allowedLongSize;
     let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]) as number;
     targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
     if (closingPair) {
       targetVolume = closingPair[0].size;
     }
-    const commission = this.calculateTotalCommission([bestBid, bestAsk], targetVolume);
+    const commission = this.calculateTotalCommission([bid, ask], targetVolume);
     const targetProfit = _.round(invertedSpread * targetVolume - commission);
-    const midNotional = _.mean([bestAsk.price, bestBid.price]) * targetVolume;
+    const midNotional = _.mean([ask.price, bid.price]) * targetVolume;
     const profitPercentAgainstNotional = _.round(targetProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
     const spreadAnalysisResult = {
-      bestBid,
-      bestAsk,
+      bid,
+      ask,
       invertedSpread,
       availableVolume,
       targetVolume,
@@ -92,6 +88,83 @@ export default class SpreadAnalyzer {
     };
     this.log.debug(`Analysis done. Result: ${JSON.stringify(spreadAnalysisResult)}`);
     return spreadAnalysisResult;
+  }
+
+  async getSpreadStat(quotes: Quote[]): Promise<SpreadStat | undefined> {
+    const { config } = this.configStore;
+    const filteredQuotes = _(quotes)
+      .filter(q => new Decimal(q.volume).gte(config.minSize))
+      .orderBy(['price'])
+      .value();
+    const asks = _(filteredQuotes).filter(q => q.side === QuoteSide.Ask);
+    const bids = _(filteredQuotes).filter(q => q.side === QuoteSide.Bid);
+    if (asks.isEmpty() || bids.isEmpty()) {
+      return undefined;
+    }
+    const byBroker = _(filteredQuotes)
+      .groupBy(q => q.broker)
+      .mapValues(qs => {
+        const { ask, bid } = this.getBest(qs);
+        const spread = ask && bid ? ask.price - bid.price : undefined;
+        return { ask, bid, spread };
+      })
+      .value();
+    const flattened = _(byBroker)
+      .map((v, k) => [v.ask, v.bid])  
+      .flatten()      
+      .filter(q => q !== undefined)
+      .value() as Quote[];
+    const { ask: bestAsk, bid: bestBid } = this.getBest(flattened) as { ask: Quote, bid: Quote };
+    const { ask: worstAsk, bid: worstBid } = this.getWorst(flattened) as { ask: Quote, bid: Quote };
+    const bestCase = this.getEstimate(bestAsk, bestBid);
+    const worstCase = this.getEstimate(worstAsk, worstBid);
+    return {
+      byBroker,
+      bestCase,
+      worstCase
+    };
+  }
+
+  private getEstimate(ask: Quote, bid: Quote): SpreadAnalysisResult {
+    const invertedSpread = bid.price - ask.price;
+    const availableVolume = _.floor(_.min([bid.volume, ask.volume]) as number, LOT_MIN_DECIMAL_PLACE);
+    let targetVolume = _.min([availableVolume, this.configStore.config.maxSize]) as number;
+    targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
+    const commission = this.calculateTotalCommission([bid, ask], targetVolume);
+    const targetProfit = _.round(invertedSpread * targetVolume - commission);
+    const midNotional = _.mean([ask.price, bid.price]) * targetVolume;
+    const profitPercentAgainstNotional = _.round(targetProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
+    return {
+      ask,
+      bid,
+      invertedSpread,
+      availableVolume,
+      targetVolume,
+      targetProfit,
+      profitPercentAgainstNotional
+    };
+  }
+
+  private getBest(quotes: Quote[]) {
+    const ordered = _.orderBy(quotes, ['price']);
+    const ask = _(ordered)
+      .filter(q => q.side === QuoteSide.Ask)
+      .first();
+    const bid = _(ordered)
+      .filter(q => q.side === QuoteSide.Bid)
+      .last();
+    return { ask, bid };
+  }
+
+  private getWorst(quotes: Quote[]) {
+    const ordered = _.orderBy(quotes, ['price']);
+    const ask = _(ordered)
+      .filter(q => q.side === QuoteSide.Ask)
+      .last();
+    const bid = _(ordered)
+      .filter(q => q.side === QuoteSide.Bid)
+      .first();
+    return { ask, bid };
   }
 
   private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {

@@ -104,8 +104,8 @@ export default class OppotunitySearcher extends EventEmitter {
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
     const columnWidth = 17;
-    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), result.bestAsk.toString());
-    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), result.bestBid.toString());
+    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), result.ask.toString());
+    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), result.bid.toString());
     this.log.info('%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
     this.log.info('%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
     this.log.info('%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);

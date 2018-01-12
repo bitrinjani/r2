@@ -18,13 +18,19 @@ export interface BrokerMap<T> {
 export type OrderPair = [OrderImpl, OrderImpl];
 
 export interface SpreadAnalysisResult {
-  bestBid: Quote;
-  bestAsk: Quote;
+  bid: Quote;
+  ask: Quote;
   invertedSpread: number;
   availableVolume: number;
   targetVolume: number;
   targetProfit: number;
   profitPercentAgainstNotional: number;
+}
+
+export interface SpreadStat {
+  byBroker: { [x: string]: { ask?: Quote; bid?: Quote; spread?: number } };
+  bestCase: SpreadAnalysisResult;
+  worstCase: SpreadAnalysisResult;
 }
 
 export interface LimitChecker {
