@@ -1,10 +1,7 @@
 import { Container, decorate, injectable } from 'inversify';
 import symbols from './symbols';
 import Arbitrager from './Arbitrager';
-import {
-  ConfigStore,
-  ActivePairStore
-} from './types';
+import { ConfigStore, ActivePairStore, SpreadStatTimeSeries } from './types';
 import JsonConfigStore from './JsonConfigStore';
 import QuoteAggregator from './QuoteAggregator';
 import PositionService from './PositionService';
@@ -18,6 +15,8 @@ import OppotunitySearcher from './OpportunitySearcher';
 import PairTrader from './PairTrader';
 import SingleLegHandler from './SingleLegHandler';
 import { EventEmitter } from 'events';
+import { getSpreadStatTimeSeries } from './SpreadStatTimeSeries';
+import ReportService from './ReportService';
 
 decorate(injectable(), EventEmitter);
 
@@ -42,8 +41,10 @@ container.bind<LimitCheckerFactory>(LimitCheckerFactory).toSelf();
 container.bind<OppotunitySearcher>(OppotunitySearcher).toSelf();
 container.bind<PairTrader>(PairTrader).toSelf();
 container.bind<SingleLegHandler>(SingleLegHandler).toSelf();
+container.bind<ReportService>(ReportService).toSelf().inSingletonScope();
+container.bind<ActivePairStore>(symbols.ActivePairStore).toConstantValue(getActivePairStore(getChronoDB()));
 container
-  .bind<ActivePairStore>(symbols.ActivePairStore)
-  .toConstantValue(getActivePairStore(getChronoDB()));
+  .bind<SpreadStatTimeSeries>(symbols.SpreadStatTimeSeries)
+  .toConstantValue(getSpreadStatTimeSeries(getChronoDB()));
 
 export default container;

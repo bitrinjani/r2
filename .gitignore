@@ -16,3 +16,4 @@ config.json
 .idea
 .python-version
 datastore/
+reports/

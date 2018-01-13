@@ -31,7 +31,7 @@ export default class Arbitrager {
   async start(): Promise<void> {
     this.status = 'Starting';
     this.log.info(t`StartingArbitrager`);
-    this.quoteAggregator.onQuoteUpdated.push((quotes: Quote[]) => this.quoteUpdated(quotes));
+    this.quoteAggregator.onQuoteUpdated.set(this.constructor.name, quotes => this.quoteUpdated(quotes));
     this.status = 'Started';
     this.log.info(t`StartedArbitrager`);
   }
@@ -39,7 +39,7 @@ export default class Arbitrager {
   async stop(): Promise<void> {
     this.status = 'Stopping';
     this.log.info('Stopping Arbitrager...');
-    this.quoteAggregator.onQuoteUpdated = [];
+    this.quoteAggregator.onQuoteUpdated.delete(this.constructor.name);
     this.log.info('Stopped Arbitrager.');
     this.status = 'Stopped';
   }

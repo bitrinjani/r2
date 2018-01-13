@@ -36,7 +36,7 @@ export default class QuoteAggregator {
     this.log.debug('Stopped Quote Aggregator.');
   }
 
-  onQuoteUpdated: ((quotes: Quote[]) => Promise<void>)[] = [];
+  onQuoteUpdated: Map<string, ((quotes: Quote[]) => Promise<void>)> = new Map();
 
   private async aggregate(): Promise<void> {
     if (this.isRunning) {
@@ -64,7 +64,7 @@ export default class QuoteAggregator {
     this.quotes = value;
     this.log.debug('New quotes have been set.');
     this.log.debug('Calling onQuoteUpdated...');
-    const handlerTasks = this.onQuoteUpdated.map(handler => handler(this.quotes));
+    const handlerTasks = [...this.onQuoteUpdated.values()].map(handler => handler(this.quotes));
     await Promise.all(handlerTasks);
     this.log.debug('onQuoteUpdated done.');
   }

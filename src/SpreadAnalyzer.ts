@@ -119,6 +119,7 @@ export default class SpreadAnalyzer {
     const bestCase = this.getEstimate(bestAsk, bestBid);
     const worstCase = this.getEstimate(worstAsk, worstBid);
     return {
+      timestamp: Date.now(),
       byBroker,
       bestCase,
       worstCase

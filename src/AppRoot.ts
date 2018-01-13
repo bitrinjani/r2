@@ -9,12 +9,11 @@ import { closeChronoDB } from './chrono';
 import QuoteAggregator from './QuoteAggregator';
 import PositionService from './PositionService';
 import Arbitrager from './Arbitrager';
+import ReportService from './ReportService';
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
-  private quoteAggregator: QuoteAggregator;
-  private positionService: PositionService;
-  private arbitrager: Arbitrager;
+  private services: { start: () => Promise<void>; stop: () => Promise<void> }[];
 
   constructor(private readonly ioc: Container = container) {}
 
@@ -22,12 +21,15 @@ export default class AppRoot {
     try {
       this.log.info(t`StartingTheService`);
       await this.bindBrokers();
-      this.quoteAggregator = this.ioc.get(QuoteAggregator);
-      await this.quoteAggregator.start();
-      this.positionService = this.ioc.get(PositionService);
-      await this.positionService.start();
-      this.arbitrager = this.ioc.get(Arbitrager);
-      await this.arbitrager.start();
+      this.services = [
+        this.ioc.get(QuoteAggregator),
+        this.ioc.get(PositionService),
+        this.ioc.get(Arbitrager),
+        this.ioc.get(ReportService)
+      ];
+      for (const service of this.services) {
+        await service.start();
+      }
       this.log.info(t`SuccessfullyStartedTheService`);
     } catch (ex) {
       this.log.error(ex.message);
@@ -38,14 +40,8 @@ export default class AppRoot {
   async stop(): Promise<void> {
     try {
       this.log.info(t`StoppingTheService`);
-      if (this.arbitrager) {
-        await this.arbitrager.stop();
-      }
-      if (this.positionService) {
-        await this.positionService.stop();
-      }
-      if (this.quoteAggregator) {
-        await this.quoteAggregator.stop();
+      for (const service of this.services.slice().reverse()) {
+        await service.stop();
       }
       await closeChronoDB();
       this.log.info(t`SuccessfullyStoppedTheService`);
