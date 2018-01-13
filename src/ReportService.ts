@@ -12,8 +12,8 @@ const writeFile = promisify(fs.writeFile);
 
 @injectable()
 export default class ReportService {
-  static reportDir = `${process.cwd()}/reports`;
-  static spreadStatReport = `${ReportService.reportDir}/spreadStat.csv`;  
+  private reportDir = `${process.cwd()}/reports`;
+  private spreadStatReport = `${this.reportDir}/spreadStat.csv`;  
   private spreadStatWriteStream: fs.WriteStream;
 
   constructor(
@@ -23,11 +23,11 @@ export default class ReportService {
   ) {}
 
   async start() {
-    mkdirp.sync(ReportService.reportDir);
-    if (!fs.existsSync(ReportService.spreadStatReport)) {
-      await writeFile(ReportService.spreadStatReport, spreadStatCsvHeader, { flag: 'a' });
+    mkdirp.sync(this.reportDir);
+    if (!fs.existsSync(this.spreadStatReport)) {
+      await writeFile(this.spreadStatReport, spreadStatCsvHeader, { flag: 'a' });
     }
-    this.spreadStatWriteStream = fs.createWriteStream(ReportService.spreadStatReport, { flags: 'a' });
+    this.spreadStatWriteStream = fs.createWriteStream(this.spreadStatReport, { flags: 'a' });
     this.quoteAggregator.onQuoteUpdated.set(this.constructor.name, quotes => this.quoteUpdated(quotes));
   }
 
