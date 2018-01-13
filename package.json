@@ -1,10 +1,10 @@
 {
   "name": "r2",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "prestart": "rimraf dist && tsc && cpy src/config.json dist ",
+    "prestart": "rimraf dist && tsc",
     "start": "node ./dist | node ./dist/transport",
     "test": "npm run cov && cat ./coverage/lcov.info | coveralls",
     "jest": "jest --runInBand",

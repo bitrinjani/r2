@@ -5,7 +5,7 @@ import { readJsonFileSync } from './util';
 
 export function getConfigRoot(): ConfigRoot {
   let configPath =
-    process.env.NODE_ENV !== 'test' ? `${__dirname}/config.json` : `${__dirname}/__tests__/config_test.json`;
+    process.env.NODE_ENV !== 'test' ? `${process.cwd()}/config.json` : `${__dirname}/__tests__/config_test.json`;
   if (!fs.existsSync(configPath)) {
     configPath = path.join(process.cwd(), path.basename(configPath));
   }
