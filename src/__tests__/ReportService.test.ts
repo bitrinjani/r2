@@ -13,7 +13,6 @@ describe('ReportService', () => {
     ReportService.reportDir = `${__dirname}/reports`;
     ReportService.spreadStatReport = `${ReportService.reportDir}/spreadStatReport.csv`;
     rimraf.sync(ReportService.reportDir);
-    console.log(ReportService.spreadStatReport);
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries);
     await rs.start();
     expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
@@ -28,7 +27,6 @@ describe('ReportService', () => {
     mkdirp.sync(ReportService.reportDir);
     ReportService.reportDir = `${__dirname}/reports`;
     ReportService.spreadStatReport = `${ReportService.reportDir}/spreadStatReport.csv`;
-    console.log(ReportService.spreadStatReport);
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries);
     await rs.start();
     expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
@@ -43,7 +41,6 @@ describe('ReportService', () => {
     mkdirp.sync(ReportService.reportDir);
     ReportService.reportDir = `${__dirname}/reports`;
     ReportService.spreadStatReport = `${ReportService.reportDir}/spreadStatReport.csv`;
-    console.log(ReportService.spreadStatReport);
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries);
     await rs.start();
     expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
