@@ -64,9 +64,8 @@ export default class QuoteAggregator {
     this.quotes = value;
     this.log.debug('New quotes have been set.');
     this.log.debug('Calling onQuoteUpdated...');
-    for (const handler of this.onQuoteUpdated) {
-      await handler(this.quotes);
-    }
+    const handlerTasks = this.onQuoteUpdated.map(handler => handler(this.quotes));
+    await Promise.all(handlerTasks);
     this.log.debug('onQuoteUpdated done.');
   }
 
