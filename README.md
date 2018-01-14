@@ -56,14 +56,15 @@ R2 supports three exchanges operated in Japan.
 |Coincheck|✔️|✔️|
 
 ## How it works
-1. Every 3 seconds, R2 concurrently fetches quotes from exchanges.
-1. Verifies if the max net exposure (`maxNetExposure` config) is not breached.
+1. Every 3 seconds, R2 downloads quotes from exchanges.
 1. Filters out quotes that are not usable for arbitrage. For example, if `maxShortPosition` config is 0 and the current position is 0 for a broker, the ask quotes for the broker will be filtered out.
-1. Calculates the best ask and the best bid from the filtered quotes. If there is no arbitrage opportunity, R2 waits for the next iteration.
-1. Verifies if there is enough expected profit. If the expected profit is smaller than `minTargetProfit` config, R2 waits for the next iteration.
+1. Calculates the best ask and the best bid from the filtered quotes and checks if the expected profit is larger than the configured minimum value, `minTargetProfitPercent`. If there is no arbitrage opportunity, R2 waits for the next iteration.
 1. R2 concurrently sends a buy leg and a sell leg to each broker that offered the best bid or the best ask.
 1. R2 checks whether the legs are filled or not for the configured period, say 30 seconds.
 1. If the both legs are filled, shows the profit.
+
+After the spread has became smaller than the configured value, `exitNetProfitRatio`, R2 tries to close the pair.
+
 
 ## Architecture Overview
 
@@ -81,14 +82,11 @@ All configurations are stored in `config.json`.
 |priceMergeSize|number|Merges small quotes into the specified price ladder before analyzing arbitrage opportunity.|
 |maxSize|number|Maximum BTC size to be sent to a broker.|
 |minSize|number|Minimum BTC size to be sent to a broker.|
-|minTargetProfit|number|Minimum target profit in JPY. R2 attempts arbitrage if the expected profit calculated from current quotes is larger than minTargetProfit.|
-|minTargetProfitPercent|number|Minimum target profit in percent against notional. Profit percentage against notional is calculated by `100 * profit / (MID price * volume)`. When both minTargetProfit and minTargetProfitPercent is greater than zero, the larger one is effective.|
+|minTargetProfitPercent|number|Minimum target profit in percent against notional. Profit percentage against notional is calculated by `100 * profit / (MID price * volume)`.|
 |maxTargetProfit|number|[Optional] Max target profit. This is a safe-guard for abnormal quotes. If the expected profit is larger than this, R2 won't attempt arbitrage.|
 |maxTargetProfitPercent|number|[Optional] Max target profit in percent.|
-|minExitTargetProfit|number|Min target profit for closing order pairs. If the expected profit of closing existing pairs is larger than minExitTargetProfit, R2 attempts to close the pair.|
-|minExitTargetProfitPercent|number|[Optional] Min target profit in percent for closing order pairs.|
-|exitNetProfitRatio|number|[Optional] R2 attempts to close open pairs when the spread has decreased by this percentage. For example, when the open profit of an open pair is 200 JPY and exitNetProfitRatio is 20(%), R2 closes the pair once the closing cost has became 160.|
-|maxTargetVolumePercent|number| In order to execute orders as fast as possible and avoid slippage, R2 checks the volume of the quotes from the exchanges and makes sure the target volume consumes less than this percentage of the volume of the target quote before executing the order|
+|exitNetProfitRatio|number|R2 attempts to close open pairs when the spread has decreased by this percentage. For example, when the open profit of an open pair is 200 JPY and exitNetProfitRatio is 20(%), R2 closes the pair once the closing cost has became 160.|
+|maxTargetVolumePercent|number|[Optional]  In order to execute orders as fast as possible and avoid slippage, R2 checks the volume of the quotes from the exchanges and makes sure the target volume consumes less than this percentage of the volume of the target quote before executing the order|
 |iterationInterval|Millisecond|Time lapse in milliseconds of an iteration. When it's set to 3000, the quotes fetch and the spreads analysis for all the brokers are done every 3 seconds|
 |positionRefreshInterval|Millisecond|Time lapse in milliseconds of position data refresh. Position data is used to check max exposure and long/short availability for each broker.|
 |sleepAfterSend|Millisecond|Time lapse in milliseconds after one arbitrage is done.|
