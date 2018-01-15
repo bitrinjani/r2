@@ -51,9 +51,11 @@ R2 supports three exchanges operated in Japan.
 
 |Exchange|Cash|Margin|
 |----|------|-----------|
-|bitFlyer|✔️| |
+|bitFlyer|✔️|✔️*|
 |Quoine|✔️|✔️|
 |Coincheck|✔️|✔️|
+
+*bitFlyer Margin (BTC-FX/JPY) is available as an optional [broker plugin](https://github.com/bitrinjani/bitflyer-fx), not included in this repository.
 
 ## How it works
 1. Every 3 seconds, R2 downloads quotes from exchanges.
