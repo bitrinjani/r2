@@ -89,6 +89,7 @@ CoincheckのcashMarginTypeをNetOutに設定すると、裁定プロセスはオ
 取引を禁止する期間を ["開始時間", "終了時間"] の形式で記述します。その期間、その取引所からの価格配信を除外し価格が配信されていないものとみなします。例えば、bitFlyerの定期メンテナンス時間を除外するために利用できます。
 
 - 例: 一つだけの期間4:00-4:15を禁止したい場合
+
 ```json
     {
       "broker": "Bitflyer",
@@ -98,6 +99,7 @@ CoincheckのcashMarginTypeをNetOutに設定すると、裁定プロセスはオ
 ```
 
 - 例: 複数の期間を禁止したい場合
+
 ```json
     {
       "broker": "Bitflyer",
