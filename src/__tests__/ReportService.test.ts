@@ -10,8 +10,9 @@ describe('ReportService', () => {
     const quoteAggregator = { onQuoteUpdated: new Map() };
     const spreadAnalyzer = { getSpreadStat: jest.fn() };
     const timeSeries = { put: jest.fn() };
+    const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     rs.reportDir = `${__dirname}/reports`;
     rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;
     rimraf.sync(rs.reportDir);
@@ -25,8 +26,9 @@ describe('ReportService', () => {
     const quoteAggregator = { onQuoteUpdated: new Map() };
     const spreadAnalyzer = { getSpreadStat: jest.fn() };
     const timeSeries = { put: jest.fn() };
+    const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
     rs.reportDir = `${__dirname}/reports`;
     rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;
@@ -40,8 +42,9 @@ describe('ReportService', () => {
     const quoteAggregator = { onQuoteUpdated: new Map() };
     const spreadAnalyzer = { getSpreadStat: jest.fn() };
     const timeSeries = { put: jest.fn() };
+    const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
     rs.reportDir = `${__dirname}/reports`;
     rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;
@@ -62,8 +65,9 @@ describe('ReportService', () => {
       }
     } as any);
     const timeSeries = { put: jest.fn() };
+    const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
     rs.reportDir = `${__dirname}/reports`;
     rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;

@@ -1,5 +1,5 @@
 import BrokerPositionImpl from '../BrokerPositionImpl';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 options.enabled = false;
 
 describe('BrokerPosition', () => {

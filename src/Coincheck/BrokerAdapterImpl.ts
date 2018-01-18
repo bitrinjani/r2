@@ -1,4 +1,4 @@
-﻿import { getLogger } from '../logger';
+﻿import { getLogger } from '@bitr/logger';
 import { addMinutes } from 'date-fns';
 import * as _ from 'lodash';
 import BrokerApi from './BrokerApi';

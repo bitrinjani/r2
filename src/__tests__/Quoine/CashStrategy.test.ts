@@ -2,7 +2,7 @@ import CashStrategy from '../../Quoine/CashStrategy';
 import BrokerApi from '../../Quoine/BrokerApi';
 import nocksetup from './nocksetup';
 import * as nock from 'nock';
-import { options } from '../../logger';
+import { options } from '@bitr/logger';
 options.enabled = false;
 
 describe('Quoine.CashStrategy', () => {

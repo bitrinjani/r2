@@ -1,5 +1,5 @@
 import MainLimitChecker from '../MainLimitChecker';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 options.enabled = false;
 
 describe('MainLimitChecker', () => {

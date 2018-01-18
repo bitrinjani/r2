@@ -11,7 +11,7 @@
   Quote,
   BrokerConfigType
 } from '../types';
-import { getLogger } from '../logger';
+import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import BrokerApi from './BrokerApi';
 import { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from './types';

@@ -69,6 +69,11 @@ export class ProceedOption extends Castable {
   @cast ttl: number;
 }
 
+export class Analytics extends Castable {
+  @cast enabled: boolean;
+  @cast days: number;
+}
+
 export class ConfigRoot extends Castable {
   @cast language: string;
   @cast demoMode: boolean;
@@ -90,6 +95,7 @@ export class ConfigRoot extends Castable {
   @cast maxRetryCount: number;
   @cast orderStatusCheckInterval: number;
   @cast onSingleLeg: OnSingleLegConfig;
+  @cast analytics: Analytics;
   @cast
   @element(BrokerConfig)
   brokers: BrokerConfig[];

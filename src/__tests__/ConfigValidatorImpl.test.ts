@@ -1,6 +1,6 @@
 import ConfigValidator from '../ConfigValidator';
 import { ConfigRoot } from '../types';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 options.enabled = false;
 
 const config: ConfigRoot = require('./config_test.json');

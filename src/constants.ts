@@ -9,3 +9,6 @@ export const fatalErrors = [
   'Conditions and Trading Rules before continuing',
   'product_disabled'
 ];
+export const configStoreSocketUrl = 'tcp://127.0.0.1:3012';
+export const reportServicePubUrl = 'tcp://127.0.0.1:3010';
+export const reportServiceRepUrl = 'tcp://127.0.0.1:3011';

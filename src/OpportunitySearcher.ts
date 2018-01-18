@@ -1,4 +1,4 @@
-import { getLogger } from './logger';
+import { getLogger } from '@bitr/logger';
 import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
 import { ConfigStore, SpreadAnalysisResult, ActivePairStore, Quote, OrderPair } from './types';

@@ -88,3 +88,11 @@ export function toExecution(order: Order): Partial<Execution> {
 export function toQuote(broker: Broker, side: QuoteSide, price: number, volume: number) {
   return { broker, side, price, volume };
 }
+
+export function parseBuffer<T>(buffer: Buffer): T | undefined {
+  try {
+    return JSON.parse(buffer.toString());
+  } catch (ex) {
+    return undefined;
+  }
+}

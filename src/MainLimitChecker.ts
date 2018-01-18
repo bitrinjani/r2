@@ -5,7 +5,7 @@ import {
   LimitChecker,
   OrderPair
 } from './types';
-import { getLogger } from './logger';
+import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import t from './intl';
 import PositionService from './PositionService';

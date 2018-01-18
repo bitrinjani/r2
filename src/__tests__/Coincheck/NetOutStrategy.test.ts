@@ -5,7 +5,7 @@ import nocksetup from './nocksetup';
 import OrderImpl from '../../OrderImpl';
 import { NewOrderRequest } from '../../Coincheck/types';
 import * as nock from 'nock';
-import { options } from '../../logger';
+import { options } from '@bitr/logger';
 import { createOrder } from '../helper';
 options.enabled = false;
 

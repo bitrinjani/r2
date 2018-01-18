@@ -1,4 +1,4 @@
-﻿import { getLogger } from './logger';
+﻿import { getLogger } from '@bitr/logger';
 import t from './intl';
 import 'reflect-metadata';
 import container from './container';

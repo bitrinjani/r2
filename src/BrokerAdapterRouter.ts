@@ -1,5 +1,5 @@
 ﻿import { Broker, BrokerAdapter, BrokerMap, Order, Quote } from './types';
-import { getLogger } from './logger';
+import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import { injectable, multiInject } from 'inversify';
 import symbols from './symbols';

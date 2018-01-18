@@ -1,6 +1,6 @@
 import { Container } from 'inversify';
 import AppRoot from '../AppRoot';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 import { getConfigRoot } from '../configUtil';
 import symbols from '../symbols';
 options.enabled = false;

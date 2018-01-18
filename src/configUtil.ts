@@ -4,12 +4,15 @@ import { ConfigRoot, Broker, BrokerConfig } from './types';
 import { readJsonFileSync } from './util';
 
 export function getConfigRoot(): ConfigRoot {
-  let configPath =
-    process.env.NODE_ENV !== 'test' ? `${process.cwd()}/config.json` : `${__dirname}/__tests__/config_test.json`;
+  let configPath = getConfigPath();
   if (!fs.existsSync(configPath)) {
     configPath = path.join(process.cwd(), path.basename(configPath));
   }
   return new ConfigRoot(readJsonFileSync(configPath));
+}
+
+export function getConfigPath(): string {
+  return process.env.NODE_ENV !== 'test' ? `${process.cwd()}/config.json` : `${__dirname}/__tests__/config_test.json`;
 }
 
 export function findBrokerConfig(configRoot: ConfigRoot, broker: Broker): BrokerConfig {
