@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { ConfigStore, ConfigRoot } from './types';
+import { ConfigStore, ConfigRoot, ConfigRequest } from './types';
 import { getConfigRoot, getConfigPath } from './configUtil';
 import ConfigValidator from './ConfigValidator';
 import { setTimeout } from 'timers';
@@ -15,35 +15,18 @@ const writeFile = promisify(fs.writeFile);
 
 @injectable()
 export default class JsonConfigStore implements ConfigStore {
-  timer: NodeJS.Timer;
   private readonly log = getLogger(this.constructor.name);
-  private readonly pullSocket: Socket;
-  private TTL = 5 * 1000;
+  private timer: NodeJS.Timer;
+  private readonly server: Socket;
+  private readonly TTL = 5 * 1000;
   private cache?: ConfigRoot;
 
   constructor(private readonly configValidator: ConfigValidator) {
-    this.pullSocket = socket('pull');
-    this.pullSocket.connect(configStoreSocketUrl);
-    this.pullSocket.on('message', async message => {
-      try {
-        const newConfig = parseBuffer(message);
-        if (newConfig === undefined) {
-          this.log.debug(`Invalid message received. Message: ${message.toString()}`);
-          return;
-        }
-        await this.setConfig(_.merge({}, getConfigRoot(), newConfig));
-        this.log.debug(`Config updated with ${JSON.stringify(newConfig)}`);
-      } catch (ex) {
-        this.log.warn(`Failed to write config. Error: ${ex.message}`);
-        this.log.debug(ex.stack);
-      }
-    }); 
+    this.server = socket('rep');
+    this.server.on('message', message => this.messageHandler(message));
+    this.server.bindSync(configStoreSocketUrl);
   }
 
-  close() {
-    this.pullSocket.close();
-  }
-  
   get config(): ConfigRoot {
     if (this.cache) {
       return this.cache;
@@ -54,10 +37,41 @@ export default class JsonConfigStore implements ConfigStore {
     return config;
   }
 
-  private async setConfig(config: ConfigRoot) {
+  async set(config: ConfigRoot) {
     this.configValidator.validate(config);
     await writeFile(getConfigPath(), JSON.stringify(config, undefined, 2));
     this.updateCache(config);
+  }
+
+  close() {
+    this.server.close();
+  }
+
+  private async messageHandler(message: Buffer) {
+    const parsed = parseBuffer<ConfigRequest>(message);
+    if (parsed === undefined) {
+      this.log.debug(`Invalid message received. Message: ${message.toString()}`);
+      return;
+    }
+    switch (parsed.type) {
+      case 'set':
+        try {
+          const newConfig = parsed.data;
+          await this.set(_.merge({}, getConfigRoot(), newConfig));
+          this.server.send(JSON.stringify({ success: true }));
+          this.log.debug(`Config updated with ${JSON.stringify(newConfig)}`);
+        } catch (ex) {
+          this.log.warn(`Failed to update config. Error: ${ex.message}`);
+          this.log.debug(ex.stack);
+        }
+        break;
+      case 'get':
+        this.server.send(JSON.stringify(getConfigRoot()));
+        break;
+      default:
+        this.log.warn(`ConfigStore received an invalid message. Message: ${parsed}`);
+        break;
+    }
   }
 
   private updateCache(config: ConfigRoot) {

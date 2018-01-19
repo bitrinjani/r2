@@ -81,6 +81,7 @@
       "**/*.{ts,tsx}",
       "!src/index.ts",
       "!src/transport/index.ts",
+      "!src/container.config.ts",
       "!**/__tests__/**",
       "!**/node_modules/**",
       "!**/vendor/**",

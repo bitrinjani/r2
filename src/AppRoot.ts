@@ -1,7 +1,6 @@
 ﻿import { getLogger } from '@bitr/logger';
 import t from './intl';
 import 'reflect-metadata';
-import container from './container';
 import symbols from './symbols';
 import { BrokerAdapter, ConfigStore } from './types';
 import { Container } from 'inversify';
@@ -15,7 +14,7 @@ export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
   private services: { start: () => Promise<void>; stop: () => Promise<void> }[];
 
-  constructor(private readonly ioc: Container = container) {}
+  constructor(private readonly ioc: Container) {}
 
   async start(): Promise<void> {
     try {

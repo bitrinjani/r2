@@ -1,8 +1,9 @@
 import AppRoot from './AppRoot';
 import { exec } from 'child_process';
+import container from './container.config';
 
 process.title = 'r2app';
-const app = new AppRoot();
+const app = new AppRoot(container);
 app.start();
 
 function exit(code: number = 0) {

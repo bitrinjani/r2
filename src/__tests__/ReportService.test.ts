@@ -1,11 +1,16 @@
 import ReportService from '../ReportService';
 import * as rimraf from 'rimraf';
 import * as mkdirp from 'mkdirp';
-import { toQuote } from '../util';
+import { toQuote, cwd } from '../util';
 import { QuoteSide } from '../types';
 import SpreadAnalyzer from '../SpreadAnalyzer';
 
 describe('ReportService', () => {
+  afterAll(() => {
+    // delete sandbox
+    rimraf.sync(cwd());
+  });
+
   test('start/stop', async () => {
     const quoteAggregator = { onQuoteUpdated: new Map() };
     const spreadAnalyzer = { getSpreadStat: jest.fn() };
@@ -13,8 +18,7 @@ describe('ReportService', () => {
     const config = {};
 
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    rs.reportDir = `${__dirname}/reports`;
-    rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;
+    console.log(rs.spreadStatReport);
     rimraf.sync(rs.reportDir);
     await rs.start();
     expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
@@ -30,8 +34,6 @@ describe('ReportService', () => {
 
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
-    rs.reportDir = `${__dirname}/reports`;
-    rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;
     await rs.start();
     expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
     await rs.stop();
@@ -46,8 +48,6 @@ describe('ReportService', () => {
 
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
-    rs.reportDir = `${__dirname}/reports`;
-    rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;
     await rs.start();
     expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
     await quoteAggregator.onQuoteUpdated.get(ReportService.name)([]);
@@ -69,8 +69,6 @@ describe('ReportService', () => {
 
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
-    rs.reportDir = `${__dirname}/reports`;
-    rs.spreadStatReport = `${rs.reportDir}/spreadStatReport.csv`;
     await rs.start();
     expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
     await quoteAggregator.onQuoteUpdated.get(ReportService.name)([

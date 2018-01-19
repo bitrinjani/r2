@@ -69,9 +69,10 @@ export class ProceedOption extends Castable {
   @cast ttl: number;
 }
 
-export class Analytics extends Castable {
+export class AnalyticsConfig extends Castable {
   @cast enabled: boolean;
-  @cast days: number;
+  @cast fileName: string;
+  @cast initialHistory: object;
 }
 
 export class ConfigRoot extends Castable {
@@ -95,7 +96,7 @@ export class ConfigRoot extends Castable {
   @cast maxRetryCount: number;
   @cast orderStatusCheckInterval: number;
   @cast onSingleLeg: OnSingleLegConfig;
-  @cast analytics: Analytics;
+  @cast analytics: AnalyticsConfig;
   @cast
   @element(BrokerConfig)
   brokers: BrokerConfig[];

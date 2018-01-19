@@ -96,3 +96,7 @@ export function parseBuffer<T>(buffer: Buffer): T | undefined {
     return undefined;
   }
 }
+
+export function cwd() {
+  return process.env.NODE_ENV === 'test' ? `${process.cwd()}/src/__tests__/sandbox` : process.cwd();
+}

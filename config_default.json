@@ -21,6 +21,11 @@
       "ttl": 3000
     }
   },
+  "analytics": {
+    "enabled": false,
+    "fileName": "SampleHandler.js",
+    "initialHistory": { "minutes": 30 }
+  },
   "brokers": [
     {
       "broker": "Coincheck",
