@@ -42,7 +42,9 @@ describe('JsonConfigStore', () => {
       console.log(ex);
       expect(true).toBe(false);
     } finally {
-      store.close();
+      if (store) { 
+        store.close();
+      }
     }
   });
 
