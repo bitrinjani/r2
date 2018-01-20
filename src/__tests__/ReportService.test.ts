@@ -89,7 +89,7 @@ describe('ReportService', () => {
     const config = {
       analytics: {
         enabled: true,
-        fileName: 'SimpleSpreadStatHandler.js',
+        plugin: 'SimpleSpreadStatHandler.js',
         initialHistory: { minutes: 10 }
       }
     };
@@ -108,7 +108,7 @@ describe('ReportService', () => {
       maxSize: 100,
       analytics: {
         enabled: true,
-        fileName: 'SimpleSpreadStatHandler.js',
+        plugin: 'SimpleSpreadStatHandler.js',
         initialHistory: { minutes: 10 }
       },
       brokers: [{ broker: 'Coincheck', commissionPercent: 0 }, { broker: 'Quoine', commissionPercent: 0 }]
@@ -137,7 +137,7 @@ describe('ReportService', () => {
       maxSize: 100,
       analytics: {
         enabled: true,
-        fileName: 'SimpleSpreadStatHandler.js',
+        plugin: 'SimpleSpreadStatHandler.js',
         initialHistory: { minutes: 10 }
       },
       brokers: [{ broker: 'Coincheck', commissionPercent: 0 }, { broker: 'Quoine', commissionPercent: 0 }]
@@ -165,7 +165,7 @@ describe('ReportService', () => {
       maxSize: 100,
       analytics: {
         enabled: true,
-        fileName: 'SimpleSpreadStatHandler.js',
+        plugin: 'SimpleSpreadStatHandler.js',
         initialHistory: { minutes: 10 }
       },
       brokers: [{ broker: 'Coincheck', commissionPercent: 0 }, { broker: 'Quoine', commissionPercent: 0 }]

@@ -23,7 +23,7 @@
   },
   "analytics": {
     "enabled": false,
-    "fileName": "SampleHandler.js",
+    "plugin": "SimpleSpreadStatHandler.js",
     "initialHistory": { "minutes": 30 }
   },
   "brokers": [

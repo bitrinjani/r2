@@ -71,7 +71,7 @@ export class ProceedOption extends Castable {
 
 export class AnalyticsConfig extends Castable {
   @cast enabled: boolean;
-  @cast fileName: string;
+  @cast plugin: string;
   @cast initialHistory: object;
 }
 

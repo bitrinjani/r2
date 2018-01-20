@@ -70,8 +70,7 @@ export default class ReportService {
     this.log.debug('Stopping ReportService...');
     this.quoteAggregator.onQuoteUpdated.delete(this.constructor.name);
     this.spreadStatWriteStream.close();
-    const { analytics } = this.configStore.config;
-    if (analytics && analytics.enabled) {
+    if (this.analyticsProcess) {
       await promisify(this.analyticsProcess.send).bind(this.analyticsProcess)('stop');
       this.analyticsProcess.kill();
       this.streamPublisher.unbindSync(reportServicePubUrl);
@@ -90,7 +89,7 @@ export default class ReportService {
       await this.spreadStatTimeSeries.put(stat);
       await promisify(this.spreadStatWriteStream.write).bind(this.spreadStatWriteStream)(spreadStatToCsv(stat));
       const { analytics } = this.configStore.config;
-      if (analytics && analytics.enabled) {
+      if (analytics && analytics.enabled && this.analyticsProcess.connected) {
         this.streamPublisher.send(['spreadStat', JSON.stringify(stat)]);
       }
     }

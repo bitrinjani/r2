@@ -10,8 +10,8 @@ class SimpleSpreadStatHandler {
     this.log = getLogger(this.constructor.name);
     const profitPercentHistory = history.map(x => x.bestCase.profitPercentAgainstNotional);
     this.sampleSize = profitPercentHistory.length;
-    this.profitPercentMean = ss.mean(profitPercentHistory);
-    this.profitPercentVariance = ss.sampleVariance(profitPercentHistory);
+    this.profitPercentMean = this.sampleSize != 0 ? ss.mean(profitPercentHistory) : 0;
+    this.profitPercentVariance = this.sampleSize != 0 ? ss.sampleVariance(profitPercentHistory) : 0;
   }
 
   // The method is called each time new spread stat has arrived, by default every 3 seconds.
@@ -38,6 +38,9 @@ class SimpleSpreadStatHandler {
     const mean = this.profitPercentMean;
     const standardDeviation = Math.sqrt(this.profitPercentVariance * n/(n-1));
     const minTargetProfitPercent = _.round(mean + standardDeviation, precision);
+    if (_.isNaN(minTargetProfitPercent)) {
+      return undefined;
+    }
     this.log.info(
       `μ: ${_.round(mean, precision)}, σ: ${_.round(
         standardDeviation,

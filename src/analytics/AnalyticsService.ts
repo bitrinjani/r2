@@ -38,6 +38,7 @@ export default class AnalyticsService {
     this.streamSubscriber.on('message', (topic, message) => this.handleStream(topic, message));
     process.on('message', message => {
       if (message === 'stop') {
+        this.log.info('Analysis process received stop message.');
         this.stop();
       }
     });
@@ -58,7 +59,7 @@ export default class AnalyticsService {
       this.configRequester.once('message', resolve);
       this.configRequester.send(JSON.stringify({ type: 'get' }));
     });
-    const parsed = parseBuffer<{ success: boolean, data: ConfigRoot }>(reply);
+    const parsed = parseBuffer<{ success: boolean; data: ConfigRoot }>(reply);
     if (parsed === undefined || !parsed.success) {
       throw new Error('Analytics failed to get the config.');
     }
@@ -70,7 +71,7 @@ export default class AnalyticsService {
     if (snapshot === undefined) {
       throw new Error('Failed to parse the initial snapshot message.');
     }
-    const SpreadStatHandler = await import(`${this.pluginDir}/${this.config.fileName}`);
+    const SpreadStatHandler = await import(`${this.pluginDir}/${this.config.plugin}`);
     return new SpreadStatHandler(snapshot);
   }
 
@@ -85,12 +86,14 @@ export default class AnalyticsService {
         const spreadStat = parseBuffer<SpreadStat>(message);
         if (spreadStat) {
           const config = await this.spreadStatHandler.handle(spreadStat);
-          this.log.debug(`Sending to config store... ${JSON.stringify(config)}`);
-          const reply = await new Promise<Buffer>(resolve => {
-            this.configRequester.once('message', resolve);
-            this.configRequester.send(JSON.stringify({ type: 'set', data: config }));
-          });
-          this.log.debug(`Reply from config store: ${reply}`);
+          if (config) {
+            this.log.debug(`Sending to config store... ${JSON.stringify(config)}`);
+            const reply = await new Promise<Buffer>(resolve => {
+              this.configRequester.once('message', resolve);
+              this.configRequester.send(JSON.stringify({ type: 'set', data: config }));
+            });
+            this.log.debug(`Reply from config store: ${reply}`);
+          }
         }
       }
     } catch (ex) {
