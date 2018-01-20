@@ -3,14 +3,13 @@
 Analyticsサービスは、過去のスプレッド統計データをリアルタイムで受け取り解析し、その結果にもとづき設定を書き換えます。
 
 - ユーザー作成のJavaScriptプラグインがデータ解析を行う
-- 統計処理用のnpmモジュール(simple-statistics等)がプラグインから利用可能
+- 任意のnpmモジュール(統計処理用のsimple-statistics等)がプラグインから利用可能
 - Analyticsサービスは裁定プロセスとは別のプロセスで動作するため、プラグインがクラッシュしたとしても本体には影響しない
 
 ## Getting Started
 
-サンプルプラグインとして、`plugins/SimpleSpreadStatHandler.js`が用意されています。
+サンプルプラグインとして、`plugins/SimpleSpreadStatHandler.js`をリポジトリに含めています。
 このプラグインは、過去データから反転スプレッド割合(%)の平均値と標準偏差を求め、平均値 + 標準偏差を`config.json`の`minTargetProfitPercent`に設定します。
-ここで、反転スプレッド割合(%)は `100 * (best bid - best ask) / (best bidとbest ask の平均値)`と定義しています。
 
 このサンプルプラグインを有効化するには、`config.json`に以下の設定を追加します。(例は`config_default.json`を参照)
 
@@ -50,7 +49,7 @@ initialHistoryのフォーマットは、[luxonのDuration.fromObject](https://m
 
 ## Plugin specifications
 
-プラグインとなるjsファイルは、以下の条件を満たすクラスを`module.exports`にアサインする必要があります。
+プラグインとなるjsファイルは、以下の条件を満たすクラスを定義し`module.exports`にアサインする必要があります。
 
 - コンストラクタで過去のスプレッド統計データ(SpreadStat[])を受け取りプラグイン自身を初期化する。
 - handleメソッドでリアルタイムのスプレッド統計データ(SpreadStat)を受け取る。データ解析後、変更したい部分の設定を返す。設定変更を行わないときは`undefined`を返す。`async`をつけるか、Promiseで戻り値を包む必要がある。
