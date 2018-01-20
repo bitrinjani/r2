@@ -1,4 +1,4 @@
-# Analytics plugin system
+# Analytics Plugin System
 
 Analyticsサービスは、過去のスプレッド統計データをリアルタイムで受け取り解析し、その結果にもとづき設定を書き換えます。
 
@@ -47,13 +47,15 @@ initialHistoryは分単位にかぎらず、以下のような設定も可能で
 
 initialHistoryのフォーマットは、[luxonのDuration.fromObject](https://moment.github.io/luxon/docs/class/src/duration.js~Duration.html) に準じます。
 
-## Plugin specifications
+## Plugin Specifications
 
 プラグインとなるjsファイルは、以下の条件を満たすクラスを定義し`module.exports`にアサインする必要があります。
 
 - コンストラクタで過去のスプレッド統計データ(SpreadStat[])を受け取りプラグイン自身を初期化する。
 - handleメソッドでリアルタイムのスプレッド統計データ(SpreadStat)を受け取る。データ解析後、変更したい部分の設定を返す。設定変更を行わないときは`undefined`を返す。`async`をつけるか、Promiseで戻り値を包む必要がある。
 - 純粋なnode.jsモジュールとして記述する。(TypeScriptではなく、ローカルのnode.jsでそのまま動作するJavaScript)
+
+SpreadStat型の定義は以下です。
 
 ```typescript
 interface SpreadStat {
@@ -74,7 +76,7 @@ interface SpreadAnalysisResult {
 }
 ```
 
-自作プラグインで利用したい外部npmモジュールがあるときは、ローカルのリポジトリで通常通り`npm install <npmモジュール>`してプラグイン内で`require`すれば読み込まれます。
+自作プラグインで利用したい外部npmモジュールがあるときは、ローカルのリポジトリで`npm install <npmモジュール>`し、プラグイン内で`require`すれば読み込まれます。
 
 例: SimpleSpreadStatHandler.js
 
