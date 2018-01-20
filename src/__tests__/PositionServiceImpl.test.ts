@@ -3,7 +3,7 @@ import PositionService from '../PositionService';
 import { Broker } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 options.enabled = false;
 
 const config = {

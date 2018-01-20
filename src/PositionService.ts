@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { ConfigStore, BrokerConfig, BrokerMap, BrokerPosition } from './types';
-import { getLogger } from './logger';
+import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import Decimal from 'decimal.js';
 import BrokerPositionImpl from './BrokerPositionImpl';

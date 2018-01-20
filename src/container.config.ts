@@ -41,7 +41,10 @@ container.bind<LimitCheckerFactory>(LimitCheckerFactory).toSelf();
 container.bind<OppotunitySearcher>(OppotunitySearcher).toSelf();
 container.bind<PairTrader>(PairTrader).toSelf();
 container.bind<SingleLegHandler>(SingleLegHandler).toSelf();
-container.bind<ReportService>(ReportService).toSelf().inSingletonScope();
+container
+  .bind<ReportService>(ReportService)
+  .toSelf()
+  .inSingletonScope();
 container.bind<ActivePairStore>(symbols.ActivePairStore).toConstantValue(getActivePairStore(getChronoDB()));
 container
   .bind<SpreadStatTimeSeries>(symbols.SpreadStatTimeSeries)

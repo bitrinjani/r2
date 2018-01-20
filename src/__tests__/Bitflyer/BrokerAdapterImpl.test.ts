@@ -5,7 +5,7 @@ import BrokerAdapterImpl from '../../Bitflyer/BrokerAdapterImpl';
 import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType, TimeInForce, BrokerConfigType } from '../../types';
 import nocksetup from './nocksetup';
 import OrderImpl from '../../OrderImpl';
-import { options } from '../../logger';
+import { options } from '@bitr/logger';
 import { createOrder } from '../helper';
 options.enabled = false;
 

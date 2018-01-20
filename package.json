@@ -19,6 +19,7 @@
   "dependencies": {
     "@bitr/castable": "^1.0.1",
     "@bitr/chronodb": "^1.0.2",
+    "@bitr/logger": "^1.0.0",
     "chalk": "^2.3.0",
     "date-fns": "^1.28.5",
     "decimal.js": "^7.3.0",
@@ -32,8 +33,10 @@
     "node-fetch": "^1.7.3",
     "pino": "^4.10.2",
     "reflect-metadata": "^0.1.10",
+    "simple-statistics": "^5.2.1",
     "split2": "^2.2.0",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "zeromq": "^4.6.0"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",
@@ -49,6 +52,7 @@
     "@types/pino": "^4.7.0",
     "@types/split2": "^2.1.6",
     "@types/uuid": "^3.4.2",
+    "@types/zeromq": "^4.5.3",
     "coveralls": "^3.0.0",
     "cpy-cli": "^1.0.1",
     "jest": "^21.0.0",
@@ -77,6 +81,8 @@
       "**/*.{ts,tsx}",
       "!src/index.ts",
       "!src/transport/index.ts",
+      "!src/analytics/index.ts",
+      "!src/container.config.ts",
       "!**/__tests__/**",
       "!**/node_modules/**",
       "!**/vendor/**",

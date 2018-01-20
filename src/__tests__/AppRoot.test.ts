@@ -1,6 +1,5 @@
-import { Container } from 'inversify';
 import AppRoot from '../AppRoot';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 import { getConfigRoot } from '../configUtil';
 import symbols from '../symbols';
 options.enabled = false;
@@ -8,12 +7,15 @@ options.enabled = false;
 describe('AppRoot', () => {
   test('start and stop', async () => {
     const service = { start: jest.fn(), stop: jest.fn() };
-    const container = new Container();
+    const container = {};
     container.get = symbol => {
       if (symbol === symbols.ConfigStore) {
         return { config: { brokers: [{ broker: 'Bitflyer' }, { broker: 'Coincheck' }, { broker: 'Quoine' }] } };
       }
       return service;
+    };
+    container.bind = () => {
+      return { toConstantValue: jest.fn() };
     };
     const target = new AppRoot(container);
     await target.start();
@@ -24,12 +26,15 @@ describe('AppRoot', () => {
 
   test('unknown broker', async () => {
     const service = { start: jest.fn(), stop: jest.fn() };
-    const container = new Container();
+    const container = {};
     container.get = symbol => {
       if (symbol === symbols.ConfigStore) {
         return { config: { brokers: [{ broker: 'Unknown' }, { broker: 'Coincheck' }, { broker: 'Quoine' }] } };
       }
       return service;
+    };
+    container.bind = () => {
+      return { toConstantValue: jest.fn() };
     };
     const target = new AppRoot(container);
     await target.start();
@@ -38,7 +43,7 @@ describe('AppRoot', () => {
 
   test('unknown broker with npmPath', async () => {
     const service = { start: jest.fn(), stop: jest.fn() };
-    const container = new Container();
+    const container = {};
     container.get = symbol => {
       if (symbol === symbols.ConfigStore) {
         return {
@@ -49,6 +54,9 @@ describe('AppRoot', () => {
       }
       return service;
     };
+    container.bind = () => {
+      return { toConstantValue: jest.fn() };
+    };
     const target = new AppRoot(container);
     await target.start();
     expect(service.start).not.toBeCalled();
@@ -56,7 +64,7 @@ describe('AppRoot', () => {
 
   test('unknown broker with wrong npmPath', async () => {
     const service = { start: jest.fn(), stop: jest.fn() };
-    const container = new Container();
+    const container = {};
     container.get = symbol => {
       if (symbol === symbols.ConfigStore) {
         return {
@@ -66,6 +74,9 @@ describe('AppRoot', () => {
         };
       }
       return service;
+    };
+    container.bind = () => {
+      return { toConstantValue: jest.fn() };
     };
     const target = new AppRoot(container);
     await target.start();
@@ -79,12 +90,15 @@ describe('AppRoot', () => {
       },
       stop: jest.fn()
     };
-    const container = new Container();
+    const container = {};
     container.get = symbol => {
       if (symbol === symbols.ConfigStore) {
         return { config: { brokers: [{ broker: 'Bitflyer' }] } };
       }
       return service;
+    };
+    container.bind = () => {
+      return { toConstantValue: jest.fn() };
     };
     const target = new AppRoot(container);
     await target.start();
@@ -97,12 +111,15 @@ describe('AppRoot', () => {
         throw new Error('Mock stop failed.');
       }
     };
-    const container = new Container();
+    const container = {};
     container.get = symbol => {
       if (symbol === symbols.ConfigStore) {
         return { config: { brokers: [{ broker: 'Bitflyer' }] } };
       }
       return service;
+    };
+    container.bind = () => {
+      return { toConstantValue: jest.fn() };
     };
     const target = new AppRoot(container);
     await target.start();
@@ -111,18 +128,17 @@ describe('AppRoot', () => {
 
   test('stop with undefined arbitrager', async () => {
     const service = { start: jest.fn(), stop: jest.fn() };
-    const container = new Container();
+    const container = {};
     container.get = symbol => {
       if (symbol === symbols.ConfigStore) {
         return { config: { brokers: [{ broker: 'Bitflyer' }] } };
       }
       return service;
     };
+    container.bind = () => {
+      return { toConstantValue: jest.fn() };
+    };
     const target = new AppRoot(container);
     await target.stop();
-  });
-
-  test('instantiate with default param', () => {
-    const target = new AppRoot();
   });
 });

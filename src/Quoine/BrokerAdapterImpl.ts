@@ -11,7 +11,7 @@
   BrokerConfigType
 } from '../types';
 import BrokerApi from './BrokerApi';
-import { getLogger } from '../logger';
+import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from './types';
 import { timestampToDate, toExecution, toQuote } from '../util';

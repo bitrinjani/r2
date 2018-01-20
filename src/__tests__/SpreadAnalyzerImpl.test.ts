@@ -3,7 +3,7 @@ import SpreadAnalyzer from '../SpreadAnalyzer';
 import { Broker, QuoteSide, ConfigStore } from '../types';
 import * as _ from 'lodash';
 import Quote from '../types';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 import { toQuote } from '../util';
 options.enabled = false;
 

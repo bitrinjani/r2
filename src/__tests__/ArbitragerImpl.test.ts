@@ -17,7 +17,7 @@ import PairTrader from '../PairTrader';
 import LimitCheckerFactory from '../LimitCheckerFactory';
 import SpreadAnalyzer from '../SpreadAnalyzer';
 import { delay, toQuote } from '../util';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 import { getActivePairStore } from '../ActivePairLevelStore';
 import { ChronoDB } from '@bitr/chronodb';
 import QuoteAggregator from '../QuoteAggregator';

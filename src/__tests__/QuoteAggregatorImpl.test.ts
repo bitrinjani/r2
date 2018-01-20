@@ -4,7 +4,7 @@ import { Broker, QuoteSide } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
 import BrokerAdapterRouter from '../BrokerAdapterRouter';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 import { DateTime } from 'luxon';
 options.enabled = false;
 

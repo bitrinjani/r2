@@ -2,7 +2,7 @@ import { OnSingleLegConfig, ReverseOption, ProceedOption, OrderSide, OrderType, 
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
 import OrderImpl from './OrderImpl';
 import * as _ from 'lodash';
-import { getLogger } from './logger/index';
+import { getLogger } from '@bitr/logger';
 import t from './intl';
 import { delay } from './util';
 import BrokerAdapterRouter from './BrokerAdapterRouter';

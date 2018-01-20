@@ -1,6 +1,6 @@
 ﻿import { injectable, inject } from 'inversify';
 import { ConfigStore, BrokerConfig, QuoteSide, Broker, Quote } from './types';
-import { getLogger } from './logger';
+import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import symbols from './symbols';
 import QuoteImpl from './QuoteImpl';

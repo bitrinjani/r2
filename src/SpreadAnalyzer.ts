@@ -10,7 +10,7 @@ import {
   OrderPair,
   SpreadStat
 } from './types';
-import { getLogger } from './logger';
+import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import t from './intl';
 import symbols from './symbols';

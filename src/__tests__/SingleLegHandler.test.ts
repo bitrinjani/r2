@@ -1,7 +1,7 @@
 import SingleLegHandler from '../SingleLegHandler';
 import { OnSingleLegConfig, OrderSide, CashMarginType, OrderType, OrderStatus } from '../types';
 import OrderImpl from '../OrderImpl';
-import { options } from '../logger';
+import { options } from '@bitr/logger';
 import { createOrder } from './helper';
 options.enabled = false;
 
