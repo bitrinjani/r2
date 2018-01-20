@@ -58,11 +58,11 @@ export default class AnalyticsService {
       this.configRequester.once('message', resolve);
       this.configRequester.send(JSON.stringify({ type: 'get' }));
     });
-    const config = parseBuffer<ConfigRoot>(reply);
-    if (config === undefined || config.analytics === undefined) {
+    const parsed = parseBuffer<{ success: boolean, data: ConfigRoot }>(reply);
+    if (parsed === undefined || !parsed.success) {
       throw new Error('Analytics failed to get the config.');
     }
-    return config.analytics;
+    return parsed.data.analytics;
   }
 
   private async getSpreadStatHandler(message: Buffer): Promise<SpreadStatHandlerPlugin> {

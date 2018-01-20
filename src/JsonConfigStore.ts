@@ -51,6 +51,7 @@ export default class JsonConfigStore implements ConfigStore {
     const parsed = parseBuffer<ConfigRequest>(message);
     if (parsed === undefined) {
       this.log.debug(`Invalid message received. Message: ${message.toString()}`);
+      this.server.send(JSON.stringify({ success: false, reason: 'invalid message' }));
       return;
     }
     switch (parsed.type) {
@@ -61,15 +62,17 @@ export default class JsonConfigStore implements ConfigStore {
           this.server.send(JSON.stringify({ success: true }));
           this.log.debug(`Config updated with ${JSON.stringify(newConfig)}`);
         } catch (ex) {
+          this.server.send(JSON.stringify({ success: false, reason: 'invalid config' }));
           this.log.warn(`Failed to update config. Error: ${ex.message}`);
           this.log.debug(ex.stack);
         }
         break;
       case 'get':
-        this.server.send(JSON.stringify(getConfigRoot()));
+        this.server.send(JSON.stringify({ success: true, data: getConfigRoot() }));
         break;
       default:
         this.log.warn(`ConfigStore received an invalid message. Message: ${parsed}`);
+        this.server.send(JSON.stringify({ success: false, reason: 'invalid message type' }));
         break;
     }
   }

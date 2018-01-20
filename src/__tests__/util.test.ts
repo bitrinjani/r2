@@ -55,3 +55,9 @@ test('safeQueryStringStringify', () => {
   expect(result).toBe('a=1');
 });
 
+test('cwd', () => {
+  const tmp = process.env.NODE_ENV;
+  process.env.NODE_ENV = '__test__';
+  const dir = util.cwd();
+  process.env.NODE_ENV = tmp;
+});

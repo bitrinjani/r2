@@ -55,6 +55,8 @@ export default class ReportService {
       this.snapshotResponder.on('message', request => {
         if (request.toString() === 'spreadStatSnapshot') {
           this.snapshotResponder.send(JSON.stringify(snapshot.map(s => s.value)));
+        } else {
+          this.snapshotResponder.send(JSON.stringify({ success: false, reason: 'invalid request' }));
         }
       });
       this.streamPublisher.bindSync(reportServicePubUrl);
