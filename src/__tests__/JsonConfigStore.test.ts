@@ -25,6 +25,7 @@ describe('JsonConfigStore', () => {
     expect(store.config.brokers[1].enabled).toBe(true);
     expect(store.config.brokers[1].maxLongPosition).toBe(0.2);
     store.close();
+    await delay(10);
   });
 
   test('set', async () => {
