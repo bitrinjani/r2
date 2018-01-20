@@ -1,7 +1,7 @@
 // Ad-hoc script to close all leverage positions in Coincheck.
 
 import CoincheckApi from '../src/Coincheck/BrokerApi';
-import { options } from '../src/logger';
+import { options } from '@bitr/logger';
 import { getConfigRoot, findBrokerConfig } from '../src/configUtil';
 
 options.enabled = false;

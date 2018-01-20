@@ -7,7 +7,7 @@ import CoincheckApi from '../src/Coincheck/BrokerApi';
 import QuoineApi from '../src/Quoine/BrokerApi';
 import { Balance } from '../src/Bitflyer/types';
 import { TradingAccount, AccountBalance } from '../src/Quoine/types';
-import { options } from '../src/logger';
+import { options } from '@bitr/logger';
 
 options.enabled = false;
 

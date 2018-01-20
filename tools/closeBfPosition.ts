@@ -2,7 +2,7 @@
 import BitflyerApi from '../src/Bitflyer/BrokerApi';
 import { Balance } from '../src/Bitflyer/types';
 import * as _ from 'lodash';
-import { options } from '../src/logger';
+import { options } from '@bitr/logger';
 import { getConfigRoot, findBrokerConfig } from '../src/configUtil';
 
 options.enabled = false;

@@ -1,6 +1,6 @@
 // Ad-hoc script to close all trades in quoine.
 import QuoineApi from '../src/Quoine/BrokerApi';
-import { options } from '../src/logger';
+import { options } from '@bitr/logger';
 import { findBrokerConfig, getConfigRoot } from '../src/configUtil';
 
 options.enabled = false;
