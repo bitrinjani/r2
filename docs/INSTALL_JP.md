@@ -19,3 +19,14 @@ npm install
 6) 日本語UIにする場合、`language`フィールドを"en"から"ja"に変更する
 7) コンソールから`npm start`で起動
 
+# 最新版へのアップデート方法
+
+インストールフォルダでコンソールから以下を実行。
+
+```bash
+git pull
+npm install # or yarn
+```
+
+
+
