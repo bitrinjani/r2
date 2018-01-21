@@ -131,3 +131,33 @@ class SimpleSpreadStatHandler {
 // module.exportsによるエクスポートが必須
 module.exports = SimpleSpreadStatHandler;
 ```
+
+## リアルタイムで変更可能な設定一覧
+
+全体設定:
+- demoMode
+- maxSize
+- minSize
+- minTargetProfit
+- minExitTargetProfit
+- minTargetProfitPercent
+- minExitTargetProfitPercent
+- exitNetProfitRatio
+- maxTargetProfit
+- maxTargetProfitPercent
+- maxTargetVolumePercent
+- sleepAfterSend
+- maxNetExposure
+- maxRetryCount
+- orderStatusCheckInterval
+- onSingleLeg: OnSingleLegConfig;
+
+  
+取引所設定:
+- enabled
+- key
+- secret
+- maxLongPosition
+- maxShortPosition
+- commissionPercent
+- noTradePeriods
