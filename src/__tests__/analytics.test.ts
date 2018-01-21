@@ -31,6 +31,9 @@ describe('AnalyticsService', () => {
     const as = new AnalyticsService();
     await as.start();
     await as.stop();
+    configServer.unbindSync(configStoreSocketUrl);
+    rsPub.unbindSync(reportServicePubUrl);
+    rsRep.unbindSync(reportServiceRepUrl);
     configServer.close();
     rsPub.close();
     rsRep.close();
@@ -65,6 +68,9 @@ describe('AnalyticsService', () => {
       expect(ex.message).toBe('Analytics failed to get the config.');
     } finally {
       await as.stop();
+      configServer.unbindSync(configStoreSocketUrl);
+      rsPub.unbindSync(reportServicePubUrl);
+      rsRep.unbindSync(reportServiceRepUrl);
       configServer.close();
       rsPub.close();
       rsRep.close();
@@ -100,6 +106,9 @@ describe('AnalyticsService', () => {
       expect(ex.message).toBe('Failed to parse the initial snapshot message.');
     } finally {
       await as.stop();
+      configServer.unbindSync(configStoreSocketUrl);
+      rsPub.unbindSync(reportServicePubUrl);
+      rsRep.unbindSync(reportServiceRepUrl);
       configServer.close();
       rsPub.close();
       rsRep.close();
@@ -144,6 +153,9 @@ describe('AnalyticsService', () => {
     rsPub.send(['sometopic', 'invalid']);
     await delay(100);
     await as.stop();
+    configServer.unbindSync(configStoreSocketUrl);
+    rsPub.unbindSync(reportServicePubUrl);
+    rsRep.unbindSync(reportServiceRepUrl);
     configServer.close();
     rsPub.close();
     rsRep.close();
@@ -174,6 +186,9 @@ describe('AnalyticsService', () => {
     await as.start();    
     process.emit('message', 'invalid', undefined);
     process.emit('message', 'stop', undefined);
+    configServer.unbindSync(configStoreSocketUrl);
+    rsPub.unbindSync(reportServicePubUrl);
+    rsRep.unbindSync(reportServiceRepUrl);
     configServer.close();
     rsPub.close();
     rsRep.close();

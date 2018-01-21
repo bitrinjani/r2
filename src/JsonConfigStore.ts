@@ -44,6 +44,7 @@ export default class JsonConfigStore implements ConfigStore {
   }
 
   close() {
+    this.server.unbindSync(configStoreSocketUrl);
     this.server.close();
   }
 

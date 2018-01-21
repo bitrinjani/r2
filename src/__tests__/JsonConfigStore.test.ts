@@ -191,7 +191,7 @@ describe('JsonConfigStore', () => {
     } catch (ex) {
       console.log(ex);
       expect(true).toBe(false);
-    } finally {
+    } finally {      
       store.close();
       client.close();
     }
