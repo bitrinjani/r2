@@ -67,9 +67,6 @@ export default class AnalyticsService {
   }
 
   private async getSpreadStatHandler(snapshot: SpreadStat[]): Promise<SpreadStatHandlerPlugin> {
-    if (snapshot === undefined) {
-      throw new Error('Failed to parse the initial snapshot message.');
-    }
     const SpreadStatHandler = await import(`${this.pluginDir}/${this.config.plugin}`);
     return new SpreadStatHandler(snapshot);
   }

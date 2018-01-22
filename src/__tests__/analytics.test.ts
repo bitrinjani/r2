@@ -45,6 +45,41 @@ describe('AnalyticsService', () => {
     }
   });
 
+  test('snapshot fail', async () => {
+    const config = {
+      analytics: {
+        enabled: true,
+        plugin: '../src/__tests__/DummyPlugin.ts',
+        initHistory: { minutes: 3 }
+      }
+    };
+    const configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
+      respond({ success: true, data: config });
+    });
+
+    const rsPub = socket('pub');
+    rsPub.bindSync(reportServicePubUrl);
+
+    const rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
+      respond({ success: false, data: [] });
+    });
+    let as;
+    try {
+      as = new AnalyticsService();
+      await as.start();
+    } catch (ex) {
+      if (process.env.CI && ex.message === 'address already in use') return;
+      expect(ex.message).toBe('Failed to initial snapshot message.');
+    } finally {
+      await as.stop();
+      await delay(10);
+      rsPub.unbindSync(reportServicePubUrl);
+      configServer.dispose();
+      rsPub.close();
+      rsRep.dispose();
+    }
+  });
+
   test('invalid config', async () => {
     const config = {
       analytics: {
