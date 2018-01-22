@@ -158,10 +158,10 @@ describe('ReportService', () => {
       expect(reply.data).toEqual(['dummy']);
       await rs.stop();
     } catch (ex) {
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
-      client.dispose();
+      if (client) client.dispose();
     }
   });
 
@@ -190,10 +190,10 @@ describe('ReportService', () => {
       expect(reply.success).toBe(false);
       await rs.stop();
     } catch (ex) {
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
-      client.dispose();
+      if (client) client.dispose();
     }
   });
 });

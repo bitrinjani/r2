@@ -68,7 +68,7 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
       store.close();
@@ -97,7 +97,7 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
       store.close();
@@ -129,7 +129,7 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
       store.close();
@@ -154,11 +154,11 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
-      store.close();
-      client.dispose();
+      if (store) store.close();
+      if (client) client.dispose();
     }
   });
 
@@ -179,11 +179,11 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
-      store.close();
-      client.dispose();
+      if (store) store.close();
+      if (client) client.dispose();
     }
   });
 });

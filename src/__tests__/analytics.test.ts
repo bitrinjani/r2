@@ -28,20 +28,21 @@ describe('AnalyticsService', () => {
       respond({ success: true, data: [] });
     });
 
+    let as;
     try {
-      const as = new AnalyticsService();
+      as = new AnalyticsService();
       await as.start();
-      await as.stop();
       await delay(10);
     } catch (ex) {
       console.log(ex);
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
       rsPub.unbindSync(reportServicePubUrl);
       configServer.dispose();
       rsPub.close();
       rsRep.dispose();
+      if (as) await as.stop();
     }
   });
 
@@ -68,10 +69,10 @@ describe('AnalyticsService', () => {
       as = new AnalyticsService();
       await as.start();
     } catch (ex) {
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(ex.message).toBe('Failed to initial snapshot message.');
     } finally {
-      await as.stop();
+      if (as) await as.stop();
       await delay(10);
       rsPub.unbindSync(reportServicePubUrl);
       configServer.dispose();
@@ -106,7 +107,7 @@ describe('AnalyticsService', () => {
     } catch (ex) {
       expect(ex.message).toBe('Analytics failed to get the config.');
     } finally {
-      await as.stop();
+      if (as) await as.stop();
       await delay(10);
       rsPub.unbindSync(reportServicePubUrl);
       configServer.dispose();
@@ -142,7 +143,7 @@ describe('AnalyticsService', () => {
     } catch (ex) {
       expect(ex.message).toBe('Invalid JSON string received.');
     } finally {
-      await as.stop();
+      if (as) await as.stop();
       await delay(10);
       rsPub.unbindSync(reportServicePubUrl);
       rsRep.unbindSync(reportServiceRepUrl);
@@ -187,13 +188,14 @@ describe('AnalyticsService', () => {
       await delay(100);
       rsPub.send(['sometopic', 'invalid']);
       await delay(100);
-      await as.stop();
+
       await delay(10);
     } catch (ex) {
       console.log(ex);
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
+      if (as) await as.stop();
       rsPub.unbindSync(reportServicePubUrl);
       configServer.dispose();
       rsPub.close();
@@ -219,16 +221,18 @@ describe('AnalyticsService', () => {
     const rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
       respond({ success: true, data: [] });
     });
+    let as;
     try {
-      const as = new AnalyticsService();
+      as = new AnalyticsService();
       await as.start();
       process.emit('message', 'invalid', undefined);
       process.emit('message', 'stop', undefined);
       await delay(10);
     } catch (ex) {
-      if (process.env.CI && ex.message === 'address already in use') return;
+      if (process.env.CI && ex.message === 'Address already in use') return;
       expect(true).toBe(false);
     } finally {
+      if (as) await as.stop();
       rsPub.unbindSync(reportServicePubUrl);
       configServer.dispose();
       rsPub.close();
