@@ -6,6 +6,7 @@ import { QuoteSide } from '../types';
 import SpreadAnalyzer from '../SpreadAnalyzer';
 import { socket } from 'zeromq';
 import { reportServiceRepUrl } from '../constants';
+import { SnapshotRequester } from '../messages';
 
 describe('ReportService', () => {
   afterAll(() => {
@@ -144,19 +145,24 @@ describe('ReportService', () => {
     };
     const quoteAggregator = { onQuoteUpdated: new Map() };
     const spreadAnalyzer = new SpreadAnalyzer({ config });
-    const timeSeries = { put: jest.fn(), query: () => ['dummy'] };
+    const timeSeries = { put: jest.fn(), query: () => [{ value: 'dummy' }] };
 
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
-    await rs.start();
-    const client = socket('req');
-    client.connect(reportServiceRepUrl);
-    const reply = await new Promise(resolve => {
-      client.once('message', resolve);
-      client.send('spreadStatSnapshot');
-    });
-    await rs.stop();
-    client.close();
+    let client;
+    try {
+      await rs.start();
+      client = new SnapshotRequester(reportServiceRepUrl);
+      const reply = await client.request({ type: 'spreadStatSnapshot' });
+      expect(reply.success).toBe(true);
+      expect(reply.data).toEqual(['dummy']);
+      await rs.stop();
+    } catch (ex) {
+      if (process.env.CI && ex.message === 'address already in use') return;
+      expect(true).toBe(false);
+    } finally {
+      client.dispose();
+    }
   });
 
   test('invalid request', async () => {
@@ -176,15 +182,18 @@ describe('ReportService', () => {
 
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
     mkdirp.sync(rs.reportDir);
-    await rs.start();
-    const client = socket('req');
-    client.connect(reportServiceRepUrl);
-    const reply = await new Promise(resolve => {
-      client.once('message', resolve);
-      client.send('invalid');
-    });
-    expect(parseBuffer(reply).success).toBe(false);
-    await rs.stop();
-    client.close();
+    let client;
+    try {
+      await rs.start();
+      client = new SnapshotRequester(reportServiceRepUrl);
+      const reply = await client.request('invalid');
+      expect(reply.success).toBe(false);
+      await rs.stop();
+    } catch (ex) {
+      if (process.env.CI && ex.message === 'address already in use') return;
+      expect(true).toBe(false);
+    } finally {
+      client.dispose();
+    }
   });
 });

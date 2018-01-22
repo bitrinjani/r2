@@ -6,6 +6,8 @@ import { delay, parseBuffer } from '../util';
 import * as _ from 'lodash';
 import { Socket, socket } from 'zeromq';
 import { configStoreSocketUrl } from '../constants';
+import { ZmqRequester } from '@bitr/zmq';
+import { ConfigRequester } from '../messages';
 options.enabled = false;
 
 describe('JsonConfigStore', () => {
@@ -43,7 +45,7 @@ describe('JsonConfigStore', () => {
       console.log(ex);
       expect(true).toBe(false);
     } finally {
-      if (store) { 
+      if (store) {
         store.close();
       }
     }
@@ -51,32 +53,26 @@ describe('JsonConfigStore', () => {
 
   test('server', async () => {
     let store: JsonConfigStore;
-    let client: Socket;
+    let client: ConfigRequester;
     try {
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator);
       store.TTL = 5;
       expect(store.config.minSize).toBe(0.01);
 
-      client = socket('req');
-      client.connect(configStoreSocketUrl);
-      await new Promise(resolve => {
-        client.on('message', resolve);
-        client.send(JSON.stringify({ type: 'set', data: { minSize: 0.002 } }));
-      });
+      client = new ConfigRequester(configStoreSocketUrl);
+      await client.request({ type: 'set', data: { minSize: 0.002 } });
       expect(store.config.minSize).toBe(0.002);
 
-      await new Promise(resolve => {
-        client.on('message', resolve);
-        client.send(JSON.stringify({ type: 'set', data: { minSize: 0.01 } }));
-      });
+      await client.request({ type: 'set', data: { minSize: 0.01 } });
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
+      if (process.env.CI && ex.message === 'address already in use') return;
       expect(true).toBe(false);
     } finally {
       store.close();
-      client.close();
+      client.dispose();
     }
   });
 
@@ -101,6 +97,7 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
+      if (process.env.CI && ex.message === 'address already in use') return;
       expect(true).toBe(false);
     } finally {
       store.close();
@@ -110,90 +107,83 @@ describe('JsonConfigStore', () => {
 
   test('server: configValidator throws', async () => {
     let store: JsonConfigStore;
-    let client: Socket;
+    let client: ConfigRequester;
     try {
-      const validator = { validate: (config: ConfigRoot) => {
-        if (config.maxNetExposure <= 0) {
-          throw new Error();
+      const validator = {
+        validate: (config: ConfigRoot) => {
+          if (config.maxNetExposure <= 0) {
+            throw new Error();
+          }
+          return true;
         }
-        return true;
-      } };
+      };
       store = new JsonConfigStore(validator);
       store.TTL = 5;
       expect(store.config.minSize).toBe(0.01);
 
-      client = socket('req');
-      client.connect(configStoreSocketUrl);
-      const reply = await new Promise(resolve => {
-        client.once('message', resolve);
-        client.send(JSON.stringify({ type: 'set', data: { maxNetExposure: -1 } }));
-      });
-      const parsed = parseBuffer(reply);
-      expect(parsed.success).toBe(false);
-      expect(parsed.reason).toBe('invalid config');
+      client = new ConfigRequester(configStoreSocketUrl);
+
+      const reply = await client.request({ type: 'set', data: { maxNetExposure: -1 } });
+      expect(reply.success).toBe(false);
+      expect(reply.reason).toBe('invalid config');
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
+      if (process.env.CI && ex.message === 'address already in use') return;
       expect(true).toBe(false);
     } finally {
       store.close();
-      client.close();
+      client.dispose();
     }
   });
 
   test('server: invalid message type', async () => {
     let store: JsonConfigStore;
-    let client: Socket;
+    let client: ConfigRequester;
     try {
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator);
       store.TTL = 5;
       expect(store.config.minSize).toBe(0.01);
 
-      client = socket('req');
-      client.connect(configStoreSocketUrl);
-      const reply = await new Promise(resolve => {
-        client.once('message', resolve);
-        client.send(JSON.stringify({ type: 'invalid' }));
-      });
-      const parsed = parseBuffer(reply);
-      expect(parsed.success).toBe(false);
-      expect(parsed.reason).toBe('invalid message type');
+      client = new ConfigRequester(configStoreSocketUrl);
+
+      const reply = await client.request({ type: 'invalid' });
+      expect(reply.success).toBe(false);
+      expect(reply.reason).toBe('invalid message type');
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
+      if (process.env.CI && ex.message === 'address already in use') return;
       expect(true).toBe(false);
     } finally {
       store.close();
-      client.close();
+      client.dispose();
     }
   });
 
   test('server: get', async () => {
     let store: JsonConfigStore;
-    let client: Socket;
+    let client: ConfigRequester;
     try {
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator);
       store.TTL = 5;
       expect(store.config.minSize).toBe(0.01);
 
-      client = socket('req');
-      client.connect(configStoreSocketUrl);
-      const reply = await new Promise(resolve => {
-        client.once('message', resolve);
-        client.send(JSON.stringify({ type: 'get' }));
-      });
-      const parsed = parseBuffer(reply);
-      expect(parsed.success).toBe(true);
-      expect(parsed.data.minSize).toBe(0.01);
+      client = new ConfigRequester(configStoreSocketUrl);
+
+      const reply = await client.request({ type: 'get' });
+      expect(reply.success).toBe(true);
+      expect(reply.data.minSize).toBe(0.01);
       expect(store.config.minSize).toBe(0.01);
     } catch (ex) {
       console.log(ex);
+      if (process.env.CI && ex.message === 'address already in use') return;
       expect(true).toBe(false);
-    } finally {      
+    } finally {
       store.close();
-      client.close();
+      client.dispose();
     }
   });
 });

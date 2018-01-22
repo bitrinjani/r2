@@ -24,6 +24,13 @@
   dependencies:
     pino "4.10.3"
 
+"@bitr/zmq@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@bitr/zmq/-/zmq-1.0.2.tgz#c6ac887d5d0f3467dade1dc4dc665bb4c8e65476"
+  dependencies:
+    lodash "^4.17.4"
+    zeromq "^4.6.0"
+
 "@types/chalk@^2.2.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@types/chalk/-/chalk-2.2.0.tgz#b7f6e446f4511029ee8e3f43075fb5b73fbaa0ba"

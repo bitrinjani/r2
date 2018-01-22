@@ -69,8 +69,3 @@ export interface ActivePairStore {
 }
 
 export interface SpreadStatTimeSeries extends TimeSeries<SpreadStat> {}
-
-export interface ConfigRequest {
-  type: 'set' | 'get';
-  data: any;
-}

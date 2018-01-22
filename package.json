@@ -20,6 +20,7 @@
     "@bitr/castable": "^1.0.1",
     "@bitr/chronodb": "^1.0.2",
     "@bitr/logger": "^1.0.0",
+    "@bitr/zmq": "^1.0.2",
     "chalk": "^2.3.0",
     "date-fns": "^1.28.5",
     "decimal.js": "^7.3.0",

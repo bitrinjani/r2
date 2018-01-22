@@ -1,15 +1,14 @@
 import { injectable } from 'inversify';
-import { ConfigStore, ConfigRoot, ConfigRequest } from './types';
+import { ConfigStore, ConfigRoot } from './types';
 import { getConfigRoot, getConfigPath } from './configUtil';
 import ConfigValidator from './ConfigValidator';
 import { setTimeout } from 'timers';
-import { socket, Socket } from 'zeromq';
 import { configStoreSocketUrl } from './constants';
-import { parseBuffer } from './util';
 import * as _ from 'lodash';
 import * as fs from 'fs';
 import { promisify } from 'util';
 import { getLogger } from '@bitr/logger';
+import { ConfigRequest, ConfigResponse, ConfigResponder } from './messages';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -17,14 +16,14 @@ const writeFile = promisify(fs.writeFile);
 export default class JsonConfigStore implements ConfigStore {
   private readonly log = getLogger(this.constructor.name);
   private timer: NodeJS.Timer;
-  private readonly server: Socket;
+  private readonly responder: ConfigResponder;
   private readonly TTL = 5 * 1000;
   private cache?: ConfigRoot;
 
   constructor(private readonly configValidator: ConfigValidator) {
-    this.server = socket('rep');
-    this.server.on('message', message => this.messageHandler(message));
-    this.server.bindSync(configStoreSocketUrl);
+    this.responder = new ConfigResponder(configStoreSocketUrl, (request, respond) =>
+      this.requestHandler(request, respond)
+    );
   }
 
   get config(): ConfigRoot {
@@ -44,36 +43,34 @@ export default class JsonConfigStore implements ConfigStore {
   }
 
   close() {
-    this.server.unbindSync(configStoreSocketUrl);
-    this.server.close();
+    this.responder.dispose();
   }
 
-  private async messageHandler(message: Buffer) {
-    const parsed = parseBuffer<ConfigRequest>(message);
-    if (parsed === undefined) {
-      this.log.debug(`Invalid message received. Message: ${message.toString()}`);
-      this.server.send(JSON.stringify({ success: false, reason: 'invalid message' }));
+  private async requestHandler(request: ConfigRequest | undefined, respond: (response: ConfigResponse) => void) {
+    if (request === undefined) {
+      this.log.debug(`Invalid message received.`);
+      respond({ success: false, reason: 'invalid message' });
       return;
     }
-    switch (parsed.type) {
+    switch (request.type) {
       case 'set':
         try {
-          const newConfig = parsed.data;
+          const newConfig = request.data;
           await this.set(_.merge({}, getConfigRoot(), newConfig));
-          this.server.send(JSON.stringify({ success: true }));
+          respond({ success: true });
           this.log.debug(`Config updated with ${JSON.stringify(newConfig)}`);
         } catch (ex) {
-          this.server.send(JSON.stringify({ success: false, reason: 'invalid config' }));
+          respond({ success: false, reason: 'invalid config' });
           this.log.warn(`Failed to update config. Error: ${ex.message}`);
           this.log.debug(ex.stack);
         }
         break;
       case 'get':
-        this.server.send(JSON.stringify({ success: true, data: getConfigRoot() }));
+        respond({ success: true, data: getConfigRoot() });
         break;
       default:
-        this.log.warn(`ConfigStore received an invalid message. Message: ${parsed}`);
-        this.server.send(JSON.stringify({ success: false, reason: 'invalid message type' }));
+        this.log.warn(`ConfigStore received an invalid message. Message: ${request}`);
+        respond({ success: false, reason: 'invalid message type' });
         break;
     }
   }

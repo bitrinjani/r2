@@ -1,7 +1,12 @@
 import SpreadAnalyzer from './SpreadAnalyzer';
 import { injectable, inject } from 'inversify';
 import symbols from './symbols';
-import { SpreadStatTimeSeries, Quote, ConfigStore, ZmqSocket } from './types';
+import {
+  SpreadStatTimeSeries,
+  Quote,
+  ConfigStore,
+  ZmqSocket
+} from './types';
 import QuoteAggregator from './QuoteAggregator';
 import { spreadStatToCsv, spreadStatCsvHeader } from './SpreadStatTimeSeries';
 import * as fs from 'fs';
@@ -13,6 +18,7 @@ import { reportServicePubUrl, reportServiceRepUrl } from './constants';
 import { getLogger } from '@bitr/logger';
 import { cwd } from './util';
 import { Duration, DateTime } from 'luxon';
+import { SnapshotResponder } from './messages';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -24,7 +30,7 @@ export default class ReportService {
   private readonly spreadStatReport = `${this.reportDir}/spreadStat.csv`;
   private spreadStatWriteStream: fs.WriteStream;
   private readonly streamPublisher: ZmqSocket;
-  private readonly snapshotResponder: ZmqSocket;
+  private snapshotResponder: SnapshotResponder;
   private analyticsProcess: ChildProcess;
 
   constructor(
@@ -33,7 +39,6 @@ export default class ReportService {
     @inject(symbols.SpreadStatTimeSeries) private readonly spreadStatTimeSeries: SpreadStatTimeSeries,
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
   ) {
-    this.snapshotResponder = socket('rep') as ZmqSocket;
     this.streamPublisher = socket('pub') as ZmqSocket;
   }
 
@@ -52,15 +57,14 @@ export default class ReportService {
       const start = dt.minus(duration).toJSDate();
       const end = dt.toJSDate();
       const snapshot = await this.spreadStatTimeSeries.query({ start, end });
-      this.snapshotResponder.on('message', request => {
-        if (request.toString() === 'spreadStatSnapshot') {
-          this.snapshotResponder.send(JSON.stringify(snapshot.map(s => s.value)));
+      this.snapshotResponder = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
+        if (request && request.type === 'spreadStatSnapshot') {
+          respond({ success: true, data: snapshot.map(s => s.value) });
         } else {
-          this.snapshotResponder.send(JSON.stringify({ success: false, reason: 'invalid request' }));
+          respond({ success: false, reason: 'invalid request' });
         }
       });
       this.streamPublisher.bindSync(reportServicePubUrl);
-      this.snapshotResponder.bindSync(reportServiceRepUrl);
       this.analyticsProcess = fork(this.analyticsPath, [], { stdio: [0, 1, 2, 'ipc'] });
     }
     this.log.debug('Started.');
@@ -75,11 +79,9 @@ export default class ReportService {
       this.analyticsProcess.kill();
       this.streamPublisher.unbindSync(reportServicePubUrl);
       this.streamPublisher.removeAllListeners('message');
-      this.snapshotResponder.unbindSync(reportServiceRepUrl);
-      this.snapshotResponder.removeAllListeners('message');
+      this.snapshotResponder.dispose();
     }
     this.streamPublisher.close();
-    this.snapshotResponder.close();
     this.log.debug('Stopped.');
   }
 
