@@ -91,7 +91,7 @@ class SimpleSpreadStatHandler {
     const profitPercentHistory = history.map(x => x.bestCase.profitPercentAgainstNotional);
     this.sampleSize = profitPercentHistory.length;
     this.profitPercentMean = this.sampleSize != 0 ? ss.mean(profitPercentHistory) : 0;
-    this.profitPercentVariance = this.sampleSize != 0 ? ss.sampleVariance(profitPercentHistory) : 0;
+    this.profitPercentVariance = this.sampleSize != 0 ? ss.variance(profitPercentHistory) : 0;
   }
 
   // handleメソッドは既定で3秒に一度呼び出される。
@@ -114,7 +114,7 @@ class SimpleSpreadStatHandler {
 
     const n = this.sampleSize;
     const mean = this.profitPercentMean;
-    // 不変標準偏差を標本分散から計算する。
+    // 不偏標準偏差を標本分散から計算する。
     const standardDeviation = Math.sqrt(this.profitPercentVariance * n/(n-1));
     // minTargetProfitPercentを平均値+標準偏差に変換する。(小数点3桁目で四捨五入)
     const minTargetProfitPercent = _.round(mean + standardDeviation, 3);

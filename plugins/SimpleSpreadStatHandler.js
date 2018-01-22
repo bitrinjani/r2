@@ -11,7 +11,7 @@ class SimpleSpreadStatHandler {
     const profitPercentHistory = history.map(x => x.bestCase.profitPercentAgainstNotional);
     this.sampleSize = profitPercentHistory.length;
     this.profitPercentMean = this.sampleSize != 0 ? ss.mean(profitPercentHistory) : 0;
-    this.profitPercentVariance = this.sampleSize != 0 ? ss.sampleVariance(profitPercentHistory) : 0;
+    this.profitPercentVariance = this.sampleSize != 0 ? ss.variance(profitPercentHistory) : 0;
   }
 
   // The method is called each time new spread stat has arrived, by default every 3 seconds.
