@@ -41,7 +41,11 @@ export default class SpreadAnalyzer {
     }
     let filteredQuotes = _(quotes)
       .filter(q => this.isAllowedByCurrentPosition(q, positionMap[q.broker]))
-      .filter(q => new Decimal(q.volume).gte(config.minSize))
+      .filter(q => new Decimal(q.volume).gte(
+        (closingPair ? closingPair[0].size : config.minSize) *
+          _.floor(config.maxTargetVolumePercent !== undefined
+            ? 100 / config.maxTargetVolumePercent
+            : 1)))
       .orderBy(['price'])
       .value();
     if (closingPair) {
