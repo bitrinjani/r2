@@ -69,12 +69,14 @@ export default class OppotunitySearcher extends EventEmitter {
       return { closable: false };
     }
     const activePairsMap = await this.activePairStore.getAll();
-    this.printActivePairs(activePairsMap.map(kv => kv.value));
+    if (activePairsMap.length > 0) {
+      this.log.info(t`OpenPairs`);
+    }
     for (const { key, value: pair } of activePairsMap) {
       try {
-        this.log.debug(`Analyzing pair: ${this.formatPair(pair)}...`);
         const exitAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap, pair);
         this.log.debug(`pair: ${pair}, result: ${JSON.stringify(exitAnalysisResult)}.`);
+        this.log.info(this.formatPairInfo(pair, exitAnalysisResult));
         const limitResult = this.limitCheckerFactory.create(exitAnalysisResult, pair).check();
         if (limitResult.success) {
           return { closable: true, key, exitAnalysisResult };
@@ -86,20 +88,10 @@ export default class OppotunitySearcher extends EventEmitter {
     return { closable: false };
   }
 
-  private printActivePairs(activePairs: OrderPair[]): void {
-    if (activePairs.length === 0) {
-      return;
-    }
-    this.log.info(t`OpenPairs`);
-    activePairs.forEach(pair => {
-      this.log.info(this.formatPair(pair));
-    });
-  }
-
-  private formatPair(pair: OrderPair) {
+  private formatPairInfo(pair: OrderPair, exitAnalysisResult: SpreadAnalysisResult) {
     return `[${pair[0].toShortString()}, ${pair[1].toShortString()}, Entry PL: ${_.round(
       calcProfit(pair, this.configStore.config).profit
-    )} JPY]`;
+    )} JPY, Current exit cost: ${_.round(-exitAnalysisResult.targetProfit)} JPY]`;
   }
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
