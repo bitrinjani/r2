@@ -8,7 +8,7 @@ import symbols from './symbols';
 import { fatalErrors } from './constants';
 import QuoteAggregator from './QuoteAggregator';
 import PositionService from './PositionService';
-import OppotunitySearcher from './OpportunitySearcher';
+import OpportunitySearcher from './OpportunitySearcher';
 import PairTrader from './PairTrader';
 
 @injectable()
@@ -21,7 +21,7 @@ export default class Arbitrager {
     private readonly quoteAggregator: QuoteAggregator,
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     private readonly positionService: PositionService,
-    private readonly opportunitySearcher: OppotunitySearcher,
+    private readonly opportunitySearcher: OpportunitySearcher,
     private readonly pairTrader: PairTrader
   ) {
     this.opportunitySearcher.on('status', x => (this.status = x));
