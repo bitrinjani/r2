@@ -1515,6 +1515,54 @@ describe('Arbitrager', () => {
     expect((await activePairStore.getAll()).length).toBe(0);
   });
 
+  test('Close two sets of filled orders', async () => {
+    const quotes = [
+      toQuote('Quoine', QuoteSide.Ask, 700, 4),
+      toQuote('Quoine', QuoteSide.Bid, 600, 4),
+      toQuote('Coincheck', QuoteSide.Ask, 500, 1),
+      toQuote('Coincheck', QuoteSide.Bid, 400, 1)
+    ];
+    const quotes2 = [
+      toQuote('Quoine', QuoteSide.Bid, 601, 4),
+      toQuote('Coincheck', QuoteSide.Ask, 501, 1)
+    ];
+    baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
+    config.maxRetryCount = 3;
+    config.minTargetProfit = 50;
+    config.minExitTargetProfit = -1000;
+    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const searcher = new OppotunitySearcher(
+      configStore,
+      positionService,
+      spreadAnalyzer,
+      limitCheckerFactory,
+      activePairStore
+    );
+    const trader = new PairTrader(configStore, baRouter, activePairStore, new SingleLegHandler(baRouter, configStore));
+    const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
+    positionService.isStarted = true;
+    await arbitrager.start();
+
+    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await activePairStore.getAll()).length).toBe(1);
+
+    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes2);
+    expect(arbitrager.status).toBe('Filled');
+    expect((await activePairStore.getAll()).length).toBe(2);
+ 
+    // closing
+    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    expect(arbitrager.status).toBe('Closed');
+    const pairs = await activePairStore.getAll();
+    expect(pairs.length).toBe(1);
+    expect(pairs[0].value[0].price).toBe(501);
+ 
+    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    expect(arbitrager.status).toBe('Closed');
+    expect((await activePairStore.getAll()).length).toBe(0);
+  });
+
   test('Close filled orders with minExitTargetProfitPercent', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),

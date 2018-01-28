@@ -70,7 +70,7 @@ export default class OppotunitySearcher extends EventEmitter {
     }
     const activePairsMap = await this.activePairStore.getAll();
     this.printActivePairs(activePairsMap.map(kv => kv.value));
-    for (const { key, value: pair } of activePairsMap.slice().reverse()) {
+    for (const { key, value: pair } of activePairsMap) {
       try {
         this.log.debug(`Analyzing pair: ${this.formatPair(pair)}...`);
         const exitAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap, pair);
