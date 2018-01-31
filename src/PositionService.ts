@@ -7,6 +7,7 @@ import BrokerPositionImpl from './BrokerPositionImpl';
 import { hr, eRound } from './util';
 import symbols from './symbols';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
+import BrokerStabilityTracker from './BrokerStabilityTracker';
 
 @injectable()
 export default class PositionService {
@@ -17,7 +18,8 @@ export default class PositionService {
 
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
-    private readonly brokerAdapterRouter: BrokerAdapterRouter
+    private readonly brokerAdapterRouter: BrokerAdapterRouter,
+    private readonly brokerStabilityTracker: BrokerStabilityTracker
   ) {}
 
   async start(): Promise<void> {
@@ -38,7 +40,10 @@ export default class PositionService {
   print(): void {
     this.log.info(hr(21) + 'POSITION' + hr(21));
     this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} BTC`);
-    _.each(this.positionMap, (position: BrokerPosition) => this.log.info(position.toString()));
+    _.each(this.positionMap, (position: BrokerPosition) => {
+      const stability = this.brokerStabilityTracker.stability(position.broker);
+      this.log.info(`${position.toString()} (Stability: ${stability})`);      
+    });
     this.log.info(hr(50));
     this.log.debug(JSON.stringify(this.positionMap));
   }
@@ -91,8 +96,9 @@ export default class PositionService {
     pos.btc = currentBtc;
     pos.allowedLongSize = allowedLongSize;
     pos.allowedShortSize = allowedShortSize;
-    pos.longAllowed = new Decimal(allowedLongSize).gte(minSize);
-    pos.shortAllowed = new Decimal(allowedShortSize).gte(minSize);
+    const isStable = this.brokerStabilityTracker.isStable(brokerConfig.broker);
+    pos.longAllowed = new Decimal(allowedLongSize).gte(minSize) && isStable;
+    pos.shortAllowed = new Decimal(allowedShortSize).gte(minSize) && isStable;
     return pos;
   }
 } /* istanbul ignore next */

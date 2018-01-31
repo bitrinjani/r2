@@ -17,6 +17,7 @@ import SingleLegHandler from './SingleLegHandler';
 import { EventEmitter } from 'events';
 import { getSpreadStatTimeSeries } from './SpreadStatTimeSeries';
 import ReportService from './ReportService';
+import BrokerStabilityTracker from './BrokerStabilityTracker';
 
 decorate(injectable(), EventEmitter);
 
@@ -34,13 +35,14 @@ container
   .bind<PositionService>(PositionService)
   .toSelf()
   .inSingletonScope();
-container.bind<BrokerAdapterRouter>(BrokerAdapterRouter).toSelf();
+container.bind<BrokerAdapterRouter>(BrokerAdapterRouter).toSelf().inSingletonScope();
 container.bind<SpreadAnalyzer>(SpreadAnalyzer).toSelf();
 container.bind<ConfigValidator>(ConfigValidator).toSelf();
 container.bind<LimitCheckerFactory>(LimitCheckerFactory).toSelf();
 container.bind<OppotunitySearcher>(OppotunitySearcher).toSelf();
 container.bind<PairTrader>(PairTrader).toSelf();
 container.bind<SingleLegHandler>(SingleLegHandler).toSelf();
+container.bind<BrokerStabilityTracker>(BrokerStabilityTracker).toSelf().inSingletonScope();
 container
   .bind<ReportService>(ReportService)
   .toSelf()

@@ -21,6 +21,7 @@
 |maxNetExposure|number|最大ネットエクスポージャー*。取引所の合計ネットエクスポージャーの絶対値がこの値を超える場合、取引を行わない。| 
 |maxRetryCount|number|裁定取引のオーダーを送信後、注文の約定状態をチェックする最大回数。|
 |orderStatusCheckInterval|Millisecond|裁定取引の注文を送信後、注文の約定状態をチェックするインターバル。|
+|stabilityTracker|-|下記「stabilityTracker設定詳細」を参照|
 |onSingleLeg|-|下記「onSingleLeg設定詳細」参照|
 |analytics|-|[ANALYTICS_PLUGIN_JP.md](https://github.com/bitrinjani/r2/blob/master/docs/ANALYTICS_PLUGIN_JP.md)を参照|
 
@@ -32,6 +33,29 @@ minTargetProfitPercent: 0.1%
 この値はminTargetProfitPercentである0.1%を上回っているので、取引を送信します。
 
 *ここでのネットエクスポージャーとは、各取引所のポジションを合計した"BTC数量"です。一般にはエクスポージャーには数量ではなく割合を指しますが、簡略化のため数量としています。例えば、Bitflyerで0.1 BTC, Quoineで0.1 BTC, Coincheckでマイナス0.1 BTC(空売り)のとき、ネットエクスポージャーは 0.1 + 0.1 - 0.1 = 0.1 BTCとなります。仮にMaxNetExposure=0.05と設定されていた場合、0.1 > 0.05のため取引は送信しません。
+
+#### stabilityTracker 設定詳細
+
+R2は自動的に不安定なブローカーでの取引を無効化します。
+
+- 各ブローカーは10段階の安定性指標をもつ
+- 初期値は10
+- 安定性指標は取引所API呼び出しが一度失敗するごとに1減る。
+- 安定性指標は`recoveryInterval`msが経過するごとに1増える
+- R2は安定性指標が`threshold`の値を下回るとそのブローカーでの取引を行わないようになる
+
+既定値では、5分間に3回API呼び出しに失敗するとそのブローカーは最大5分間無効化されます。
+
+既定の設定:
+
+```json
+...
+  "stabilityTracker": {
+    "threshold": 8,
+    "recoveryInterval": 300000 
+  },
+...
+```
 
 #### onSingleLeg設定詳細
 onSingleLeg設定で裁定ペアの片側だけ約定したときの動作を指定できます。反対売買で約定を取り消すか、未約定オーダーを再送信するか指定できます。

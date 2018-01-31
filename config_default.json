@@ -13,6 +13,10 @@
   "maxNetExposure": 0.1,
   "maxRetryCount": 10,
   "orderStatusCheckInterval": 3000,
+  "stabilityTracker": {
+    "threshold": 8,
+    "recoveryInterval": 300000 
+  },
   "onSingleLeg": {
     "action": "Reverse",
     "actionOnExit": "Proceed",

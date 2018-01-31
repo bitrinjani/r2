@@ -9,6 +9,7 @@ import QuoteAggregator from './QuoteAggregator';
 import PositionService from './PositionService';
 import Arbitrager from './Arbitrager';
 import ReportService from './ReportService';
+import BrokerStabilityTracker from './BrokerStabilityTracker';
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
@@ -24,7 +25,8 @@ export default class AppRoot {
         this.ioc.get(QuoteAggregator),
         this.ioc.get(PositionService),
         this.ioc.get(Arbitrager),
-        this.ioc.get(ReportService)
+        this.ioc.get(ReportService),
+        this.ioc.get(BrokerStabilityTracker)
       ];
       for (const service of this.services) {
         await service.start();

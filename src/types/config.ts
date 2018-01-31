@@ -75,6 +75,11 @@ export class AnalyticsConfig extends Castable {
   @cast initialHistory: object;
 }
 
+export class StabilityTrackerConfig extends Castable {
+  @cast threshold: number;
+  @cast recoveryInterval: number;
+}
+
 export class ConfigRoot extends Castable {
   @cast language: string;
   @cast demoMode: boolean;
@@ -95,6 +100,7 @@ export class ConfigRoot extends Castable {
   @cast maxNetExposure: number;
   @cast maxRetryCount: number;
   @cast orderStatusCheckInterval: number;
+  @cast stabilityTracker: StabilityTrackerConfig;
   @cast onSingleLeg: OnSingleLegConfig;
   @cast analytics: AnalyticsConfig;
   @cast
