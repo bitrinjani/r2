@@ -11,6 +11,6 @@ describe('BrokerPosition', () => {
     target.allowedShortSize = 0;
     target.longAllowed = true;
     target.shortAllowed = false;
-    expect(target.toString()).toBe('Coincheck :  0.01 BTC, LongAllowed: OK, ShortAllowed: NG');
+    expect(target.toString()).toBe('Coincheck :   0.01 BTC, LongAllowed: OK, ShortAllowed: NG');
   });
 });
