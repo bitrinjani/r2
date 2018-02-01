@@ -3,11 +3,11 @@ import { ConfigStore, BrokerConfig, BrokerMap, BrokerPosition } from './types';
 import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import Decimal from 'decimal.js';
-import BrokerPositionImpl from './BrokerPositionImpl';
-import { hr, eRound } from './util';
+import { hr, eRound, splitSymbol, padEnd, padStart } from './util';
 import symbols from './symbols';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import BrokerStabilityTracker from './BrokerStabilityTracker';
+import t from './intl';
 
 @injectable()
 export default class PositionService {
@@ -38,18 +38,26 @@ export default class PositionService {
   }
 
   print(): void {
+    const symbol = this.configStore.config.symbol;
+    const { baseCcy } = splitSymbol(symbol);
+    const isOk = b => (b ? 'OK' : 'NG');
+    const formatBrokerPosition = (brokerPosition: BrokerPosition) =>
+      `${padEnd(brokerPosition.broker, 10)}: ${padStart(_.round(brokerPosition.baseCcyPosition, 3), 6)} ${baseCcy}, ` +
+      `${t`LongAllowed`}: ${isOk(brokerPosition.longAllowed)}, ` +
+      `${t`ShortAllowed`}: ${isOk(brokerPosition.shortAllowed)}`;
+
     this.log.info(hr(21) + 'POSITION' + hr(21));
-    this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} BTC`);
+    this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} ${baseCcy}`);
     _.each(this.positionMap, (position: BrokerPosition) => {
       const stability = this.brokerStabilityTracker.stability(position.broker);
-      this.log.info(`${position.toString()} (Stability: ${stability})`);      
+      this.log.info(`${formatBrokerPosition(position)} (Stability: ${stability})`);
     });
     this.log.info(hr(50));
     this.log.debug(JSON.stringify(this.positionMap));
   }
 
   get netExposure() {
-    return eRound(_.sumBy(_.values(this.positionMap), (p: BrokerPosition) => p.btc));
+    return eRound(_.sumBy(_.values(this.positionMap), (p: BrokerPosition) => p.baseCcyPosition));
   }
 
   get positionMap() {
@@ -91,14 +99,14 @@ export default class PositionService {
       0,
       new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()
     ]) as number;
-    const pos = new BrokerPositionImpl();
-    pos.broker = brokerConfig.broker;
-    pos.btc = currentBtc;
-    pos.allowedLongSize = allowedLongSize;
-    pos.allowedShortSize = allowedShortSize;
     const isStable = this.brokerStabilityTracker.isStable(brokerConfig.broker);
-    pos.longAllowed = new Decimal(allowedLongSize).gte(minSize) && isStable;
-    pos.shortAllowed = new Decimal(allowedShortSize).gte(minSize) && isStable;
-    return pos;
+    return {
+      broker: brokerConfig.broker,
+      baseCcyPosition: currentBtc,
+      allowedLongSize,
+      allowedShortSize,
+      longAllowed: new Decimal(allowedLongSize).gte(minSize) && isStable,
+      shortAllowed: new Decimal(allowedShortSize).gte(minSize) && isStable
+    };
   }
 } /* istanbul ignore next */

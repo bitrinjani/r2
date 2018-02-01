@@ -100,3 +100,8 @@ export function parseBuffer<T>(buffer: Buffer): T | undefined {
 export function cwd() {
   return process.env.NODE_ENV === 'test' ? `${process.cwd()}/src/__tests__/sandbox` : process.cwd();
 }
+
+export function splitSymbol(symbol: string): { baseCcy: string; quoteCcy: string } {
+  const [baseCcy, quoteCcy] = symbol.split('/');
+  return { baseCcy, quoteCcy };
+}

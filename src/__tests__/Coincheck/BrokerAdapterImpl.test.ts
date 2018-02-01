@@ -79,7 +79,7 @@ describe('Coincheck BrokerAdapter', () => {
   test('refresh', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
-      symbol: 'BTCJPY',
+      symbol: 'BTC/JPY',
       type: 'Limit',
       timeInForce: 'None',
       id: '28f5d9f1-5e13-4bb7-845c-b1b7f02f5e64',
@@ -102,7 +102,7 @@ describe('Coincheck BrokerAdapter', () => {
   test('refresh partial fill', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
-      symbol: 'BTCJPY',
+      symbol: 'BTC/JPY',
       type: 'Limit',
       timeInForce: 'None',
       id: '28f5d9f1-5e13-4bb7-845c-b1b7f02f5e64',
@@ -125,7 +125,7 @@ describe('Coincheck BrokerAdapter', () => {
   test('refresh partial fill', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
-      symbol: 'BTCJPY',
+      symbol: 'BTC/JPY',
       type: 'Limit',
       timeInForce: 'None',
       id: '28f5d9f1-5e13-4bb7-845c-b1b7f02f5e64',

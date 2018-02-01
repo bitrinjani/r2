@@ -109,7 +109,7 @@ describe('NetOutStrategy', () => {
     expect(request.rate).toBeUndefined();
   });
 
-  test('netout non BTCJPY', async () => {
+  test('netout non BTC/JPY', async () => {
     const strategy = new NetOutStrategy(new BrokerApi('', ''));
     const order = createOrder(
       'Coincheck', 

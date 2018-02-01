@@ -8,6 +8,7 @@ import BrokerStabilityTracker from '../BrokerStabilityTracker';
 options.enabled = false;
 
 const config = {
+  symbol: 'BTC/JPY',
   minSize: 0.01,
   positionRefreshInterval: 5000,
   brokers: [{
@@ -40,13 +41,13 @@ describe('Position Service', () => {
     const ccPos = _.find(positions, x => x.broker === 'Coincheck');
     expect(positions.length).toBe(2);
     expect(exposure).toBe(-0.1);
-    expect(ccPos.btc).toBe(-0.3);
+    expect(ccPos.baseCcyPosition).toBe(-0.3);
     expect(ccPos.longAllowed).toBe(true);
     expect(ccPos.shortAllowed).toBe(false);
     expect(ccPos.allowedLongSize).toBe(1.3);
     expect(ccPos.allowedShortSize).toBe(0);
     const qPos = _.find(positions, x => x.broker === 'Quoine');
-    expect(qPos.btc).toBe(0.2);
+    expect(qPos.baseCcyPosition).toBe(0.2);
     expect(qPos.longAllowed).toBe(true);
     expect(qPos.shortAllowed).toBe(true);
     expect(qPos.allowedLongSize).toBe(0.1);
@@ -75,13 +76,13 @@ describe('Position Service', () => {
     const ccPos = _.find(positions, x => x.broker === 'Coincheck');
     expect(positions.length).toBe(2);
     expect(exposure).toBe(-0.299998);
-    expect(ccPos.btc).toBe(-0.3);
+    expect(ccPos.baseCcyPosition).toBe(-0.3);
     expect(ccPos.longAllowed).toBe(true);
     expect(ccPos.shortAllowed).toBe(false);
     expect(ccPos.allowedLongSize).toBe(1.3);
     expect(ccPos.allowedShortSize).toBe(0);
     const qPos = _.find(positions, x => x.broker === 'Quoine');
-    expect(qPos.btc).toBe(0.000002);
+    expect(qPos.baseCcyPosition).toBe(0.000002);
     expect(qPos.longAllowed).toBe(true);
     expect(qPos.shortAllowed).toBe(false);
     expect(qPos.allowedLongSize).toBe(0.299998);

@@ -1,6 +1,7 @@
 {
   "language": "en",
   "demoMode": true,
+  "symbol": "BTC/JPY",
   "priceMergeSize": 100,
   "maxSize": 0.01,
   "minSize": 0.01,

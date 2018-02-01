@@ -53,7 +53,7 @@ export interface BrokerPosition {
   broker: Broker;
   longAllowed: boolean;
   shortAllowed: boolean;
-  btc: number;
+  baseCcyPosition: number;
   allowedLongSize: number;
   allowedShortSize: number;
 }

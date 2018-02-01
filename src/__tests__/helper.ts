@@ -11,6 +11,7 @@ export function createOrder(
   leverageLevel: number
 ) {
   return new OrderImpl({
+    symbol: 'BTC/JPY',
     broker,
     side,
     size,

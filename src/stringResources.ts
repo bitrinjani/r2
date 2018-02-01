@@ -43,14 +43,14 @@ export const en = {
   ThisIsDemoModeNotSendingOrders: '>>This is Demo mode. Not sending orders.',
   AnalyzingQuotes: 'Analyzing quotes...',
   WaitingForPositionService: 'Waiting for Position Service...',
-  FilledSummary: '>>Filled: %s %s %d BTC filled at %s',
-  UnfilledSummary: '>>Pending: %s %s %d BTC sent at %s, pending size %d BTC',
+  FilledSummary: '>>Filled: %s %s %d %s filled at %s',
+  UnfilledSummary: '>>Pending: %s %s %d %s sent at %s, pending size %d %s',
   FoundClosableOrders: 'Found closable orders.',
   OpenPairs: 'Open pairs:',
   SendingOrderTtl: '>>Sending an order with TTL %d ms...',
   NotFilledTtl: '>>The order was not filled within TTL %d ms. Cancelling the order.',
-  ExecuteUnfilledLeg: '>>Trying to execute the unfilled leg %s at new price %s, size %s BTC',
-  ReverseFilledLeg: '>>Trying to reverse the filled leg %s at new price %s, size %s BTC'
+  ExecuteUnfilledLeg: '>>Trying to execute the unfilled leg %s at new price %s, size %s %s',
+  ReverseFilledLeg: '>>Trying to reverse the filled leg %s at new price %s, size %s %s'
 };
 
 export const ja = {
@@ -99,12 +99,12 @@ export const ja = {
   ThisIsDemoModeNotSendingOrders: '>>現在デモモードです。オーダーは送信しません。',
   AnalyzingQuotes: '板情報解析中...',
   WaitingForPositionService: 'ポジションサービスの待機中...',
-  FilledSummary: '>>約定済み: %s %s %d BTC 約定価格 %s',
-  UnfilledSummary: '>>執行中: %s %s %d BTC 指値 %s, 残り数量 %d BTC',
+  FilledSummary: '>>約定済み: %s %s %d %s 約定価格 %s',
+  UnfilledSummary: '>>執行中: %s %s %d %s 指値 %s, 残り数量 %d %s',
   FoundClosableOrders: 'クローズ可能なオーダーを発見。',
   OpenPairs: 'オープン状態のオーダーペア:',
   SendingOrderTtl: '>>TTL %d msのオーダーを送信中...',
   NotFilledTtl: '>>TTL %d msの間にオーダーは約定しませんでした。キャンセルします。',
-  ExecuteUnfilledLeg: '>>約定しなかったオーダー %s を価格 %s 数量 %s で再送信中...',
-  ReverseFilledLeg: '>>約定したオーダー %s を価格 %s 数量 %s で反対売買中...'
+  ExecuteUnfilledLeg: '>>約定しなかったオーダー %s を価格 %s 数量 %s %s で再送信中...',
+  ReverseFilledLeg: '>>約定したオーダー %s を価格 %s 数量 %s %s で反対売買中...'
 };

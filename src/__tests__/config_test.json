@@ -42,5 +42,6 @@
       "leverageLevel": 10,
       "commissionPercent": 0
     }
-  ]
+  ],
+  "symbol": "BTC/JPY"
 }

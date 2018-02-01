@@ -1,20 +1,12 @@
 import * as _ from 'lodash';
 import { format } from 'util';
 import { v4 as uuid } from 'uuid';
-import {
-  OrderSide,
-  CashMarginType,
-  OrderType,
-  TimeInForce,
-  OrderStatus,
-  Broker,
-  Order,
-  Execution
-} from './types';
-import { eRound } from './util';
+import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker, Order, Execution } from './types';
+import { eRound, splitSymbol } from './util';
 import t from './intl';
 
 export interface Init {
+  symbol: string;
   broker: Broker;
   side: OrderSide;
   size: number;
@@ -37,7 +29,7 @@ export default class OrderImpl implements Order {
   type: OrderType;
   leverageLevel: number;
   id: string = uuid();
-  symbol: string = 'BTCJPY';
+  symbol: string;
   timeInForce: TimeInForce = TimeInForce.None;
   brokerOrderId: string;
   status: OrderStatus = OrderStatus.PendingNew;
@@ -66,19 +58,31 @@ export default class OrderImpl implements Order {
   }
 
   toExecSummary(): string {
+    const { baseCcy } = splitSymbol(this.symbol);
     return this.filled
       ? format(
           t`FilledSummary`,
           this.broker,
           this.side,
           this.filledSize,
+          baseCcy,
           _.round(this.averageFilledPrice).toLocaleString()
         )
-      : format(t`UnfilledSummary`, this.broker, this.side, this.size, this.price.toLocaleString(), this.pendingSize);
+      : format(
+          t`UnfilledSummary`,
+          this.broker,
+          this.side,
+          this.size,
+          baseCcy,
+          this.price.toLocaleString(),
+          this.pendingSize,
+          baseCcy
+        );
   }
 
   toShortString(): string {
-    return `${this.broker} ${this.side} ${this.size} BTC`;
+    const { baseCcy } = splitSymbol(this.symbol);
+    return `${this.broker} ${this.side} ${this.size} ${baseCcy}`;
   }
 
   toString(): string {

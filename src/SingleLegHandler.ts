@@ -4,7 +4,7 @@ import OrderImpl from './OrderImpl';
 import * as _ from 'lodash';
 import { getLogger } from '@bitr/logger';
 import t from './intl';
-import { delay } from './util';
+import { delay, splitSymbol } from './util';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import { injectable, inject } from 'inversify';
 import symbols from './symbols';
@@ -13,12 +13,14 @@ import symbols from './symbols';
 export default class SingleLegHandler {
   private readonly log = getLogger(this.constructor.name);
   private readonly onSingleLegConfig: OnSingleLegConfig;
+  private symbol: string;
 
   constructor(
     private readonly brokerAdapterRouter: BrokerAdapterRouter,
     @inject(symbols.ConfigStore) configStore: ConfigStore
   ) {
     this.onSingleLegConfig = configStore.config.onSingleLeg;
+    this.symbol = configStore.config.symbol;
   }
 
   async handle(orders: OrderPair, closable: boolean): Promise<OrderImpl[]> {
@@ -46,8 +48,10 @@ export default class SingleLegHandler {
     const sign = largeLeg.side === OrderSide.Buy ? -1 : 1;
     const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
-    this.log.info(t`ReverseFilledLeg`, largeLeg.toShortString(), price.toLocaleString(), size);
+    const { baseCcy } = splitSymbol(this.symbol);
+    this.log.info(t`ReverseFilledLeg`, largeLeg.toShortString(), price.toLocaleString(), size, baseCcy);
     const reversalOrder = new OrderImpl({
+      symbol: this.symbol,
       broker: largeLeg.broker,
       side: largeLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
       size,
@@ -66,8 +70,10 @@ export default class SingleLegHandler {
     const sign = smallLeg.side === OrderSide.Buy ? 1 : -1;
     const price = _.round(smallLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(smallLeg.pendingSize - largeLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
-    this.log.info(t`ExecuteUnfilledLeg`, smallLeg.toShortString(), price.toLocaleString(), size);
+    const { baseCcy } = splitSymbol(this.symbol);
+    this.log.info(t`ExecuteUnfilledLeg`, smallLeg.toShortString(), price.toLocaleString(), size, baseCcy);
     const proceedOrder = new OrderImpl({
+      symbol: this.symbol,
       broker: smallLeg.broker,
       side: smallLeg.side,
       size,

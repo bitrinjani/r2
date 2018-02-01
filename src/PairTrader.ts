@@ -102,6 +102,7 @@ export default class PairTrader extends EventEmitter {
     const { cashMarginType, leverageLevel } = brokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
     const order = new OrderImpl({
+      symbol: this.configStore.config.symbol,
       broker: quote.broker,
       side: orderSide,
       size: targetVolume,

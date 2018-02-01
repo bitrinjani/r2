@@ -48,6 +48,7 @@ describe('Arbitrager', () => {
       onQuoteUpdated: new Map()
     };
     config = {
+      symbol: 'BTC/JPY',
       maxNetExposure: 10.0,
       minSize: 0.005,
       brokers: [
@@ -84,14 +85,14 @@ describe('Arbitrager', () => {
         allowedShortSize: 10,
         longAllowed: true,
         shortAllowed: true,
-        btc: 0.1
+        baseCcyPosition: 0.1
       },
       Quoine: {
         allowedLongSize: 10,
         allowedShortSize: 10,
         longAllowed: true,
         shortAllowed: true,
-        btc: -0.1
+        baseCcyPosition: -0.1
       }
     };
     positionService = {
