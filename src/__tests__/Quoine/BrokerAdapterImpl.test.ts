@@ -100,12 +100,6 @@ describe('Quoine BrokerAdapter', () => {
     result.forEach(q => expect(q.broker).toBe('Quoine'));
   });
 
-  test('fetchQuotes throws', async () => {
-    const target = new BrokerAdapterImpl(brokerConfig);
-    const result = await target.fetchQuotes();
-    expect(result.length).toBe(0);
-  });
-
   test('getBtcPosition Margin', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const result = await target.getBtcPosition();

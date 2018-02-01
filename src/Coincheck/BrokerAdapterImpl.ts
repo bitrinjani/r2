@@ -23,7 +23,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly log = getLogger('Coincheck.BrokerAdapter');
   readonly broker = 'Coincheck';
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
-  
+
   constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
@@ -42,14 +42,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   async fetchQuotes(): Promise<Quote[]> {
-    try {
-      const response = await this.brokerApi.getOrderBooks();
-      return this.mapToQuote(response);
-    } catch (ex) {
-      this.log.error(ex.message);
-      this.log.debug(ex.stack);
-      return [];
-    }
+    const response = await this.brokerApi.getOrderBooks();
+    return this.mapToQuote(response);
   }
 
   private mapToQuote(orderBooksResponse: OrderBooksResponse): Quote[] {

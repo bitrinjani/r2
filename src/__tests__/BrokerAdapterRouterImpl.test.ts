@@ -116,13 +116,9 @@ describe('BrokerAdapterRouter', () => {
 
     const brokerAdapters = [baBitflyer];
     const baRouter = new BrokerAdapterRouter(brokerAdapters, bst);
-    try {
-      await baRouter.fetchQuotes('Bitflyer');
-    } catch (ex) {
-      expect(ex.message).toBe('dummy');
-      return;
-    }
-    expect(true).toBe(false);
+    
+    const quotes =  await baRouter.fetchQuotes('Bitflyer');
+    expect(quotes).toEqual([]);
   });
 
   test('getBtcPosition throws', async () => {

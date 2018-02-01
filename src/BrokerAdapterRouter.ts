@@ -51,7 +51,9 @@ export default class BrokerAdapterRouter {
       return await this.brokerAdapterMap[broker].fetchQuotes();
     } catch (ex) {
       this.brokerStabilityTracker.decrement(broker);
-      throw ex;
+      this.log.error(ex.message);
+      this.log.debug(ex.stack);
+      return [];
     }
   }
 } /* istanbul ignore next */

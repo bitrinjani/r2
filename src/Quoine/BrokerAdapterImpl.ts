@@ -11,7 +11,6 @@
   BrokerConfigType
 } from '../types';
 import BrokerApi from './BrokerApi';
-import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from './types';
 import { timestampToDate, toExecution, toQuote } from '../util';
@@ -21,7 +20,6 @@ import NetOutStrategy from './NetOutStrategy';
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
-  private readonly log = getLogger('Quoine.BrokerAdapter');
   readonly broker = 'Quoine';
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
@@ -65,14 +63,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   async fetchQuotes(): Promise<Quote[]> {
-    try {
-      const response = await this.brokerApi.getPriceLevels();
-      return this.mapToQuote(response);
-    } catch (ex) {
-      this.log.error(ex.message);
-      this.log.debug(ex.stack);
-      return [];
-    }
+    const response = await this.brokerApi.getPriceLevels();
+    return this.mapToQuote(response);
   }
 
   private mapOrderToSendOrderRequest(order: Order): SendOrderRequest {

@@ -156,12 +156,6 @@ describe('Coincheck BrokerAdapter', () => {
     result.forEach(q => expect(q.broker).toBe('Coincheck'));
   });
 
-  test('fetchQuotes throws', async () => {
-    const target = new BrokerAdapterImpl(brokerConfig);
-    const result = await target.fetchQuotes();
-    expect(result.length).toBe(0);
-  });
-
   test('send wrong broker order', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = { broker: 'Bitflyer' };

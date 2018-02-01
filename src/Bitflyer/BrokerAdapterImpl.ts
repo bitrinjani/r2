@@ -87,14 +87,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   async fetchQuotes(): Promise<Quote[]> {
-    try {
-      const response = await this.brokerApi.getBoard();
-      return this.mapToQuote(response);
-    } catch (ex) {
-      this.log.error(ex.message);
-      this.log.debug(ex.stack);
-      return [];
-    }
+    const response = await this.brokerApi.getBoard();
+    return this.mapToQuote(response);
   }
 
   private mapOrderToSendChildOrderRequest(order: Order): SendChildOrderRequest {
