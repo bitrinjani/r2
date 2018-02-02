@@ -73,25 +73,32 @@ export default class OppotunitySearcher extends EventEmitter {
       this.log.info(t`OpenPairs`);
     }
     for (const { key, value: pair } of activePairsMap) {
+      let exitAnalysisResult: SpreadAnalysisResult | undefined;
       try {
-        const exitAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap, pair);
+        exitAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap, pair);
         this.log.debug(`pair: ${pair}, result: ${JSON.stringify(exitAnalysisResult)}.`);
-        this.log.info(this.formatPairInfo(pair, exitAnalysisResult));
         const limitResult = this.limitCheckerFactory.create(exitAnalysisResult, pair).check();
         if (limitResult.success) {
           return { closable: true, key, exitAnalysisResult };
         }
       } catch (ex) {
         this.log.debug(ex.message);
+      } finally {
+        this.log.info(this.formatPairInfo(pair, exitAnalysisResult));
       }
     }
     return { closable: false };
   }
 
-  private formatPairInfo(pair: OrderPair, exitAnalysisResult: SpreadAnalysisResult) {
+  private formatPairInfo(pair: OrderPair, exitAnalysisResult?: SpreadAnalysisResult) {
+    if (exitAnalysisResult) {
+      return `[${pair[0].toShortString()}, ${pair[1].toShortString()}, Entry PL: ${_.round(
+        calcProfit(pair, this.configStore.config).profit
+      )} JPY, Current exit cost: ${_.round(-exitAnalysisResult.targetProfit)} JPY]`;
+    }
     return `[${pair[0].toShortString()}, ${pair[1].toShortString()}, Entry PL: ${_.round(
       calcProfit(pair, this.configStore.config).profit
-    )} JPY, Current exit cost: ${_.round(-exitAnalysisResult.targetProfit)} JPY]`;
+    )} JPY]`;
   }
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
