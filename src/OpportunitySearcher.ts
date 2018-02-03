@@ -1,7 +1,7 @@
 import { getLogger } from '@bitr/logger';
 import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
-import { ConfigStore, SpreadAnalysisResult, ActivePairStore, Quote, OrderPair } from './types';
+import { ConfigStore, SpreadAnalysisResult, ActivePairStore, Quote, OrderPair, OrderSide } from './types';
 import t from './intl';
 import { padEnd } from './util';
 import symbols from './symbols';
@@ -10,6 +10,8 @@ import SpreadAnalyzer from './SpreadAnalyzer';
 import LimitCheckerFactory from './LimitCheckerFactory';
 import { EventEmitter } from 'events';
 import { calcProfit } from './pnl';
+import OrderImpl from './OrderImpl';
+import { LOT_MIN_DECIMAL_PLACE } from './constants';
 
 @injectable()
 export default class OppotunitySearcher extends EventEmitter {
@@ -91,14 +93,19 @@ export default class OppotunitySearcher extends EventEmitter {
   }
 
   private formatPairInfo(pair: OrderPair, exitAnalysisResult?: SpreadAnalysisResult) {
+    const entryProfit = calcProfit(pair, this.configStore.config).profit;
+    const buyLeg = pair.find(o => o.side === OrderSide.Buy) as OrderImpl;
+    const sellLeg = pair.find(o => o.side === OrderSide.Sell) as OrderImpl;
+    const midNotional = _.mean([buyLeg.averageFilledPrice, sellLeg.averageFilledPrice]) * buyLeg.filledSize;
+    const entryProfitRatio = _.round(entryProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
     if (exitAnalysisResult) {
       return `[${pair[0].toShortString()}, ${pair[1].toShortString()}, Entry PL: ${_.round(
-        calcProfit(pair, this.configStore.config).profit
-      )} JPY, Current exit cost: ${_.round(-exitAnalysisResult.targetProfit)} JPY]`;
+        entryProfit
+      )} JPY (${entryProfitRatio}%), Current exit cost: ${_.round(-exitAnalysisResult.targetProfit)} JPY]`;
     }
     return `[${pair[0].toShortString()}, ${pair[1].toShortString()}, Entry PL: ${_.round(
-      calcProfit(pair, this.configStore.config).profit
-    )} JPY]`;
+      entryProfit
+    )} JPY (${entryProfitRatio}%)]`;
   }
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
