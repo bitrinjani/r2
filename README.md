@@ -99,7 +99,7 @@ All configurations are stored in `config.json`.
 |orderStatusCheckInterval|Millisecond|Time lapse in milliseconds to check if arbitrage orders are filled or not.|
 |stabilityTracker|-|See stabilityTracker config below|
 |onSingleLeg|-|See onSingleLeg config below|
-|analytics|-|See [ANALYTICS_PLUGIN_JP.md](https://github.com/bitrinjani/r2/blob/master/docs/ANALYTICS_PLUGIN_JP.md)|
+|analytics|-|See [ANALYTICS_PLUGIN.md](https://github.com/bitrinjani/r2/blob/master/docs/ANALYTICS_PLUGIN.md)|
 
 #### stabilityTracker config details
 
@@ -253,6 +253,12 @@ All log files are saved under `logs` directory.
 |---------|-----------|
 |info.log|Standard log file|
 |debug.log|Verbose logging, including all REST HTTP requests and responses in JSON format|
+
+## Utility scripts
+
+Several utility scripts are available to close positions, show balances and clear cache.
+
+See [TOOLS.md](https://github.com/bitrinjani/r2/blob/master/docs/TOOLS.md)
 
 ## Running the tests
 `test` script runs [ts-jest](https://github.com/kulshekhar/ts-jest).
