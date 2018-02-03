@@ -38,8 +38,7 @@ export default class PositionService {
   }
 
   print(): void {
-    const symbol = this.configStore.config.symbol;
-    const { baseCcy } = splitSymbol(symbol);
+    const { baseCcy } = splitSymbol(this.configStore.config.symbol);
     const isOk = b => (b ? 'OK' : 'NG');
     const formatBrokerPosition = (brokerPosition: BrokerPosition) =>
       `${padEnd(brokerPosition.broker, 10)}: ${padStart(_.round(brokerPosition.baseCcyPosition, 3), 6)} ${baseCcy}, ` +
@@ -90,19 +89,24 @@ export default class PositionService {
   }
 
   private async getBrokerPosition(brokerConfig: BrokerConfig, minSize: number): Promise<BrokerPosition> {
-    const currentBtc = await this.brokerAdapterRouter.getBtcPosition(brokerConfig.broker);
+    const { baseCcy } = splitSymbol(this.configStore.config.symbol);
+    const positions =  await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
+    const baseCcyPosition = positions.get(baseCcy);
+    if (baseCcyPosition === undefined) {
+      throw new Error('Unable to find base ccy position.');
+    }
     const allowedLongSize = _.max([
       0,
-      new Decimal(brokerConfig.maxLongPosition).minus(currentBtc).toNumber()
+      new Decimal(brokerConfig.maxLongPosition).minus(baseCcyPosition).toNumber()
     ]) as number;
     const allowedShortSize = _.max([
       0,
-      new Decimal(brokerConfig.maxShortPosition).plus(currentBtc).toNumber()
+      new Decimal(brokerConfig.maxShortPosition).plus(baseCcyPosition).toNumber()
     ]) as number;
     const isStable = this.brokerStabilityTracker.isStable(brokerConfig.broker);
     return {
       broker: brokerConfig.broker,
-      baseCcyPosition: currentBtc,
+      baseCcyPosition,
       allowedLongSize,
       allowedShortSize,
       longAllowed: new Decimal(allowedLongSize).gte(minSize) && isStable,

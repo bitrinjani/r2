@@ -1,18 +1,19 @@
-﻿import { Broker, BrokerAdapter, BrokerMap, Order, Quote } from './types';
+﻿import { Broker, BrokerAdapter, BrokerMap, Order, Quote, ConfigStore } from './types';
 import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
-import { injectable, multiInject } from 'inversify';
+import { injectable, multiInject, inject } from 'inversify';
 import symbols from './symbols';
 import BrokerStabilityTracker from './BrokerStabilityTracker';
 
 @injectable()
 export default class BrokerAdapterRouter {
   private readonly log = getLogger(this.constructor.name);
-  private brokerAdapterMap: BrokerMap<BrokerAdapter>;
+  private readonly brokerAdapterMap: BrokerMap<BrokerAdapter>;
 
   constructor(
     @multiInject(symbols.BrokerAdapter) brokerAdapters: BrokerAdapter[],
-    private readonly brokerStabilityTracker: BrokerStabilityTracker
+    private readonly brokerStabilityTracker: BrokerStabilityTracker,
+    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
   ) {
     this.brokerAdapterMap = _.keyBy(brokerAdapters, x => x.broker);
   }
@@ -37,9 +38,17 @@ export default class BrokerAdapterRouter {
     await this.brokerAdapterMap[order.broker].refresh(order);
   }
 
-  async getBtcPosition(broker: Broker): Promise<number> {
+  async getPositions(broker: Broker): Promise<Map<string, number>> {
     try {
-      return await this.brokerAdapterMap[broker].getBtcPosition();
+      // for backword compatibility, use getBtcPosition if getPositions is not defined
+      if (!_.isFunction(this.brokerAdapterMap[broker].getPositions) && this.configStore.config.symbol === 'BTC/JPY') {
+        const btcPosition = await this.brokerAdapterMap[broker].getBtcPosition();
+        return new Map<string, number>([['BTC', btcPosition]]);
+      }
+      if (this.brokerAdapterMap[broker].getPositions !== undefined) {
+        return await (this.brokerAdapterMap[broker].getPositions as () => Promise<Map<string, number>>)();
+      }
+      throw new Error('Unable to find a method to get positions.');
     } catch (ex) {
       this.brokerStabilityTracker.decrement(broker);
       throw ex;
