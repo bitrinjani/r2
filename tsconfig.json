@@ -14,7 +14,8 @@
     "types": ["reflect-metadata"],
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "pretty": true
   },
   "files": [
     "./node_modules/@types/node/index.d.ts"
