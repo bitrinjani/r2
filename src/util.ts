@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as querystring from 'querystring';
-import { Execution, Order, Broker, QuoteSide } from './types';
+import { Execution, Order, Broker, QuoteSide, Quote } from './types';
 
 interface ToStringable {
   toString(): string;
@@ -104,4 +104,11 @@ export function cwd() {
 export function splitSymbol(symbol: string): { baseCcy: string; quoteCcy: string } {
   const [baseCcy, quoteCcy] = symbol.split('/');
   return { baseCcy, quoteCcy };
+}
+
+export function formatQuote(quote: Quote) {
+  return (
+    `${padEnd(quote.broker, 10)} ${quote.side} ` +
+    `${padStart(quote.price.toLocaleString(), 7)} ${_.round(quote.volume, 3)}`
+  );
 }

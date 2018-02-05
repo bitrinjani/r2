@@ -3,7 +3,7 @@ import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
 import { ConfigStore, SpreadAnalysisResult, ActivePairStore, Quote, OrderPair, OrderSide } from './types';
 import t from './intl';
-import { padEnd } from './util';
+import { padEnd, formatQuote } from './util';
 import symbols from './symbols';
 import PositionService from './PositionService';
 import SpreadAnalyzer from './SpreadAnalyzer';
@@ -110,8 +110,8 @@ export default class OppotunitySearcher extends EventEmitter {
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
     const columnWidth = 17;
-    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), result.ask.toString());
-    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), result.bid.toString());
+    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), formatQuote(result.ask));
+    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), formatQuote(result.bid));
     this.log.info('%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
     this.log.info('%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
     this.log.info('%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);

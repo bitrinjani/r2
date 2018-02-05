@@ -60,9 +60,17 @@ describe('Quote Aggregator', () => {
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const mustBeCalled = jest.fn();
     aggregator.onQuoteUpdated.set('Arbitrager', async quotes => {
-      expect(quotes.length).toBe(3);
-      expect(quotes[0].toString()).toBe('Bitflyer   Ask 500,000 0.1');
-      mustBeCalled();
+      try {
+        expect(quotes.length).toBe(3);
+        expect(quotes[0].broker).toBe('Bitflyer');
+        expect(quotes[0].side).toBe('Ask');
+        expect(quotes[0].price).toBe(500000);
+        expect(quotes[0].volume).toBe(0.1);
+        mustBeCalled();
+      } catch (ex) {
+        console.log(ex);
+        expect(ex.message).toBe('');
+      }
     });
     await aggregator.start();
     await delay(0);
@@ -156,9 +164,7 @@ describe('Quote Aggregator', () => {
 
   test('folding with noTradePeriods -> invalid period', async () => {
     configStore.config.iterationInterval = 10;
-    configStore.config.brokers[0].noTradePeriods = [
-      ['00_00', '01_00']
-    ];
+    configStore.config.brokers[0].noTradePeriods = [['00_00', '01_00']];
     const bitflyerBa = {
       broker: 'Bitflyer',
       fetchQuotes: () =>

@@ -3,7 +3,6 @@ import { ConfigStore, BrokerConfig, QuoteSide, Broker, Quote } from './types';
 import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import symbols from './symbols';
-import QuoteImpl from './QuoteImpl';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import { DateTime, Interval } from 'luxon';
 
@@ -99,15 +98,12 @@ export default class QuoteAggregator {
         const price = q.side === QuoteSide.Ask ? _.ceil(q.price / step) * step : _.floor(q.price / step) * step;
         return _.join([price, q.broker, QuoteSide[q.side]], '#');
       })
-      .map(
-        (value: Quote[], key) =>
-          new QuoteImpl(
-            value[0].broker,
-            value[0].side,
-            Number(key.substring(0, key.indexOf('#'))),
-            _.sumBy(value, q => q.volume)
-          )
-      )
+      .map((value: Quote[], key) => ({
+        broker: value[0].broker,
+        side: value[0].side,
+        price: Number(key.substring(0, key.indexOf('#'))),
+        volume: _.sumBy(value, q => q.volume)
+      }))
       .value();
   }
 } /* istanbul ignore next */
