@@ -18,8 +18,10 @@ import { EventEmitter } from 'events';
 import { getSpreadStatTimeSeries } from './SpreadStatTimeSeries';
 import ReportService from './ReportService';
 import BrokerStabilityTracker from './BrokerStabilityTracker';
+import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
 
 decorate(injectable(), EventEmitter);
+decorate(injectable(), AwaitableEventEmitter);
 
 const container = new Container();
 container.bind<Arbitrager>(Arbitrager).toSelf();

@@ -59,7 +59,7 @@ describe('Quote Aggregator', () => {
     const baRouter = new BrokerAdapterRouter(baList);
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const mustBeCalled = jest.fn();
-    aggregator.onQuoteUpdated.set('Arbitrager', async quotes => {
+    aggregator.on('quoteUpdated', async quotes => {
       try {
         expect(quotes.length).toBe(3);
         expect(quotes[0].broker).toBe('Bitflyer');
@@ -110,7 +110,7 @@ describe('Quote Aggregator', () => {
     const baRouter = new BrokerAdapterRouter(baList);
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const mustBeCalled = jest.fn();
-    aggregator.onQuoteUpdated.set('Arbitrager', async quotes => {
+    aggregator.on('quoteUpdated', async quotes => {
       expect(quotes.length).toBe(1);
       mustBeCalled();
     });
@@ -152,7 +152,7 @@ describe('Quote Aggregator', () => {
     const baRouter = new BrokerAdapterRouter(baList);
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const mustBeCalled = jest.fn();
-    aggregator.onQuoteUpdated.set('Arbitrager', async quotes => {
+    aggregator.on('quoteUpdated', async quotes => {
       expect(quotes.length).toBe(3);
       mustBeCalled();
     });
@@ -189,7 +189,7 @@ describe('Quote Aggregator', () => {
     const baRouter = new BrokerAdapterRouter(baList);
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const mustBeCalled = jest.fn();
-    aggregator.onQuoteUpdated.set('Arbitrager', async quotes => {
+    aggregator.on('quoteUpdated', async quotes => {
       expect(quotes.length).toBe(3);
       mustBeCalled();
     });
@@ -226,7 +226,7 @@ describe('Quote Aggregator', () => {
     const baRouter = new BrokerAdapterRouter(baList);
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const mustBeCalled = jest.fn();
-    aggregator.onQuoteUpdated.set('Arbitrager', async quotes => {
+    aggregator.on('quoteUpdated', async quotes => {
       expect(quotes.length).toBe(1);
       mustBeCalled();
     });
@@ -258,7 +258,7 @@ describe('Quote Aggregator', () => {
     const baRouter = new BrokerAdapterRouter(baList);
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
     const fn = jest.fn();
-    aggregator.onQuoteUpdated.set('Arbitrager', fn);
+    aggregator.on('quoteUpdated', fn);
     await aggregator.start();
     await delay(0);
     expect(fn.mock.calls.length).toBeGreaterThan(0);

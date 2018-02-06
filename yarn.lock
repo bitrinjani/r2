@@ -2,9 +2,31 @@
 # yarn lockfile v1
 
 
-"@bitr/castable@^1.0.1":
+"@bitr/awaitable-event-emitter@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@bitr/awaitable-event-emitter/-/awaitable-event-emitter-1.0.3.tgz#78d5e1057e9796934d0e82a07ed23bf5622060fa"
+  dependencies:
+    lodash "^4.17.4"
+
+"@bitr/bitflyer-fx@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@bitr/bitflyer-fx/-/bitflyer-fx-1.0.4.tgz#c7c7c1500bef289d9f3b88afffd41a420be7381b"
+  dependencies:
+    "@bitr/castable" "^1.0.2"
+    coveralls "^3.0.0"
+    lodash "^4.17.4"
+    node-fetch "^1.7.3"
+    pino "^4.10.2"
+
+"@bitr/castable@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@bitr/castable/-/castable-1.0.2.tgz#c41f7067f0afe815a8de78ff1d03045f6f8edf9a"
+  dependencies:
+    reflect-metadata "^0.1.10"
+
+"@bitr/castable@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@bitr/castable/-/castable-1.0.3.tgz#77ead4c0e64c23112751db60629f083d3a941210"
   dependencies:
     reflect-metadata "^0.1.10"
 
@@ -24,9 +46,9 @@
   dependencies:
     pino "4.10.3"
 
-"@bitr/zmq@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@bitr/zmq/-/zmq-1.0.2.tgz#c6ac887d5d0f3467dade1dc4dc665bb4c8e65476"
+"@bitr/zmq@^1.1.0":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@bitr/zmq/-/zmq-1.1.1.tgz#412eb56eb47ad24d3efb208b381113e01410fd3b"
   dependencies:
     lodash "^4.17.4"
     zeromq "^4.6.0"

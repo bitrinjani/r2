@@ -61,7 +61,7 @@ export default class AppRoot {
         ? await this.tryImport(brokerConfig.npmPath)
         : (await this.tryImport(`./${brokerName}`)) || (await this.tryImport(`@bitr/${brokerName}`));
       if (brokerModule === undefined) {
-        throw new Error(`Unabled to find ${brokerName} package.`);
+        throw new Error(`Unable to find ${brokerName} package.`);
       }
       const brokerAdapter = brokerModule.create(brokerConfig);
       this.ioc.bind<BrokerAdapter>(symbols.BrokerAdapter).toConstantValue(brokerAdapter);

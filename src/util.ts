@@ -89,14 +89,6 @@ export function toQuote(broker: Broker, side: QuoteSide, price: number, volume: 
   return { broker, side, price, volume };
 }
 
-export function parseBuffer<T>(buffer: Buffer): T | undefined {
-  try {
-    return JSON.parse(buffer.toString());
-  } catch (ex) {
-    return undefined;
-  }
-}
-
 export function cwd() {
   return process.env.NODE_ENV === 'test' ? `${process.cwd()}/src/__tests__/sandbox` : process.cwd();
 }

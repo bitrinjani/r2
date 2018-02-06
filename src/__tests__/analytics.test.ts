@@ -175,7 +175,7 @@ describe('AnalyticsService', () => {
     const as = new AnalyticsService();
     try {
       await as.start();
-      as.streamSubscriber.subscribe('sometopic');
+      as.streamSubscriber.subscribe('sometopic', message => console.log(message));
       await delay(100);
       rsPub.send(['spreadStat', JSON.stringify({ pattern: 1 })]);
       rsPub.send(['spreadStat', 'handling']);

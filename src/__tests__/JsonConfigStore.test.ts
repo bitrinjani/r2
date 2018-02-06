@@ -2,13 +2,21 @@ import 'reflect-metadata';
 import JsonConfigStore from '../JsonConfigStore';
 import { ConfigStore, ConfigRoot, Broker } from '../types';
 import { options } from '@bitr/logger';
-import { delay, parseBuffer } from '../util';
+import { delay } from '../util';
 import * as _ from 'lodash';
 import { Socket, socket } from 'zeromq';
 import { configStoreSocketUrl } from '../constants';
 import { ZmqRequester } from '@bitr/zmq';
 import { ConfigRequester } from '../messages';
 options.enabled = false;
+
+function parseBuffer<T>(buffer: Buffer): T | undefined {
+  try {
+    return JSON.parse(buffer.toString());
+  } catch (ex) {
+    return undefined;
+  }
+}
 
 describe('JsonConfigStore', () => {
   test('JsonConfigStore', async () => {
@@ -91,7 +99,7 @@ describe('JsonConfigStore', () => {
         client.once('message', resolve);
         client.send('invalid message');
       });
-      const parsed = parseBuffer(reply);
+      const parsed = JSON.parse(reply.toString());
       expect(parsed.success).toBe(false);
       expect(parsed.reason).toBe('invalid message');
       expect(store.config.minSize).toBe(0.01);

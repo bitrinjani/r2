@@ -24,7 +24,7 @@ export function getConfigPath(): string {
 export function findBrokerConfig(configRoot: ConfigRoot, broker: Broker): BrokerConfig {
   const found = configRoot.brokers.find(brokerConfig => brokerConfig.broker === broker);
   if (found === undefined) {
-    throw new Error(`Unabled to find ${broker} in config.`);
+    throw new Error(`Unable to find ${broker} in config.`);
   }
   return found;
 }

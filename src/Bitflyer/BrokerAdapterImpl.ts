@@ -44,7 +44,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     const reply = await this.brokerApi.getChildOrders(request);
     const childOrder = reply[0];
     if (childOrder === undefined) {
-      const message = `Unabled to find ${orderId}. GetOrderState failed.`;
+      const message = `Unable to find ${orderId}. GetOrderState failed.`;
       this.log.warn(message);
       return;
     }

@@ -1,6 +1,6 @@
 {
   "name": "r2",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -17,10 +17,12 @@
     "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run clearPairs && npm run getBalance"
   },
   "dependencies": {
-    "@bitr/castable": "^1.0.1",
+    "@bitr/awaitable-event-emitter": "^1.0.3",
+    "@bitr/bitflyer-fx": "^1.0.4",
+    "@bitr/castable": "^1.0.3",
     "@bitr/chronodb": "^1.0.2",
     "@bitr/logger": "^1.0.0",
-    "@bitr/zmq": "^1.0.2",
+    "@bitr/zmq": "^1.1.0",
     "chalk": "^2.3.0",
     "date-fns": "^1.28.5",
     "decimal.js": "^7.3.0",

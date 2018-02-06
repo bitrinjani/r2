@@ -25,6 +25,7 @@ import PositionService from '../PositionService';
 import BrokerAdapterRouter from '../BrokerAdapterRouter';
 import OrderImpl from '../OrderImpl';
 import SingleLegHandler from '../SingleLegHandler';
+import AwaitableEventEmitter from '@bitr/awaitable-event-emitter/dist/AwaitableEventEmitter';
 options.enabled = false;
 
 const chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
@@ -42,11 +43,10 @@ let quoteAggregator,
 
 describe('Arbitrager', () => {
   beforeEach(async () => {
-    quoteAggregator = {
-      start: jest.fn(),
-      stop: jest.fn(),
-      onQuoteUpdated: new Map()
-    };
+    const aee: QuoteAggregator = new AwaitableEventEmitter();
+    aee.start = jest.fn();
+    aee.stop = jest.fn();
+    quoteAggregator = aee as QuoteAggregator;
     config = {
       symbol: 'BTC/JPY',
       maxNetExposure: 10.0,
@@ -144,7 +144,7 @@ describe('Arbitrager', () => {
     const trader = new PairTrader(configStore, baRouter, activePairStore, new SingleLegHandler(baRouter, configStore));
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     await arbitrager.start();
-    expect(quoteAggregator.onQuoteUpdated.size).toBe(1);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
     expect(arbitrager.status).toBe('Started');
     await arbitrager.stop();
     expect(arbitrager.status).toBe('Stopped');
@@ -181,7 +181,7 @@ describe('Arbitrager', () => {
 
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(spreadAnalyzer.analyze).toBeCalled();
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Spread analysis failed');
@@ -209,7 +209,7 @@ describe('Arbitrager', () => {
     const trader = new PairTrader(configStore, baRouter, activePairStore, new SingleLegHandler(baRouter, configStore));
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(spreadAnalyzer.analyze).toBeCalled();
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Max exposure breached');
@@ -236,7 +236,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(spreadAnalyzer.analyze).toBeCalled();
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Spread not inverted');
@@ -265,7 +265,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Too small profit');
   });
@@ -294,7 +294,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Too small profit');
   });
@@ -323,7 +323,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Too small profit');
   });
@@ -351,7 +351,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Too large profit');
   });
@@ -379,7 +379,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Too large profit');
   });
@@ -408,7 +408,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(baRouter.send).not.toBeCalled();
     expect(arbitrager.status).toBe('Demo mode');
   });
@@ -440,7 +440,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Filled');
     expect(baRouter.refresh.mock.calls.length).toBe(2);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -481,7 +481,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Filled');
     expect(baRouter.refresh.mock.calls.length).toBe(2);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -521,7 +521,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
   });
 
@@ -554,7 +554,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(6);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -593,7 +593,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -632,7 +632,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -670,7 +670,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -709,7 +709,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -748,7 +748,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -786,7 +786,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -824,7 +824,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -862,7 +862,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(6);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -900,7 +900,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(6);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -946,7 +946,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(3);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -991,7 +991,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(6);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -1031,7 +1031,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -1070,7 +1070,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -1109,7 +1109,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -1147,7 +1147,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -1185,7 +1185,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(7);
     expect(baRouter.send.mock.calls.length).toBe(3);
@@ -1223,7 +1223,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(6);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -1261,7 +1261,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
     expect(baRouter.refresh.mock.calls.length).toBe(6);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -1300,7 +1300,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Order send/refresh failed');
     expect(baRouter.refresh.mock.calls.length).toBe(6);
     expect(baRouter.send.mock.calls.length).toBe(2);
@@ -1330,7 +1330,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
   });
 
@@ -1360,7 +1360,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Order send/refresh failed');
   });
 
@@ -1390,8 +1390,8 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.shouldStop).toBe(true);
   });
 
@@ -1421,7 +1421,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('MaxRetryCount breached');
   });
 
@@ -1449,7 +1449,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Filled');
   });
 
@@ -1480,7 +1480,7 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Filled');
   });
 
@@ -1507,11 +1507,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Closed');
     expect((await activePairStore.getAll()).length).toBe(0);
   });
@@ -1544,22 +1544,22 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
 
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
 
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes2);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes2);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(2);
  
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Closed');
     const pairs = await activePairStore.getAll();
     expect(pairs.length).toBe(1);
     expect(pairs[0].value[0].price).toBe(501);
  
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Closed');
     expect((await activePairStore.getAll()).length).toBe(0);
   });
@@ -1587,11 +1587,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Closed');
     expect((await activePairStore.getAll()).length).toBe(0);
   });
@@ -1619,11 +1619,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(2);
   });
@@ -1651,10 +1651,10 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(2);
 
@@ -1665,10 +1665,10 @@ describe('Arbitrager', () => {
       toQuote('Coincheck', QuoteSide.Ask, 500, 1),
       toQuote('Coincheck', QuoteSide.Bid, 450, 1)
     ];
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes2);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes2);
     expect(arbitrager.status).toBe('Closed');
     expect((await activePairStore.getAll()).length).toBe(1);
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes2);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes2);
     expect(arbitrager.status).toBe('Closed');
     expect((await activePairStore.getAll()).length).toBe(0);
   });
@@ -1696,11 +1696,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Closed');
     expect((await activePairStore.getAll()).length).toBe(0);
   });
@@ -1728,11 +1728,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Spread analysis failed');
     expect((await activePairStore.getAll()).length).toBe(1);
   });
@@ -1776,11 +1776,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')([]);
+    await quoteAggregator.emitParallel('quoteUpdated', []);
     expect(arbitrager.status).toBe('Too large Volume');
     expect((await activePairStore.getAll()).length).toBe(1);
   });
@@ -1812,11 +1812,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Closed');
     expect((await activePairStore.getAll()).length).toBe(0);
   });
@@ -1848,11 +1848,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // Not closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(2);
   });
@@ -1886,11 +1886,11 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(1);
     // Not closing
-    await quoteAggregator.onQuoteUpdated.get('Arbitrager')(quotes);
+    await quoteAggregator.emitParallel('quoteUpdated', quotes);
     expect(arbitrager.status).toBe('Filled');
     expect((await activePairStore.getAll()).length).toBe(2);
   });

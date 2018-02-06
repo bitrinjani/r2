@@ -5,9 +5,10 @@ import * as _ from 'lodash';
 import symbols from './symbols';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import { DateTime, Interval } from 'luxon';
+import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
 
 @injectable()
-export default class QuoteAggregator {
+export default class QuoteAggregator extends AwaitableEventEmitter {
   private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRunning: boolean;
@@ -16,7 +17,9 @@ export default class QuoteAggregator {
   constructor(
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     private readonly brokerAdapterRouter: BrokerAdapterRouter
-  ) {}
+  ) {
+    super();
+  }
 
   async start(): Promise<void> {
     this.log.debug('Starting Quote Aggregator...');
@@ -34,8 +37,6 @@ export default class QuoteAggregator {
     }
     this.log.debug('Stopped Quote Aggregator.');
   }
-
-  onQuoteUpdated: Map<string, ((quotes: Quote[]) => Promise<void>)> = new Map();
 
   private async aggregate(): Promise<void> {
     if (this.isRunning) {
@@ -63,8 +64,7 @@ export default class QuoteAggregator {
     this.quotes = value;
     this.log.debug('New quotes have been set.');
     this.log.debug('Calling onQuoteUpdated...');
-    const handlerTasks = [...this.onQuoteUpdated.values()].map(handler => handler(this.quotes));
-    await Promise.all(handlerTasks);
+    await this.emitParallel('quoteUpdated', this.quotes);
     this.log.debug('onQuoteUpdated done.');
   }
 
