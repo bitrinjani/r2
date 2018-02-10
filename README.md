@@ -54,6 +54,7 @@ R2 supports three exchanges operated in Japan.
 |bitFlyer|✔️|✔️*|
 |Quoine|✔️|✔️|
 |Coincheck|✔️|✔️|
+|bitbank.cc|️️️✔️|| 
 
 *bitFlyer margin trading (BTC-FX/JPY) is available as a [broker plugin](https://github.com/bitrinjani/bitflyer-fx).
 
