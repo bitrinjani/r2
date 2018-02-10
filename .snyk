@@ -1,0 +1,11 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.10.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:hawk:20160119':
+    - '@bitr/bitflyer-fx > coveralls > log-driver > codecov.io > request > hawk':
+        patched: '2018-02-10T04:55:29.501Z'
+  'npm:request:20160119':
+    - '@bitr/bitflyer-fx > coveralls > log-driver > codecov.io > request':
+        patched: '2018-02-10T04:55:29.501Z'

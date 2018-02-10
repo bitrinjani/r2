@@ -14,7 +14,9 @@
     "closeCcPosition": "ts-node ./tools/closeCcPosition.ts",
     "closeBfPosition": "ts-node ./tools/closeBfPosition.ts",
     "closeQuPosition": "ts-node ./tools/closeQuPosition.ts",
-    "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run clearPairs && npm run getBalance"
+    "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run clearPairs && npm run getBalance",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "dependencies": {
     "@bitr/awaitable-event-emitter": "^1.0.3",
@@ -40,7 +42,8 @@
     "simple-statistics": "^5.2.1",
     "split2": "^2.2.0",
     "uuid": "^3.1.0",
-    "zeromq": "^4.6.0"
+    "zeromq": "^4.6.0",
+    "snyk": "^1.69.7"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",
@@ -92,5 +95,6 @@
       "!**/vendor/**",
       "!tools/**"
     ]
-  }
+  },
+  "snyk": true
 }
