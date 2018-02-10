@@ -47,7 +47,7 @@ R2 works on any OS that supports Node.js, such as:
 - Linux
 
 #### Supported Exchanges
-R2 supports three exchanges operated in Japan.
+R2 supports the following exchanges.
 
 |Exchange|Cash|Margin|
 |----|------|-----------|
