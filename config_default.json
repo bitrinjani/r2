@@ -66,6 +66,7 @@
     },
     {
       "broker": "Bitbankcc",
+      "npmPath": "@bitr/bitbankcc",
       "enabled": true,
       "key": "xxxxxx",
       "secret": "xxxxxxx",
