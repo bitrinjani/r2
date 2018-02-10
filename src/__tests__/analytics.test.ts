@@ -17,25 +17,26 @@ describe('AnalyticsService', () => {
         initHistory: { minutes: 3 }
       }
     };
-    const configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-      respond({ success: true, data: config });
-    });
 
-    const rsPub = socket('pub');
-    rsPub.bindSync(reportServicePubUrl);
-
-    const rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
-      respond({ success: true, data: [] });
-    });
-
-    let as;
+    let configServer, rsPub, rsRep, as;
     try {
+      configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
+        respond({ success: true, data: config });
+      });
+  
+      rsPub = socket('pub');
+      rsPub.bindSync(reportServicePubUrl);
+  
+      rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
+        respond({ success: true, data: [] });
+      });
       as = new AnalyticsService();
       await as.start();
       await delay(10);
     } catch (ex) {
       console.log(ex);
       if (process.env.CI && ex.message === 'Address already in use') return;
+      console.log(ex);
       expect(true).toBe(false);
     } finally {
       rsPub.unbindSync(reportServicePubUrl);
@@ -54,18 +55,19 @@ describe('AnalyticsService', () => {
         initHistory: { minutes: 3 }
       }
     };
-    const configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-      respond({ success: true, data: config });
-    });
 
-    const rsPub = socket('pub');
-    rsPub.bindSync(reportServicePubUrl);
-
-    const rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
-      respond({ success: false, data: [] });
-    });
-    let as;
+    let configServer, rsPub, rsRep, as;
     try {
+      configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
+        respond({ success: true, data: config });
+      });
+
+      rsPub = socket('pub');
+      rsPub.bindSync(reportServicePubUrl);
+
+      rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
+        respond({ success: false, data: [] });
+      });
       as = new AnalyticsService();
       await as.start();
     } catch (ex) {
@@ -89,19 +91,21 @@ describe('AnalyticsService', () => {
         initHistory: { minutes: 3 }
       }
     };
-    const configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-      respond({ success: false, data: config });
-    });
+    let configServer, rsPub, rsRep, as;
 
-    const rsPub = socket('pub');
-    rsPub.bindSync(reportServicePubUrl);
-
-    const rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
-      respond({ success: true, data: undefined });
-    });
-
-    const as = new AnalyticsService();
     try {
+      configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
+        respond({ success: false, data: config });
+      });
+  
+      rsPub = socket('pub');
+      rsPub.bindSync(reportServicePubUrl);
+  
+      rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
+        respond({ success: true, data: undefined });
+      });
+  
+      as = new AnalyticsService();
       await as.start();
       expect(true).toBe(false);
     } catch (ex) {
@@ -124,20 +128,22 @@ describe('AnalyticsService', () => {
         initHistory: { minutes: 3 }
       }
     };
-    const configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-      respond({ success: true, data: config });
-    });
 
-    const rsPub = socket('pub');
-    rsPub.bindSync(reportServicePubUrl);
-
-    const rsRep = socket('rep');
-    rsRep.bindSync(reportServiceRepUrl);
-    rsRep.on('message', () => {
-      rsRep.send('{invalid');
-    });
-    const as = new AnalyticsService();
+    let configServer, rsPub, rsRep, as;
     try {
+      configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
+        respond({ success: true, data: config });
+      });
+  
+      rsPub = socket('pub');
+      rsPub.bindSync(reportServicePubUrl);
+  
+      rsRep = socket('rep');
+      rsRep.bindSync(reportServiceRepUrl);
+      rsRep.on('message', () => {
+        rsRep.send('{invalid');
+      });
+      as = new AnalyticsService();
       await as.start();
       expect(true).toBe(false);
     } catch (ex) {
@@ -161,19 +167,20 @@ describe('AnalyticsService', () => {
         initHistory: { minutes: 3 }
       }
     };
-    const configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-      respond({ success: true, data: config });
-    });
-
-    const rsPub = socket('pub');
-    rsPub.bindSync(reportServicePubUrl);
-
-    const rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
-      respond({ success: true, data: [] });
-    });
-
-    const as = new AnalyticsService();
+    let configServer, rsPub, rsRep, as;
     try {
+      configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
+        respond({ success: true, data: config });
+      });
+  
+      rsPub = socket('pub');
+      rsPub.bindSync(reportServicePubUrl);
+  
+      rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
+        respond({ success: true, data: [] });
+      });
+  
+      as = new AnalyticsService();
       await as.start();
       as.streamSubscriber.subscribe('sometopic', message => console.log(message));
       await delay(100);
@@ -211,18 +218,19 @@ describe('AnalyticsService', () => {
         initHistory: { minutes: 3 }
       }
     };
-    const configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-      respond({ success: true, data: config });
-    });
 
-    const rsPub = socket('pub');
-    rsPub.bindSync(reportServicePubUrl);
-
-    const rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
-      respond({ success: true, data: [] });
-    });
-    let as;
+    let configServer, rsPub, rsRep, as;
     try {
+      configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
+        respond({ success: true, data: config });
+      });
+  
+      rsPub = socket('pub');
+      rsPub.bindSync(reportServicePubUrl);
+  
+      rsRep = new SnapshotResponder(reportServiceRepUrl, (request, respond) => {
+        respond({ success: true, data: [] });
+      });
       as = new AnalyticsService();
       await as.start();
       process.emit('message', 'invalid', undefined);
