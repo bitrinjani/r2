@@ -8,6 +8,22 @@
   dependencies:
     lodash "^4.17.4"
 
+"@bitr/bitbankcc-api@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@bitr/bitbankcc-api/-/bitbankcc-api-1.0.2.tgz#59a8bc6ada3ba638ab44a6a578e19c61518c9027"
+  dependencies:
+    "@bitr/castable" "^1.0.2"
+    axios "^0.17.1"
+    lodash "^4.17.4"
+
+"@bitr/bitbankcc@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@bitr/bitbankcc/-/bitbankcc-1.0.4.tgz#cb886b0e01a6bb8c5299ab206363f34246006b41"
+  dependencies:
+    "@bitr/bitbankcc-api" "^1.0.2"
+    "@bitr/logger" "^1.0.0"
+    lodash "^4.17.4"
+
 "@bitr/bitflyer-fx@^1.0.4":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@bitr/bitflyer-fx/-/bitflyer-fx-1.0.4.tgz#c7c7c1500bef289d9f3b88afffd41a420be7381b"
@@ -330,6 +346,13 @@ aws-sign2@~0.7.0:
 aws4@^1.2.1, aws4@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
+
+axios@^0.17.1:
+  version "0.17.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.17.1.tgz#2d8e3e5d0bdbd7327f91bc814f5c57660f81824d"
+  dependencies:
+    follow-redirects "^1.2.5"
+    is-buffer "^1.1.5"
 
 babel-code-frame@^6.22.0, babel-code-frame@^6.26.0:
   version "6.26.0"
@@ -1132,6 +1155,12 @@ find-up@^2.0.0, find-up@^2.1.0:
 flatstr@^1.0.4, flatstr@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/flatstr/-/flatstr-1.0.5.tgz#5b451b08cbd48e2eac54a2bbe0bf46165aa14be3"
+
+follow-redirects@^1.2.5:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.4.1.tgz#d8120f4518190f55aac65bb6fc7b85fcd666d6aa"
+  dependencies:
+    debug "^3.1.0"
 
 for-in@^1.0.1:
   version "1.0.2"

@@ -63,6 +63,16 @@
       "cashMarginType": "NetOut",
       "leverageLevel": 10,
       "commissionPercent": 0
+    },
+    {
+      "broker": "Bitbankcc",
+      "enabled": true,
+      "key": "xxxxxx",
+      "secret": "xxxxxxx",
+      "maxLongPosition": 0.03,
+      "maxShortPosition": 0,
+      "cashMarginType": "Cash",
+      "commissionPercent": 0
     }
   ],
   "logging": {
