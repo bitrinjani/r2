@@ -93,7 +93,7 @@ export default class PositionService {
     const positions =  await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
     const baseCcyPosition = positions.get(baseCcy);
     if (baseCcyPosition === undefined) {
-      throw new Error('Unable to find base ccy position.');
+      throw new Error(`Unable to find base ccy position in ${brokerConfig.broker}. ${JSON.stringify([...positions])}`);
     }
     const allowedLongSize = _.max([
       0,
