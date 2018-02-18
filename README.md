@@ -20,7 +20,7 @@ cd r2
 npm install
 ```
 4. Rename `config_default.json` in the folder to `config.json`
-5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. 
+5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. Set `enabled` to `false` for exchanges you do not use.
 6. Start the application by `npm start` or `yarn start`.
 ```bash
 npm start
@@ -55,6 +55,7 @@ R2 supports the following exchanges.
 |Quoine|✔️|✔️|
 |Coincheck|✔️|✔️|
 |bitbank.cc|️️️✔️|| 
+|BTCBox|✔️|| 
 
 *bitFlyer margin trading (BTC-FX/JPY) is available as a [broker plugin](https://github.com/bitrinjani/bitflyer-fx).
 
@@ -172,6 +173,8 @@ The onSingleLeg config specifies what action should be taken when only one leg i
 |Bitflyer|Cash|
 |Quoine|Cash, NetOut|
 |Coincheck|Cash, MarginOpen, NetOut|
+|Bitbankcc|Cash|
+|Btcbox|Cash|
 
 Quoine's NetOut is natively handled by Exchange API. Quoine can close multiple positions by one order.
 Coincheck's NetOut is artificially handled by R2 because the exchange doesn't support netout operation. Coincheck's NetOut works as below.

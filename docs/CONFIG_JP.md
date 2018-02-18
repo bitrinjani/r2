@@ -106,6 +106,8 @@ onSingleLeg設定で裁定ペアの片側だけ約定したときの動作を指
 |Bitflyer|Cash|
 |Quoine|Cash, NetOut|
 |Coincheck|Cash, MarginOpen, NetOut*|
+|Bitbankcc|Cash|
+|Btcbox|Cash|
 
 *Coincheckのネットアウトは、取引所APIに存在しない取引タイプのため、アプリケーション内部でどのポジションをクローズするか判断しています。(Quoine APIはネットアウトをネイティブでサポートしています)
 CoincheckのcashMarginTypeをNetOutに設定すると、裁定プロセスはオーダーを送信する前に現在のオープンポジションをチェックします。もしほとんど同じサイズのポジションが見つかれば、そのうち最も古いものに対しクローズオーダーを送信します。(FIFO)

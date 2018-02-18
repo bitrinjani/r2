@@ -34,6 +34,14 @@
     node-fetch "^1.7.3"
     pino "^4.10.2"
 
+"@bitr/btcbox@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@bitr/btcbox/-/btcbox-1.0.1.tgz#9548080e68e20ffc66a6e2605545f44096b4eaf9"
+  dependencies:
+    "@bitr/logger" "^1.0.0"
+    axios "^0.17.1"
+    lodash "^4.17.4"
+
 "@bitr/castable@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@bitr/castable/-/castable-1.0.2.tgz#c41f7067f0afe815a8de78ff1d03045f6f8edf9a"

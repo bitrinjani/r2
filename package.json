@@ -1,6 +1,6 @@
 {
   "name": "r2",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -20,6 +20,7 @@
     "@bitr/awaitable-event-emitter": "^1.0.3",
     "@bitr/bitbankcc": "^1.0.5",
     "@bitr/bitflyer-fx": "^1.0.4",
+    "@bitr/btcbox": "^1.0.1",
     "@bitr/castable": "^1.0.3",
     "@bitr/chronodb": "^1.0.2",
     "@bitr/logger": "^1.0.0",

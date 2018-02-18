@@ -74,6 +74,17 @@
       "maxShortPosition": 0,
       "cashMarginType": "Cash",
       "commissionPercent": 0
+    },
+    {
+      "broker": "Btcbox",
+      "npmPath": "@bitr/btcbox",
+      "enabled": true,
+      "key": "xxxxxx",
+      "secret": "xxxxxxx",
+      "maxLongPosition": 0.03,
+      "maxShortPosition": 0,
+      "cashMarginType": "Cash",
+      "commissionPercent": 0
     }
   ],
   "logging": {
