@@ -12,3 +12,4 @@ export const fatalErrors = [
 export const configStoreSocketUrl = 'tcp://127.0.0.1:8709';
 export const reportServicePubUrl = 'tcp://127.0.0.1:8710';
 export const reportServiceRepUrl = 'tcp://127.0.0.1:8711';
+export const wssPort = 8720;

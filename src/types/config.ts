@@ -75,6 +75,10 @@ export class AnalyticsConfig extends Castable {
   @cast initialHistory: object;
 }
 
+export class WebGatewayConfig extends Castable {
+  @cast enabled: boolean;
+}
+
 export class StabilityTrackerConfig extends Castable {
   @cast threshold: number;
   @cast recoveryInterval: number;
@@ -104,6 +108,7 @@ export class ConfigRoot extends Castable {
   @cast stabilityTracker: StabilityTrackerConfig;
   @cast onSingleLeg: OnSingleLegConfig;
   @cast analytics: AnalyticsConfig;
+  @cast webGateway: WebGatewayConfig;
   @cast
   @element(BrokerConfig)
   brokers: BrokerConfig[];
