@@ -47,6 +47,7 @@ export default class OppotunitySearcher extends EventEmitter {
     try {
       const spreadAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap);
       this.printSpreadAnalysisResult(spreadAnalysisResult);
+      this.emit('spreadAnalysisDone', spreadAnalysisResult);
       const limitCheckResult = this.limitCheckerFactory.create(spreadAnalysisResult).check();
       if (!limitCheckResult.success) {
         this.status = limitCheckResult.reason;

@@ -43,11 +43,26 @@ container
   .toSelf()
   .inSingletonScope();
 container.bind<SpreadAnalyzer>(SpreadAnalyzer).toSelf();
-container.bind<ConfigValidator>(ConfigValidator).toSelf();
-container.bind<LimitCheckerFactory>(LimitCheckerFactory).toSelf();
-container.bind<OppotunitySearcher>(OppotunitySearcher).toSelf();
-container.bind<PairTrader>(PairTrader).toSelf();
-container.bind<SingleLegHandler>(SingleLegHandler).toSelf();
+container
+  .bind<ConfigValidator>(ConfigValidator)
+  .toSelf()
+  .inSingletonScope();
+container
+  .bind<LimitCheckerFactory>(LimitCheckerFactory)
+  .toSelf()
+  .inSingletonScope();
+container
+  .bind<OppotunitySearcher>(OppotunitySearcher)
+  .toSelf()
+  .inSingletonScope();
+container
+  .bind<PairTrader>(PairTrader)
+  .toSelf()
+  .inSingletonScope();
+container
+  .bind<SingleLegHandler>(SingleLegHandler)
+  .toSelf()
+  .inSingletonScope();
 container
   .bind<BrokerStabilityTracker>(BrokerStabilityTracker)
   .toSelf()
@@ -56,7 +71,10 @@ container
   .bind<ReportService>(ReportService)
   .toSelf()
   .inSingletonScope();
-container.bind<WebGateway>(WebGateway).toSelf().inSingletonScope();
+container
+  .bind<WebGateway>(WebGateway)
+  .toSelf()
+  .inSingletonScope();
 container.bind<ActivePairStore>(symbols.ActivePairStore).toConstantValue(getActivePairStore(getChronoDB()));
 container
   .bind<SpreadStatTimeSeries>(symbols.SpreadStatTimeSeries)

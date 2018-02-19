@@ -8,9 +8,10 @@ import symbols from './symbols';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import BrokerStabilityTracker from './BrokerStabilityTracker';
 import t from './intl';
+import { EventEmitter } from 'events';
 
 @injectable()
-export default class PositionService {
+export default class PositionService extends EventEmitter {
   private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRefreshing: boolean;
@@ -20,7 +21,9 @@ export default class PositionService {
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     private readonly brokerAdapterRouter: BrokerAdapterRouter,
     private readonly brokerStabilityTracker: BrokerStabilityTracker
-  ) {}
+  ) {
+    super();
+  }
 
   async start(): Promise<void> {
     this.log.debug('Starting PositionService...');
@@ -68,7 +71,7 @@ export default class PositionService {
     if (this.isRefreshing) {
       this.log.debug('Already refreshing.');
       return;
-    }
+    } 
     try {
       this.isRefreshing = true;
       const config = this.configStore.config;
@@ -79,6 +82,7 @@ export default class PositionService {
         .map((p: BrokerPosition) => [p.broker, p])
         .fromPairs()
         .value();
+      await this.emit('positionUpdated', this.positionMap);
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
