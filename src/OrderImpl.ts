@@ -5,7 +5,7 @@ import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker,
 import { eRound, splitSymbol } from './util';
 import t from './intl';
 
-export interface Init {
+export interface OrderInit {
   symbol: string;
   broker: Broker;
   side: OrderSide;
@@ -17,7 +17,7 @@ export interface Init {
 }
 
 export default class OrderImpl implements Order {
-  constructor(init: Init) {
+  constructor(init: OrderInit) {
     Object.assign(this, init);
   }
 

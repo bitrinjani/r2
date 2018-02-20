@@ -35,8 +35,13 @@ const config = {
   },
   brokers: [{ broker: 'dummy1' }, { broker: 'dummy2' }]
 };
+
+const orderService = {
+  emitOrderUpdated: jest.fn()
+};
+
 const bst = new BrokerStabilityTracker({ config });
-const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config });
+const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config }, orderService);
 
 describe('BrokerAdapterRouter', () => {
   test('send', async () => {
@@ -89,7 +94,7 @@ describe('BrokerAdapterRouter', () => {
     };
 
     const brokerAdapters = [baBitflyer];
-    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config });
+    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config }, orderService);
     try {
       await baRouter.send({ broker: 'Bitflyer' });
     } catch (ex) {
@@ -116,7 +121,7 @@ describe('BrokerAdapterRouter', () => {
     };
 
     const brokerAdapters = [baBitflyer];
-    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config });
+    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config }, orderService);
 
     const quotes = await baRouter.fetchQuotes('Bitflyer');
     expect(quotes).toEqual([]);
@@ -139,7 +144,7 @@ describe('BrokerAdapterRouter', () => {
     };
 
     const brokerAdapters = [baBitflyer];
-    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config });
+    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config }, orderService);
     try {
       await baRouter.getPositions('Bitflyer');
     } catch (ex) {
@@ -156,7 +161,7 @@ describe('BrokerAdapterRouter', () => {
 
     const brokerAdapters = [baBitflyer];
     const conf = Object.assign({}, config, { symbol: 'XXX/YYY' });
-    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config: conf });
+    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config: conf }, orderService);
     try {
       await baRouter.getPositions('Bitflyer');
     } catch (ex) {
@@ -174,7 +179,7 @@ describe('BrokerAdapterRouter', () => {
 
     const brokerAdapters = [baBitflyer];
     const conf = Object.assign({}, config, { symbol: 'XXX/YYY' });
-    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config: conf });
+    const baRouter = new BrokerAdapterRouter(brokerAdapters, bst, { config: conf }, orderService);
     await baRouter.getPositions('Bitflyer');
     expect(baBitflyer.getPositions).toBeCalled();
   });

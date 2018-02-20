@@ -4,6 +4,8 @@ import * as _ from 'lodash';
 import { injectable, multiInject, inject } from 'inversify';
 import symbols from './symbols';
 import BrokerStabilityTracker from './BrokerStabilityTracker';
+import OrderService from './OrderService';
+import OrderImpl from './OrderImpl';
 
 @injectable()
 export default class BrokerAdapterRouter {
@@ -13,7 +15,8 @@ export default class BrokerAdapterRouter {
   constructor(
     @multiInject(symbols.BrokerAdapter) brokerAdapters: BrokerAdapter[],
     private readonly brokerStabilityTracker: BrokerStabilityTracker,
-    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
+    @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
+    private readonly orderService: OrderService
   ) {
     this.brokerAdapterMap = _.keyBy(brokerAdapters, x => x.broker);
   }
@@ -22,6 +25,7 @@ export default class BrokerAdapterRouter {
     this.log.debug(order.toString());
     try {
       await this.brokerAdapterMap[order.broker].send(order);
+      this.orderService.emitOrderUpdated(order as OrderImpl);
     } catch (ex) {
       this.brokerStabilityTracker.decrement(order.broker);
       throw ex;
@@ -31,11 +35,13 @@ export default class BrokerAdapterRouter {
   async cancel(order: Order): Promise<void> {
     this.log.debug(order.toString());
     await this.brokerAdapterMap[order.broker].cancel(order);
+    this.orderService.emitOrderUpdated(order as OrderImpl);
   }
 
   async refresh(order: Order): Promise<void> {
     this.log.debug(order.toString());
     await this.brokerAdapterMap[order.broker].refresh(order);
+    this.orderService.emitOrderUpdated(order as OrderImpl);
   }
 
   async getPositions(broker: Broker): Promise<Map<string, number>> {
