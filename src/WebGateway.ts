@@ -10,12 +10,18 @@ import PositionService from './PositionService';
 import OppotunitySearcher from './OpportunitySearcher';
 import OrderService from './OrderService';
 import OrderImpl from './OrderImpl';
+import * as express from 'express';
+import * as http from 'http';
+import { promisify } from 'util';
 
 @injectable()
 export default class WebGateway {
+  server: http.Server;
+  app: express.Express;
   private wss: WebSocket.Server;
   private readonly log = getLogger(this.constructor.name);
   private readonly clients: WebSocket[] = [];
+  private readonly staticPath: string = 'TODO';
 
   constructor(
     private readonly quoteAggregator: QuoteAggregator,
@@ -47,7 +53,13 @@ export default class WebGateway {
     this.orderService.on('orderUpdated', this.orderUpdated);
     this.orderFinalized = this.orderFinalized.bind(this);
     this.orderService.on('orderFinalized', this.orderFinalized);
-    this.wss = new WebSocket.Server({ port: wssPort });
+
+    this.app = express();
+    this.app.use(express.static(this.staticPath));
+    this.server = this.app.listen(wssPort, () => {
+      this.log.debug(`Express started listening on ${wssPort}.`);
+    });
+    this.wss = new WebSocket.Server({ server: this.server });
     this.wss.on('connection', ws => {
       ws.on('message', message => {
         this.log.debug(`Received ${JSON.stringify(message)}.`);
@@ -65,6 +77,8 @@ export default class WebGateway {
     }
 
     this.log.debug(`Stopping ${this.constructor.name}...`);
+    await promisify(this.wss.close.bind(this.wss))();
+    await promisify(this.server.close.bind(this.server))();
     this.orderService.removeListener('orderCreated', this.orderCreated);
     this.orderService.removeListener('orderUpdated', this.orderUpdated);
     this.orderService.removeListener('orderFinalized', this.orderFinalized);
@@ -72,11 +86,6 @@ export default class WebGateway {
     this.opportunitySearcher.removeListener('spreadAnalysisDone', this.spreadAnalysisDone);
     this.positionService.removeListener('positionUpdated', this.positionUpdated);
     this.quoteAggregator.removeListener('quoteUpdated', this.quoteUpdated);
-    this.wss.close(err => {
-      if (err) {
-        this.log.error(err.message);
-      }
-    });
     this.log.debug(`Stopped ${this.constructor.name}.`);
   }
 
