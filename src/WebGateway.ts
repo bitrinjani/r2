@@ -64,6 +64,9 @@ export default class WebGateway {
       ws.on('message', message => {
         this.log.debug(`Received ${JSON.stringify(message)}.`);
       });
+      ws.on('error', err => {
+        this.log.debug(err.message);
+      });
       this.clients.push(ws);
     });
     this.activePairUpdated();
@@ -126,7 +129,7 @@ export default class WebGateway {
             this.log.debug(err.message);
             _.pull(this.clients, client);
           }
-        });
+        });        
       }
     }
   }
