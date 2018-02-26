@@ -45,6 +45,8 @@ export default class WebGateway {
     this.positionService.on('positionUpdated', this.positionUpdated);
     this.spreadAnalysisDone = this.spreadAnalysisDone.bind(this);
     this.opportunitySearcher.on('spreadAnalysisDone', this.spreadAnalysisDone);
+    this.limitCheckDone = this.limitCheckDone.bind(this);
+    this.opportunitySearcher.on('limitCheckDone', this.limitCheckDone);
     this.activePairUpdated = this.activePairUpdated.bind(this);
     this.activePairStore.on('change', this.activePairUpdated);
     this.orderCreated = this.orderCreated.bind(this);
@@ -102,6 +104,10 @@ export default class WebGateway {
 
   private spreadAnalysisDone(result: SpreadAnalysisResult) {
     this.broadcast('spreadAnalysisDone', result);
+  }
+
+  private limitCheckDone(message: string) {
+    this.broadcast('limitCheckDone', message);
   }
 
   private async activePairUpdated() {

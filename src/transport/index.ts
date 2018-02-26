@@ -6,6 +6,8 @@ import { SlackConfig, LineConfig } from '../types';
 import { getConfigRoot } from '../configUtil';
 import * as mkdirp from 'mkdirp';
 import * as _ from 'lodash';
+import * as WebSocket from 'ws';
+import { wssLogPort } from '../constants';
 
 process.on('SIGINT', () => {
   console.log('SIGINT detected in the transport process. Passing through...');
@@ -40,6 +42,33 @@ if (configRoot) {
   const lineConfig = _.get(configRoot, 'logging.line');
   addIntegration(SlackIntegration, slackConfig);
   addIntegration(LineIntegration, lineConfig);
+}
+
+const clients: WebSocket[] = [];
+if (_.get(configRoot, 'webGateway.enabled')) {
+  const wss = new WebSocket.Server({ port: wssLogPort });
+  wss.on('connection', ws => {
+    ws.on('error', err => {});
+    clients.push(ws);
+  });
+}
+
+infoTransform.on('data', line => {
+  try {
+    broadcast('log', line);
+  } catch (err) {}
+});
+
+function broadcast(type: string, body: any) {
+  for (const client of clients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type, body }), err => {
+        if (err) {
+          _.pull(clients, client);
+        }
+      });
+    }
+  }
 }
 
 function addIntegration(
