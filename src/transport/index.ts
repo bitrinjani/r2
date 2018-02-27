@@ -9,8 +9,13 @@ import * as _ from 'lodash';
 import * as WebSocket from 'ws';
 import { wssLogPort } from '../constants';
 
+let wss: WebSocket.Server | undefined;
+
 process.on('SIGINT', () => {
   console.log('SIGINT detected in the transport process. Passing through...');
+  if (wss) {
+    wss.close();
+  }
 });
 
 const logdir = './logs';
@@ -25,16 +30,18 @@ try {
 }
 
 // console output
-process.stdin.pipe(pretty({ colorize: true, withLabel: false, debug: false })).pipe(process.stdout);
+process.stdin.pipe(pretty({ colorize: true, withLabel: false, debug: false, hidden: false })).pipe(process.stdout);
 
 // debug.log
 const debugFile = fs.createWriteStream('logs/debug.log', { flags: 'a' });
-process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: true })).pipe(debugFile);
+process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: true, hidden: false })).pipe(debugFile);
 
 // info.log
-const infoTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: false }));
+const infoTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: false, hidden: false }));
 const infoFile = fs.createWriteStream('logs/info.log', { flags: 'a' });
 infoTransform.pipe(infoFile);
+
+const wsTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: false, hidden: true }));
 
 // notification integrations
 if (configRoot) {
@@ -46,18 +53,18 @@ if (configRoot) {
 
 const clients: WebSocket[] = [];
 if (_.get(configRoot, 'webGateway.enabled')) {
-  const wss = new WebSocket.Server({ port: wssLogPort });
+  wss = new WebSocket.Server({ port: wssLogPort });
   wss.on('connection', ws => {
     ws.on('error', err => {});
     clients.push(ws);
   });
-}
 
-infoTransform.on('data', line => {
-  try {
-    broadcast('log', line);
-  } catch (err) {}
-});
+  wsTransform.on('data', line => {
+    try {
+      broadcast('log', line);
+    } catch (err) {}
+  });
+}
 
 function broadcast(type: string, body: any) {
   for (const client of clients) {

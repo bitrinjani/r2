@@ -9,6 +9,7 @@ interface LogObject {
   msg: string;
   time: number;
   label: string;
+  hidden: boolean;
 }
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss.SSS';
@@ -23,8 +24,8 @@ const levels = {
   10: 'TRACE'
 };
 
-export default function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boolean }) {
-  const { colorize, withLabel, debug } = opts;
+export default function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boolean; hidden: boolean }) {
+  const { colorize, withLabel, debug, hidden } = opts;
   const ctx = new chalk.constructor({
     enabled: !!(chalk.supportsColor && colorize)
   });
@@ -45,6 +46,9 @@ export default function pretty(opts: { colorize: boolean; withLabel: boolean; de
         return json + EOL;
       }
       if (!debug && logObj.level <= 20) {
+        return '';
+      }
+      if (hidden && logObj.hidden) {
         return '';
       }
       const dateString = formatDate(new Date(logObj.time), dateFormat);

@@ -53,9 +53,9 @@ export default class Arbitrager {
       return;
     }
     this.positionService.print();
-    this.log.info(hr(20) + 'ARBITRAGER' + hr(20));
+    this.log.info({ hidden: true }, hr(20) + 'ARBITRAGER' + hr(20));
     await this.arbitrage(quotes);
-    this.log.info(hr(50));
+    this.log.info({ hidden: true }, hr(50));
   }
 
   private async arbitrage(quotes: Quote[]): Promise<void> {

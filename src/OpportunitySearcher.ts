@@ -112,12 +112,13 @@ export default class OppotunitySearcher extends EventEmitter {
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
     const columnWidth = 17;
-    this.log.info('%s: %s', padEnd(t`BestAsk`, columnWidth), formatQuote(result.ask));
-    this.log.info('%s: %s', padEnd(t`BestBid`, columnWidth), formatQuote(result.bid));
-    this.log.info('%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
-    this.log.info('%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
-    this.log.info('%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);
+    this.log.info({ hidden: true }, '%s: %s', padEnd(t`BestAsk`, columnWidth), formatQuote(result.ask));
+    this.log.info({ hidden: true }, '%s: %s', padEnd(t`BestBid`, columnWidth), formatQuote(result.bid));
+    this.log.info({ hidden: true }, '%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
+    this.log.info({ hidden: true }, '%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
+    this.log.info({ hidden: true }, '%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);
     this.log.info(
+      { hidden: true },
       '%s: %s (%s%%)',
       padEnd(t`ExpectedProfit`, columnWidth),
       result.targetProfit,

@@ -88,6 +88,7 @@ export default class WebGateway {
     this.orderService.removeListener('orderUpdated', this.orderUpdated);
     this.orderService.removeListener('orderFinalized', this.orderFinalized);
     this.activePairStore.removeListener('change', this.activePairUpdated);
+    this.opportunitySearcher.removeListener('limitCheckDone', this.limitCheckDone);
     this.opportunitySearcher.removeListener('spreadAnalysisDone', this.spreadAnalysisDone);
     this.positionService.removeListener('positionUpdated', this.positionUpdated);
     this.quoteAggregator.removeListener('quoteUpdated', this.quoteUpdated);

@@ -48,13 +48,13 @@ export default class PositionService extends EventEmitter {
       `${t`LongAllowed`}: ${isOk(brokerPosition.longAllowed)}, ` +
       `${t`ShortAllowed`}: ${isOk(brokerPosition.shortAllowed)}`;
 
-    this.log.info(hr(21) + 'POSITION' + hr(21));
-    this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} ${baseCcy}`);
+    this.log.info({ hidden: true }, hr(21) + 'POSITION' + hr(21));
+    this.log.info({ hidden: true }, `Net Exposure: ${_.round(this.netExposure, 3)} ${baseCcy}`);
     _.each(this.positionMap, (position: BrokerPosition) => {
       const stability = this.brokerStabilityTracker.stability(position.broker);
-      this.log.info(`${formatBrokerPosition(position)} (Stability: ${stability})`);
+      this.log.info({ hidden: true }, `${formatBrokerPosition(position)} (Stability: ${stability})`);
     });
-    this.log.info(hr(50));
+    this.log.info({ hidden: true }, hr(50));
     this.log.debug(JSON.stringify(this.positionMap));
   }
 
@@ -71,7 +71,7 @@ export default class PositionService extends EventEmitter {
     if (this.isRefreshing) {
       this.log.debug('Already refreshing.');
       return;
-    } 
+    }
     try {
       this.isRefreshing = true;
       const config = this.configStore.config;
@@ -94,7 +94,7 @@ export default class PositionService extends EventEmitter {
 
   private async getBrokerPosition(brokerConfig: BrokerConfig, minSize: number): Promise<BrokerPosition> {
     const { baseCcy } = splitSymbol(this.configStore.config.symbol);
-    const positions =  await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
+    const positions = await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
     const baseCcyPosition = positions.get(baseCcy);
     if (baseCcyPosition === undefined) {
       throw new Error(`Unable to find base ccy position in ${brokerConfig.broker}. ${JSON.stringify([...positions])}`);
