@@ -9,11 +9,12 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import { getLogger } from '@bitr/logger';
 import { ConfigRequest, ConfigResponse, ConfigResponder } from './messages';
+import { EventEmitter } from 'events';
 
 const writeFile = promisify(fs.writeFile);
 
 @injectable()
-export default class JsonConfigStore implements ConfigStore {
+export default class JsonConfigStore extends EventEmitter implements ConfigStore {
   private readonly log = getLogger(this.constructor.name);
   private timer: NodeJS.Timer;
   private readonly responder: ConfigResponder;
@@ -21,6 +22,7 @@ export default class JsonConfigStore implements ConfigStore {
   private cache?: ConfigRoot;
 
   constructor(private readonly configValidator: ConfigValidator) {
+    super();
     this.responder = new ConfigResponder(configStoreSocketUrl, (request, respond) =>
       this.requestHandler(request, respond)
     );
@@ -79,5 +81,6 @@ export default class JsonConfigStore implements ConfigStore {
     this.cache = config;
     clearTimeout(this.timer);
     this.timer = setTimeout(() => (this.cache = undefined), this.TTL);
+    this.emit('configUpdated', config);
   }
 } /* istanbul ignore next */

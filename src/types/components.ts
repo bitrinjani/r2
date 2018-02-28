@@ -47,7 +47,7 @@ export interface LimitCheckResult {
   message: string;
 }
 
-export interface ConfigStore {
+export interface ConfigStore extends EventEmitter {
   config: ConfigRoot;
 }
 

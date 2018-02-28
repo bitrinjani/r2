@@ -1,6 +1,14 @@
 import { injectable, inject } from 'inversify';
 import symbols from './symbols';
-import { Quote, ConfigStore, BrokerPosition, BrokerMap, SpreadAnalysisResult, ActivePairStore } from './types';
+import {
+  Quote,
+  ConfigStore,
+  BrokerPosition,
+  BrokerMap,
+  SpreadAnalysisResult,
+  ActivePairStore,
+  ConfigRoot
+} from './types';
 import QuoteAggregator from './QuoteAggregator';
 import { getLogger } from '@bitr/logger';
 import * as WebSocket from 'ws';
@@ -55,6 +63,8 @@ export default class WebGateway {
     this.orderService.on('orderUpdated', this.orderUpdated);
     this.orderFinalized = this.orderFinalized.bind(this);
     this.orderService.on('orderFinalized', this.orderFinalized);
+    this.configUpdated = this.configUpdated.bind(this);
+    this.configStore.on('configUpdated', this.configUpdated);
 
     this.app = express();
     this.app.use(express.static(this.staticPath));
@@ -72,6 +82,7 @@ export default class WebGateway {
       this.clients.push(ws);
     });
     this.activePairUpdated();
+    this.configUpdated(this.configStore.config);
     this.log.debug(`Started ${this.constructor.name}.`);
   }
 
@@ -84,6 +95,7 @@ export default class WebGateway {
     this.log.debug(`Stopping ${this.constructor.name}...`);
     await promisify(this.wss.close.bind(this.wss))();
     await promisify(this.server.close.bind(this.server))();
+    this.configStore.removeListener('configUpdated', this.configUpdated);
     this.orderService.removeListener('orderCreated', this.orderCreated);
     this.orderService.removeListener('orderUpdated', this.orderUpdated);
     this.orderService.removeListener('orderFinalized', this.orderFinalized);
@@ -128,6 +140,20 @@ export default class WebGateway {
     this.broadcast('orderFinalized', order);
   }
 
+  private configUpdated(config: ConfigRoot) {
+    this.broadcast('configUpdated', this.sanitize(config));
+  }
+
+  private sanitize(config: ConfigRoot): ConfigRoot {
+    const copy = _.cloneDeep(config);
+    for (const brokerConfig of copy.brokers) {
+      delete brokerConfig.key;
+      delete brokerConfig.secret;
+    }
+    delete copy.logging;
+    return copy;
+  }
+
   private broadcast(type: string, body: any) {
     for (const client of this.clients) {
       if (client.readyState === WebSocket.OPEN) {
@@ -136,7 +162,7 @@ export default class WebGateway {
             this.log.debug(err.message);
             _.pull(this.clients, client);
           }
-        });        
+        });
       }
     }
   }

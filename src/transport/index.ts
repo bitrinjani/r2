@@ -41,7 +41,7 @@ const infoTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: tr
 const infoFile = fs.createWriteStream('logs/info.log', { flags: 'a' });
 infoTransform.pipe(infoFile);
 
-const wsTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: false, hidden: true }));
+const wsTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: false, debug: false, hidden: true }));
 
 // notification integrations
 if (configRoot) {
