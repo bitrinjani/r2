@@ -21,15 +21,19 @@ import OrderImpl from './OrderImpl';
 import * as express from 'express';
 import * as http from 'http';
 import { promisify } from 'util';
+import { autobind } from 'core-decorators';
+const opn = require('opn');
 
 @injectable()
+@autobind
 export default class WebGateway {
-  server: http.Server;
-  app: express.Express;
+  private readonly eventMapper: [any, string, any][];
+  private server: http.Server;
+  private app: express.Express;
   private wss: WebSocket.Server;
   private readonly log = getLogger(this.constructor.name);
   private readonly clients: WebSocket[] = [];
-  private readonly staticPath: string = 'TODO';
+  private readonly staticPath: string = `${process.cwd()}/webui/dist`;
 
   constructor(
     private readonly quoteAggregator: QuoteAggregator,
@@ -38,7 +42,19 @@ export default class WebGateway {
     private readonly opportunitySearcher: OppotunitySearcher,
     @inject(symbols.ActivePairStore) private readonly activePairStore: ActivePairStore,
     private readonly orderService: OrderService
-  ) {}
+  ) {
+    this.eventMapper = [
+      [this.quoteAggregator, 'quoteUpdated', this.quoteUpdated],
+      [this.positionService, 'positionUpdated', this.positionUpdated],
+      [this.opportunitySearcher, 'spreadAnalysisDone', this.spreadAnalysisDone],
+      [this.opportunitySearcher, 'limitCheckDone', this.limitCheckDone],
+      [this.activePairStore, 'change', this.activePairUpdated],
+      [this.orderService, 'orderCreated', this.orderCreated],
+      [this.orderService, 'orderUpdated', this.orderUpdated],
+      [this.orderService, 'orderFinalized', this.orderFinalized],
+      [this.configStore, 'configUpdated', this.configUpdated]
+    ];
+  }
 
   async start() {
     const { webGateway } = this.configStore.config;
@@ -47,35 +63,19 @@ export default class WebGateway {
     }
 
     this.log.debug(`Starting ${this.constructor.name}...`);
-    this.quoteUpdated = this.quoteUpdated.bind(this);
-    this.quoteAggregator.on('quoteUpdated', this.quoteUpdated);
-    this.positionUpdated = this.positionUpdated.bind(this);
-    this.positionService.on('positionUpdated', this.positionUpdated);
-    this.spreadAnalysisDone = this.spreadAnalysisDone.bind(this);
-    this.opportunitySearcher.on('spreadAnalysisDone', this.spreadAnalysisDone);
-    this.limitCheckDone = this.limitCheckDone.bind(this);
-    this.opportunitySearcher.on('limitCheckDone', this.limitCheckDone);
-    this.activePairUpdated = this.activePairUpdated.bind(this);
-    this.activePairStore.on('change', this.activePairUpdated);
-    this.orderCreated = this.orderCreated.bind(this);
-    this.orderService.on('orderCreated', this.orderCreated);
-    this.orderUpdated = this.orderUpdated.bind(this);
-    this.orderService.on('orderUpdated', this.orderUpdated);
-    this.orderFinalized = this.orderFinalized.bind(this);
-    this.orderService.on('orderFinalized', this.orderFinalized);
-    this.configUpdated = this.configUpdated.bind(this);
-    this.configStore.on('configUpdated', this.configUpdated);
-
+    for (const e of this.eventMapper) {
+      e[0].on(e[1], e[2]);
+    }
     this.app = express();
     this.app.use(express.static(this.staticPath));
-    this.server = this.app.listen(wssPort, () => {
+    this.app.get('*', (req, res) => {
+      res.sendFile(`${this.staticPath}/index.html`);
+    });
+    this.server = this.app.listen(wssPort, webGateway.host, () => {
       this.log.debug(`Express started listening on ${wssPort}.`);
     });
     this.wss = new WebSocket.Server({ server: this.server });
     this.wss.on('connection', ws => {
-      ws.on('message', message => {
-        this.log.debug(`Received ${JSON.stringify(message)}.`);
-      });
       ws.on('error', err => {
         this.log.debug(err.message);
       });
@@ -83,6 +83,7 @@ export default class WebGateway {
     });
     this.activePairUpdated();
     this.configUpdated(this.configStore.config);
+    opn(`http://${webGateway.host}:${wssPort}`);
     this.log.debug(`Started ${this.constructor.name}.`);
   }
 
@@ -95,15 +96,9 @@ export default class WebGateway {
     this.log.debug(`Stopping ${this.constructor.name}...`);
     await promisify(this.wss.close.bind(this.wss))();
     await promisify(this.server.close.bind(this.server))();
-    this.configStore.removeListener('configUpdated', this.configUpdated);
-    this.orderService.removeListener('orderCreated', this.orderCreated);
-    this.orderService.removeListener('orderUpdated', this.orderUpdated);
-    this.orderService.removeListener('orderFinalized', this.orderFinalized);
-    this.activePairStore.removeListener('change', this.activePairUpdated);
-    this.opportunitySearcher.removeListener('limitCheckDone', this.limitCheckDone);
-    this.opportunitySearcher.removeListener('spreadAnalysisDone', this.spreadAnalysisDone);
-    this.positionService.removeListener('positionUpdated', this.positionUpdated);
-    this.quoteAggregator.removeListener('quoteUpdated', this.quoteUpdated);
+    for (const e of this.eventMapper) {
+      e[0].removeListener(e[1], e[2]);
+    }
     this.log.debug(`Stopped ${this.constructor.name}.`);
   }
 

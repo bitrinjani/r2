@@ -8,13 +8,19 @@ import * as mkdirp from 'mkdirp';
 import * as _ from 'lodash';
 import * as WebSocket from 'ws';
 import { wssLogPort } from '../constants';
+import * as express from 'express';
+import { Server as httpServer } from 'http';
 
-let wss: WebSocket.Server | undefined;
+let wss: WebSocket.Server;
+let app: express.Express;
+let server: httpServer;
 
 process.on('SIGINT', () => {
-  console.log('SIGINT detected in the transport process. Passing through...');
   if (wss) {
     wss.close();
+  }
+  if (server) {
+    server.close();
   }
 });
 
@@ -41,6 +47,7 @@ const infoTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: tr
 const infoFile = fs.createWriteStream('logs/info.log', { flags: 'a' });
 infoTransform.pipe(infoFile);
 
+// websocket stream
 const wsTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: false, debug: false, hidden: true }));
 
 // notification integrations
@@ -51,18 +58,27 @@ if (configRoot) {
   addIntegration(LineIntegration, lineConfig);
 }
 
+// websocket integration
 const clients: WebSocket[] = [];
-if (_.get(configRoot, 'webGateway.enabled')) {
-  wss = new WebSocket.Server({ port: wssLogPort });
+const webGatewayConfig = _.get(configRoot, 'webGateway');
+if (webGatewayConfig && webGatewayConfig.enabled) {
+  app = express();
+  server = app.listen(wssLogPort, webGatewayConfig.host, () => {
+    _.noop();
+  });
+  wss = new WebSocket.Server({ server });
   wss.on('connection', ws => {
-    ws.on('error', err => {});
+    ws.on('error', err => {
+      _.noop();
+    });
     clients.push(ws);
   });
-
   wsTransform.on('data', line => {
     try {
       broadcast('log', line);
-    } catch (err) {}
+    } catch (err) {
+      _.noop();
+    }
   });
 }
 

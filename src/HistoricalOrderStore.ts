@@ -5,11 +5,18 @@ import { ChronoDB, TimeSeries } from '@bitr/chronodb';
 import { EventEmitter } from 'events';
 
 class EmittableHistoricalOrderStore extends EventEmitter implements HistoricalOrderStore {
-  timeSeries: TimeSeries<Order>;
+  private readonly timeSeries: TimeSeries<Order>;
 
   constructor(chronoDB: ChronoDB) {
     super();
-    this.timeSeries = chronoDB.getTimeSeries<Order>('HistoricalOrder', order => revive(OrderImpl, order) as Order);
+    this.timeSeries = chronoDB.getTimeSeries<Order>('HistoricalOrder', order => this.reviveOrder(OrderImpl, order));
+  }
+
+  private reviveOrder(T: Function, o: Order) {
+    const r = revive(T, o);
+    r.creationTime = new Date(r.creationTime);
+    r.sentTime = new Date(r.sentTime);
+    return r;
   }
 
   get(key: string): Promise<Order> {

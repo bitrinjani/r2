@@ -77,6 +77,7 @@ export class AnalyticsConfig extends Castable {
 
 export class WebGatewayConfig extends Castable {
   @cast enabled: boolean;
+  @cast host: string;
 }
 
 export class StabilityTrackerConfig extends Castable {

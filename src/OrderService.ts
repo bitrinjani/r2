@@ -29,4 +29,4 @@ export default class OrderService extends EventEmitter {
     _.pull(this.orders, order);
     this.emit('orderFinalized', order);
   }
-}
+} /* istanbul ignore next */
