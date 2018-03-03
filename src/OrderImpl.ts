@@ -1,9 +1,7 @@
 import * as _ from 'lodash';
-import { format } from 'util';
 import { v4 as uuid } from 'uuid';
 import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker, Order, Execution } from './types';
-import { eRound, splitSymbol } from './util';
-import t from './intl';
+import { eRound, revive } from './util';
 
 export interface OrderInit {
   symbol: string;
@@ -33,7 +31,7 @@ export default class OrderImpl implements Order {
   timeInForce: TimeInForce = TimeInForce.None;
   brokerOrderId: string;
   status: OrderStatus = OrderStatus.PendingNew;
-  filledSize: number = 0;
+  filledSize = 0;
   creationTime: Date = new Date();
   sentTime: Date;
   lastUpdated: Date;
@@ -56,36 +54,11 @@ export default class OrderImpl implements Order {
   get filledNotional(): number {
     return this.averageFilledPrice * this.filledSize;
   }
+}
 
-  toExecSummary(): string {
-    const { baseCcy } = splitSymbol(this.symbol);
-    return this.filled
-      ? format(
-          t`FilledSummary`,
-          this.broker,
-          this.side,
-          this.filledSize,
-          baseCcy,
-          _.round(this.averageFilledPrice).toLocaleString()
-        )
-      : format(
-          t`UnfilledSummary`,
-          this.broker,
-          this.side,
-          this.size,
-          baseCcy,
-          this.price.toLocaleString(),
-          this.pendingSize,
-          baseCcy
-        );
-  }
-
-  toShortString(): string {
-    const { baseCcy } = splitSymbol(this.symbol);
-    return `${this.broker} ${this.side} ${this.size} ${baseCcy}`;
-  }
-
-  toString(): string {
-    return JSON.stringify(this);
-  }
+export function reviveOrder(o: Order): OrderImpl {
+  const r = revive<OrderImpl, Order>(OrderImpl, o);
+  r.creationTime = new Date(r.creationTime);
+  r.sentTime = new Date(r.sentTime);
+  return r;
 }

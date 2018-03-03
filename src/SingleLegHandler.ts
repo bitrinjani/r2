@@ -8,6 +8,7 @@ import { delay, splitSymbol } from './util';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import { injectable, inject } from 'inversify';
 import symbols from './symbols';
+import * as OrderUtil from './OrderUtil';
 
 @injectable()
 export default class SingleLegHandler {
@@ -49,7 +50,7 @@ export default class SingleLegHandler {
     const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
     const { baseCcy } = splitSymbol(this.symbol);
-    this.log.info(t`ReverseFilledLeg`, largeLeg.toShortString(), price.toLocaleString(), size, baseCcy);
+    this.log.info(t`ReverseFilledLeg`, OrderUtil.toShortString(largeLeg), price.toLocaleString(), size, baseCcy);
     const reversalOrder = new OrderImpl({
       symbol: this.symbol,
       broker: largeLeg.broker,
@@ -71,7 +72,7 @@ export default class SingleLegHandler {
     const price = _.round(smallLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(smallLeg.pendingSize - largeLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
     const { baseCcy } = splitSymbol(this.symbol);
-    this.log.info(t`ExecuteUnfilledLeg`, smallLeg.toShortString(), price.toLocaleString(), size, baseCcy);
+    this.log.info(t`ExecuteUnfilledLeg`, OrderUtil.toShortString(smallLeg), price.toLocaleString(), size, baseCcy);
     const proceedOrder = new OrderImpl({
       symbol: this.symbol,
       broker: smallLeg.broker,
@@ -93,7 +94,7 @@ export default class SingleLegHandler {
       await delay(ttl);
       await this.brokerAdapterRouter.refresh(order);
       if (order.filled) {
-        this.log.info(`${order.toExecSummary()}`);
+        this.log.info(`${OrderUtil.toExecSummary(order)}`);
       } else {
         this.log.info(t`NotFilledTtl`, ttl);
         await this.brokerAdapterRouter.cancel(order);

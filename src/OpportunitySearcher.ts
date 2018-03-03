@@ -12,6 +12,7 @@ import { EventEmitter } from 'events';
 import { calcProfit } from './pnl';
 import OrderImpl from './OrderImpl';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
+import * as OrderUtil from './OrderUtil';
 
 @injectable()
 export default class OppotunitySearcher extends EventEmitter {
@@ -75,6 +76,7 @@ export default class OppotunitySearcher extends EventEmitter {
     const activePairsMap = await this.activePairStore.getAll();
     if (activePairsMap.length > 0) {
       this.log.info(t`OpenPairs`);
+      this.emit('activePairRefresh', activePairsMap);
     }
     for (const { key, value: pair } of activePairsMap) {
       let exitAnalysisResult: SpreadAnalysisResult | undefined;
@@ -100,14 +102,14 @@ export default class OppotunitySearcher extends EventEmitter {
     const sellLeg = pair.find(o => o.side === OrderSide.Sell) as OrderImpl;
     const midNotional = _.mean([buyLeg.averageFilledPrice, sellLeg.averageFilledPrice]) * buyLeg.filledSize;
     const entryProfitRatio = _.round(entryProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
+    const entryProfitString = `Entry PL: ${_.round(entryProfit)} JPY (${entryProfitRatio}%)`;
     if (exitAnalysisResult) {
-      return `[${pair[0].toShortString()}, ${pair[1].toShortString()}, Entry PL: ${_.round(
-        entryProfit
-      )} JPY (${entryProfitRatio}%), Current exit cost: ${_.round(-exitAnalysisResult.targetProfit)} JPY]`;
+      const currentExitCostText = `Current exit cost: ${_.round(-exitAnalysisResult.targetProfit)} JPY`;
+      return `[${OrderUtil.toShortString(pair[0])}, ${OrderUtil.toShortString(
+        pair[1]
+      )}, ${entryProfitString}, ${currentExitCostText}]`;
     }
-    return `[${pair[0].toShortString()}, ${pair[1].toShortString()}, Entry PL: ${_.round(
-      entryProfit
-    )} JPY (${entryProfitRatio}%)]`;
+    return `[${OrderUtil.toShortString(pair[0])}, ${OrderUtil.toShortString(pair[1])}, ${entryProfitString}]`;
   }
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {

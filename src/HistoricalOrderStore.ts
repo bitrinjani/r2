@@ -1,6 +1,5 @@
 import { HistoricalOrderStore, Order } from './types';
-import OrderImpl from './OrderImpl';
-import { revive } from './util';
+import { reviveOrder } from './OrderImpl';
 import { ChronoDB, TimeSeries } from '@bitr/chronodb';
 import { EventEmitter } from 'events';
 
@@ -9,14 +8,7 @@ class EmittableHistoricalOrderStore extends EventEmitter implements HistoricalOr
 
   constructor(chronoDB: ChronoDB) {
     super();
-    this.timeSeries = chronoDB.getTimeSeries<Order>('HistoricalOrder', order => this.reviveOrder(OrderImpl, order));
-  }
-
-  private reviveOrder(T: Function, o: Order) {
-    const r = revive(T, o);
-    r.creationTime = new Date(r.creationTime);
-    r.sentTime = new Date(r.sentTime);
-    return r;
+    this.timeSeries = chronoDB.getTimeSeries<Order>('HistoricalOrder', order => reviveOrder(order));
   }
 
   get(key: string): Promise<Order> {

@@ -3,6 +3,7 @@ import { OrderStatus, OrderSide, CashMarginType, OrderType, Broker, OrderPair } 
 import { getActivePairStore } from '../ActivePairLevelStore';
 import { ChronoDB } from '@bitr/chronodb';
 import { createOrder } from './helper';
+import * as OrderUtil from '../OrderUtil';
 
 describe('ActivePairLevelStore', () => {
   let store;
@@ -29,7 +30,7 @@ describe('ActivePairLevelStore', () => {
     const key = await store.put(pair);
     const result = await store.get(key);
     expect(result.length).toBe(2);
-    expect(() => result[0].toShortString()).not.toThrow();
+    expect(() => OrderUtil.toShortString(result[0])).not.toThrow();
     const activePairKeyValues = await store.getAll();
     expect(activePairKeyValues[activePairKeyValues.length - 1].value[1].broker).toBe('Dummy2');
   });
@@ -45,7 +46,7 @@ describe('ActivePairLevelStore', () => {
     const key = await store.put(pair);
     const result = await store.get(key);
     expect(result.length).toBe(2);
-    expect(() => result[0].toShortString()).not.toThrow();
+    expect(() => OrderUtil.toShortString(result[0])).not.toThrow();
     await store.del(key);
     try {
       const result2 = await store.get(key);

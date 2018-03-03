@@ -11,7 +11,7 @@ describe('WebGateway', () => {
     positionService = new EventEmitter();
     opportunitySearcher = new EventEmitter();
     activePairStore = new EventEmitter();
-    activePairStore.getAll = jest.fn();
+    activePairStore.getAll = jest.fn().mockImplementation(() => []);
     orderService = new EventEmitter();
   });
 

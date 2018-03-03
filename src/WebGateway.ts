@@ -20,7 +20,6 @@ import OrderService from './OrderService';
 import OrderImpl from './OrderImpl';
 import * as express from 'express';
 import * as http from 'http';
-import { promisify } from 'util';
 import { autobind } from 'core-decorators';
 const opn = require('opn');
 
@@ -48,6 +47,7 @@ export default class WebGateway {
       [this.positionService, 'positionUpdated', this.positionUpdated],
       [this.opportunitySearcher, 'spreadAnalysisDone', this.spreadAnalysisDone],
       [this.opportunitySearcher, 'limitCheckDone', this.limitCheckDone],
+      [this.opportunitySearcher, 'activePairRefresh', this.activePairUpdated],
       [this.activePairStore, 'change', this.activePairUpdated],
       [this.orderService, 'orderCreated', this.orderCreated],
       [this.orderService, 'orderUpdated', this.orderUpdated],
@@ -62,6 +62,7 @@ export default class WebGateway {
       return;
     }
 
+    const host = _.defaultTo(webGateway.host, 'localhost');
     this.log.debug(`Starting ${this.constructor.name}...`);
     for (const e of this.eventMapper) {
       e[0].on(e[1], e[2]);
@@ -71,7 +72,7 @@ export default class WebGateway {
     this.app.get('*', (req, res) => {
       res.sendFile(`${this.staticPath}/index.html`);
     });
-    this.server = this.app.listen(wssPort, webGateway.host, () => {
+    this.server = this.app.listen(wssPort, host, () => {
       this.log.debug(`Express started listening on ${wssPort}.`);
     });
     this.wss = new WebSocket.Server({ server: this.server });
@@ -83,7 +84,9 @@ export default class WebGateway {
     });
     this.activePairUpdated();
     this.configUpdated(this.configStore.config);
-    opn(`http://${webGateway.host}:${wssPort}`);
+    if (process.env.NODE_ENV !== 'test') {
+      opn(`http://${host}:${wssPort}`);
+    }
     this.log.debug(`Started ${this.constructor.name}.`);
   }
 
@@ -94,8 +97,8 @@ export default class WebGateway {
     }
 
     this.log.debug(`Stopping ${this.constructor.name}...`);
-    await promisify(this.wss.close.bind(this.wss))();
-    await promisify(this.server.close.bind(this.server))();
+    this.wss.close();
+    this.server.close();
     for (const e of this.eventMapper) {
       e[0].removeListener(e[1], e[2]);
     }
@@ -120,7 +123,7 @@ export default class WebGateway {
 
   private async activePairUpdated() {
     const activePairs = await this.activePairStore.getAll();
-    this.broadcast('activePairUpdated', activePairs);
+    this.broadcast('activePairUpdated', activePairs.map(p => p.value));
   }
 
   private orderCreated(order: OrderImpl) {

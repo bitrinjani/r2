@@ -1,6 +1,5 @@
 import { ActivePairStore, OrderPair } from './types';
-import OrderImpl from './OrderImpl';
-import { revive } from './util';
+import { reviveOrder } from './OrderImpl';
 import { ChronoDB, TimeSeries } from '@bitr/chronodb';
 import { EventEmitter } from 'events';
 
@@ -11,7 +10,7 @@ class EmittableActivePairStore extends EventEmitter implements ActivePairStore {
     super();
     this.timeSeries = chronoDB.getTimeSeries<OrderPair>(
       'ActivePair',
-      orderPair => orderPair.map(o => revive(OrderImpl, o)) as OrderPair
+      orderPair => orderPair.map(o => reviveOrder(o)) as OrderPair
     );
   }
 
