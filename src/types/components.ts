@@ -30,6 +30,21 @@ export interface SpreadAnalysisResult {
   profitPercentAgainstNotional: number;
 }
 
+export interface PairSummary {
+  entryProfit: number;
+  entryProfitRatio: number;
+  currentExitCost?: number;
+  currentExitCostRatio?: number;
+  currentExitNetProfitRatio?: number;
+}
+
+export interface PairWithSummary {
+  key: string;
+  pair: OrderPair;
+  pairSummary: PairSummary;
+  exitAnalysisResult?: SpreadAnalysisResult;
+}
+
 export interface SpreadStat {
   timestamp: number;
   byBroker: { [x: string]: { ask?: Quote; bid?: Quote; spread?: number } };

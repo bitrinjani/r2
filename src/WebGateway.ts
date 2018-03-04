@@ -6,7 +6,6 @@ import {
   BrokerPosition,
   BrokerMap,
   SpreadAnalysisResult,
-  ActivePairStore,
   ConfigRoot
 } from './types';
 import QuoteAggregator from './QuoteAggregator';
@@ -39,7 +38,6 @@ export default class WebGateway {
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     private readonly positionService: PositionService,
     private readonly opportunitySearcher: OppotunitySearcher,
-    @inject(symbols.ActivePairStore) private readonly activePairStore: ActivePairStore,
     private readonly orderService: OrderService
   ) {
     this.eventMapper = [
@@ -47,8 +45,7 @@ export default class WebGateway {
       [this.positionService, 'positionUpdated', this.positionUpdated],
       [this.opportunitySearcher, 'spreadAnalysisDone', this.spreadAnalysisDone],
       [this.opportunitySearcher, 'limitCheckDone', this.limitCheckDone],
-      [this.opportunitySearcher, 'activePairRefresh', this.activePairUpdated],
-      [this.activePairStore, 'change', this.activePairUpdated],
+      [this.opportunitySearcher, 'activePairRefresh', this.activePairRefresh],
       [this.orderService, 'orderCreated', this.orderCreated],
       [this.orderService, 'orderUpdated', this.orderUpdated],
       [this.orderService, 'orderFinalized', this.orderFinalized],
@@ -82,8 +79,6 @@ export default class WebGateway {
       });
       this.clients.push(ws);
     });
-    this.activePairUpdated();
-    this.configUpdated(this.configStore.config);
     if (process.env.NODE_ENV !== 'test') {
       opn(`http://${host}:${wssPort}`);
     }
@@ -121,9 +116,8 @@ export default class WebGateway {
     this.broadcast('limitCheckDone', message);
   }
 
-  private async activePairUpdated() {
-    const activePairs = await this.activePairStore.getAll();
-    this.broadcast('activePairUpdated', activePairs.map(p => p.value));
+  private async activePairRefresh(pairsWithAnalysis: any) {
+    this.broadcast('activePairRefresh', pairsWithAnalysis);
   }
 
   private orderCreated(order: OrderImpl) {
