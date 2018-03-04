@@ -24,7 +24,7 @@ const levels = {
   10: 'TRACE'
 };
 
-export default function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boolean; hidden: boolean }) {
+export function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boolean; hidden: boolean }) {
   const { colorize, withLabel, debug, hidden } = opts;
   const ctx = new chalk.constructor({
     enabled: !!(chalk.supportsColor && colorize)
@@ -55,6 +55,32 @@ export default function pretty(opts: { colorize: boolean; withLabel: boolean; de
       const levelString = levelColors[logObj.level](levels[logObj.level]);
       const labelString = withLabel ? `[${logObj.label}] ` : '';
       return `${dateString} ${levelString} ${labelString}${logObj.msg}${EOL}`;
+    } catch (ex) {
+      if (ex && ex.message) {
+        console.log(ex.message);
+      }
+      return '';
+    }
+  });
+  return stream;
+}
+
+export function splitToJson() {
+  const stream = split((json: string): string => {
+    try {
+      const parsed = new Parse(json);
+      const logObj: LogObject = parsed.value;
+      if (parsed.err) {
+        return json + EOL;
+      }
+      if (logObj.level <= 20 || logObj.hidden) {
+        return '';
+      }
+      return JSON.stringify({
+        time: logObj.time,
+        level: levels[logObj.level],
+        msg: logObj.msg
+      });
     } catch (ex) {
       if (ex && ex.message) {
         console.log(ex.message);

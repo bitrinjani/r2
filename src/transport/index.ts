@@ -1,4 +1,4 @@
-import pretty from './pretty';
+import { pretty, splitToJson } from './transform';
 import * as fs from 'fs';
 import SlackIntegration from './SlackIntegration';
 import LineIntegration from './LineIntegration';
@@ -48,7 +48,7 @@ const infoFile = fs.createWriteStream('logs/info.log', { flags: 'a' });
 infoTransform.pipe(infoFile);
 
 // websocket stream
-const wsTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: false, debug: false, hidden: true }));
+const wsTransform = process.stdin.pipe(splitToJson());
 
 // notification integrations
 if (configRoot) {
@@ -74,6 +74,9 @@ if (webGatewayConfig && webGatewayConfig.enabled) {
     clients.push(ws);
   });
   wsTransform.on('data', line => {
+    if (!line) { 
+      return;
+    }
     try {
       broadcast('log', line);
     } catch (err) {
