@@ -129,7 +129,7 @@ export default class OppotunitySearcher extends EventEmitter {
       currentExitCost = -exitAnalysisResult.targetProfit;
       currentExitCostRatio = _.round(currentExitCost / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
       currentExitNetProfitRatio = _.round(
-        (entryProfit + exitAnalysisResult.targetProfit) / midNotional * 100,
+        (entryProfit + exitAnalysisResult.targetProfit) / entryProfit * 100,
         LOT_MIN_DECIMAL_PLACE
       );
     }
