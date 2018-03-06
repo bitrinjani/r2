@@ -5,7 +5,11 @@
 
 R2 Bitcoin Arbitrager is an automatic arbitrage trading application targeting Bitcoin exchanges.
 
+## Console Mode
 ![Screenshot](screenshot.gif)
+
+## Web UI Mode
+![webui](webui.png)
 
 ## Getting Started
 
@@ -21,7 +25,8 @@ npm install
 ```
 4. Rename `config_default.json` in the folder to `config.json`
 5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. Set `enabled` to `false` for exchanges you do not use.
-6. Start the application by `npm start` or `yarn start`.
+6. To run R2 in Web UI mode, set `webGateway.enabled` to true. By default, R2 starts in Console mode. 
+7. Start the application by `npm start` or `yarn start`.
 ```bash
 npm start
 ```
@@ -102,6 +107,25 @@ All configurations are stored in `config.json`.
 |stabilityTracker|-|See stabilityTracker config below|
 |onSingleLeg|-|See onSingleLeg config below|
 |analytics|-|See [ANALYTICS_PLUGIN.md](https://github.com/bitrinjani/r2/blob/master/docs/ANALYTICS_PLUGIN.md)|
+|webGateway|-|See webGateway config details below|
+
+#### webGateway config details
+
+Default config:
+
+```
+  "webGateway": {
+    "enabled": false,
+    "host": "127.0.0.1",
+    "openBrowser": true
+  },
+```
+
+- enabled: true for Web UI mode, false for console mode.
+- host: Web server IP that accepts HTTP client connections. By default, it's localhost.
+- openBrowser: If true, the application opens a browser window. In non-GUI environment, this config needs to be false. 
+
+Web UI URL is http://127.0.0.1:8720 by default. TCP port 8720 and 8721 need to be opened.
 
 #### stabilityTracker config details
 

@@ -1,0 +1,25 @@
+<div class='content'>
+    <app-loading *ngIf="brokerPositions.length === 0"></app-loading>
+  <table class='position' *ngIf="brokerPositions.length > 0">
+    <tr>
+      <th>Broker</th>
+      <th>BTC</th>
+      <th>Long</th>
+      <th>Short</th>
+    </tr>
+    <tr *ngFor="let position of brokerPositions">
+      <td>
+        {{position.broker}}
+      </td>
+      <td>
+        {{position.baseCcyPosition | number:'.3-3'}}
+      </td>
+      <td [class.ok]='position.longAllowed' [class.ng]='!position.longAllowed'>
+        <i class="fas fa-circle"></i>
+      </td>
+      <td [class.ok]='position.shortAllowed' [class.ng]='!position.shortAllowed'>
+        <i class="fas fa-circle"></i>
+      </td>
+    </tr>
+  </table>
+</div>

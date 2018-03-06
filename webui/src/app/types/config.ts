@@ -1,5 +1,5 @@
 import { Castable, cast, element } from '@bitr/castable';
-import { CashMarginType } from './index';
+import { CashMarginType } from './types';
 
 export interface BrokerConfigType {
   broker: string;
@@ -25,7 +25,9 @@ export class BrokerConfig extends Castable implements BrokerConfigType {
   @cast cashMarginType: CashMarginType;
   @cast leverageLevel: number;
   @cast commissionPercent: number;
-  @cast @element(Array, String) noTradePeriods: string[][];
+  @cast
+  @element(Array, String)
+  noTradePeriods: string[][];
 }
 
 export class SlackConfig extends Castable {
@@ -77,8 +79,6 @@ export class AnalyticsConfig extends Castable {
 
 export class WebGatewayConfig extends Castable {
   @cast enabled: boolean;
-  @cast host: string;
-  @cast openBrowser: boolean;
 }
 
 export class StabilityTrackerConfig extends Castable {

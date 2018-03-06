@@ -62,10 +62,11 @@ export default class OppotunitySearcher extends EventEmitter {
       if (!limitCheckResult.success) {
         this.status = limitCheckResult.reason;
         this.log.info(limitCheckResult.message);
-        this.emit('limitCheckDone', limitCheckResult.message);
+        this.emit('limitCheckDone', limitCheckResult);
         return { found: false };
       }
       this.log.info(t`FoundArbitrageOppotunity`);
+      this.emit('limitCheckDone', { ...limitCheckResult, message: t`FoundArbitrageOppotunity` });
       return { found: true, spreadAnalysisResult, closable };
     } catch (ex) {
       this.status = 'Spread analysis failed';

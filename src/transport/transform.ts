@@ -56,9 +56,6 @@ export function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boo
       const labelString = withLabel ? `[${logObj.label}] ` : '';
       return `${dateString} ${levelString} ${labelString}${logObj.msg}${EOL}`;
     } catch (ex) {
-      if (ex && ex.message) {
-        console.log(ex.message);
-      }
       return '';
     }
   });
@@ -82,9 +79,6 @@ export function splitToJson() {
         msg: logObj.msg
       });
     } catch (ex) {
-      if (ex && ex.message) {
-        console.log(ex.message);
-      }
       return '';
     }
   });

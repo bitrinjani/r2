@@ -6,7 +6,8 @@ import {
   BrokerPosition,
   BrokerMap,
   SpreadAnalysisResult,
-  ConfigRoot
+  ConfigRoot,
+  LimitCheckResult
 } from './types';
 import QuoteAggregator from './QuoteAggregator';
 import { getLogger } from '@bitr/logger';
@@ -79,7 +80,7 @@ export default class WebGateway {
       });
       this.clients.push(ws);
     });
-    if (process.env.NODE_ENV !== 'test') {
+    if (webGateway.openBrowser) {
       opn(`http://${host}:${wssPort}`);
     }
     this.log.debug(`Started ${this.constructor.name}.`);
@@ -112,8 +113,8 @@ export default class WebGateway {
     this.broadcast('spreadAnalysisDone', result);
   }
 
-  private limitCheckDone(message: string) {
-    this.broadcast('limitCheckDone', message);
+  private limitCheckDone(limitCheckResult: LimitCheckResult) {
+    this.broadcast('limitCheckDone', limitCheckResult);
   }
 
   private async activePairRefresh(pairsWithAnalysis: any) {

@@ -47,9 +47,6 @@ const infoTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: tr
 const infoFile = fs.createWriteStream('logs/info.log', { flags: 'a' });
 infoTransform.pipe(infoFile);
 
-// websocket stream
-const wsTransform = process.stdin.pipe(splitToJson());
-
 // notification integrations
 if (configRoot) {
   const slackConfig = _.get(configRoot, 'logging.slack');
@@ -59,9 +56,10 @@ if (configRoot) {
 }
 
 // websocket integration
-const clients: WebSocket[] = [];
 const webGatewayConfig = _.get(configRoot, 'webGateway');
 if (webGatewayConfig && webGatewayConfig.enabled) {
+  const clients: WebSocket[] = [];
+  const wsTransform = process.stdin.pipe(splitToJson());
   app = express();
   server = app.listen(wssLogPort, webGatewayConfig.host, () => {
     _.noop();
@@ -74,18 +72,18 @@ if (webGatewayConfig && webGatewayConfig.enabled) {
     clients.push(ws);
   });
   wsTransform.on('data', line => {
-    if (!line) { 
+    if (!line) {
       return;
     }
     try {
-      broadcast('log', line);
+      broadcast(clients, 'log', line);
     } catch (err) {
       _.noop();
     }
   });
 }
 
-function broadcast(type: string, body: any) {
+function broadcast(clients: WebSocket[], type: string, body: any) {
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {
       client.send(JSON.stringify({ type, body }), err => {
