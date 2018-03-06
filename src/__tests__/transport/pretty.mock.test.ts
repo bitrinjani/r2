@@ -9,11 +9,11 @@ jest.mock('date-fns', () => ({
     })
 }));
 
-import pretty from '../../transport/pretty';
+import { pretty } from '../../transport/transform';
 import { Readable } from 'stream';
 
 test('pretty split callback throws', () => {
-  const result = pretty({ colorize: true, withLabel: true, debug: true });
+  const result = pretty({ colorize: true, withLabel: true, debug: true, hidden: false });
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 40, "label": "TestStream" }');
   stream.push(null);
@@ -21,7 +21,7 @@ test('pretty split callback throws', () => {
 });
 
 test('pretty split callback throws 2', () => {
-  const result = pretty({ colorize: true, withLabel: true, debug: true });
+  const result = pretty({ colorize: true, withLabel: true, debug: true, hidden: false });
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 40, "label": "TestStream" }');
   stream.push(null);

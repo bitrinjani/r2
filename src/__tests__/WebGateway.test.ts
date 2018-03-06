@@ -30,7 +30,7 @@ describe('WebGateway', () => {
     await wg.start();
     await delay(0);
     await wg.stop();
-    await delay(0);
+    await delay(10);
   });
 
   test('start, stop - enabled', async () => {
@@ -47,10 +47,10 @@ describe('WebGateway', () => {
     );
     try {
       await wg.start();
-      await delay(0);
+      await delay(100);
     } finally {
       await wg.stop();
-      await delay(0);
+      await delay(100);
     }
   });
 
@@ -81,11 +81,12 @@ describe('WebGateway', () => {
       orderService.emit('orderUpdated');
       orderService.emit('orderFinalized');
       configStore.emit('configUpdated', config);
-      await delay(0);
+      await delay(100);
     } finally {
       ws.close();
+      await delay(100);
       await wg.stop();
-      await delay(0);
+      await delay(100);
     }
   });
 
@@ -103,13 +104,12 @@ describe('WebGateway', () => {
     );
     try {
       await wg.start();
-      await delay(10);
-      await delay(10);
+      await delay(100);
       quoteAggregator.emit('quoteUpdated');
-      await delay(0);
+      await delay(100);
     } finally {
       await wg.stop();
-      await delay(0);
+      await delay(100);
     }
   });
 });
