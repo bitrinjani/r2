@@ -61,7 +61,7 @@ export function safeQueryStringStringify(o: any) {
   return querystring.stringify(noUndefinedFields);
 }
 
-export function revive<T>(T: Function, o: T): T {
+export function revive<T, K>(T: Function, o: K): T {
   const newObject = Object.create(T.prototype);
   return Object.assign(newObject, o) as T;
 }

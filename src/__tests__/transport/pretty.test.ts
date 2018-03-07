@@ -1,4 +1,4 @@
-import pretty from '../../transport/pretty';
+import { pretty } from '../../transport/transform';
 import { Readable } from 'stream';
 
 test('pretty', () => {

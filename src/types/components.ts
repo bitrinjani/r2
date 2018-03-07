@@ -2,6 +2,7 @@
 import { ConfigRoot } from './config';
 import OrderImpl from '../OrderImpl';
 import { TimeSeries } from '@bitr/chronodb';
+import { EventEmitter } from 'events';
 
 export interface BrokerAdapter {
   broker: Broker;
@@ -29,6 +30,21 @@ export interface SpreadAnalysisResult {
   profitPercentAgainstNotional: number;
 }
 
+export interface PairSummary {
+  entryProfit: number;
+  entryProfitRatio: number;
+  currentExitCost?: number;
+  currentExitCostRatio?: number;
+  currentExitNetProfitRatio?: number;
+}
+
+export interface PairWithSummary {
+  key: string;
+  pair: OrderPair;
+  pairSummary: PairSummary;
+  exitAnalysisResult?: SpreadAnalysisResult;
+}
+
 export interface SpreadStat {
   timestamp: number;
   byBroker: { [x: string]: { ask?: Quote; bid?: Quote; spread?: number } };
@@ -46,7 +62,7 @@ export interface LimitCheckResult {
   message: string;
 }
 
-export interface ConfigStore {
+export interface ConfigStore extends EventEmitter {
   config: ConfigRoot;
 }
 
@@ -61,7 +77,7 @@ export interface BrokerPosition {
 
 export type OrderPairKeyValue = { key: string; value: OrderPair };
 
-export interface ActivePairStore {
+export interface ActivePairStore extends EventEmitter {
   get(key: string): Promise<OrderPair>;
   getAll(): Promise<OrderPairKeyValue[]>;
   put(value: OrderPair): Promise<string>;
@@ -70,3 +86,13 @@ export interface ActivePairStore {
 }
 
 export interface SpreadStatTimeSeries extends TimeSeries<SpreadStat> {}
+
+export type OrderKeyValue = { key: string; value: Order };
+
+export interface HistoricalOrderStore extends EventEmitter {
+  get(key: string): Promise<Order>;
+  getAll(): Promise<OrderKeyValue[]>;
+  put(value: Order): Promise<string>;
+  del(key: string): Promise<void>;
+  delAll(): Promise<{}>;
+}

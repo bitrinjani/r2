@@ -9,6 +9,7 @@ interface LogObject {
   msg: string;
   time: number;
   label: string;
+  hidden: boolean;
 }
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss.SSS';
@@ -23,8 +24,8 @@ const levels = {
   10: 'TRACE'
 };
 
-export default function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boolean }) {
-  const { colorize, withLabel, debug } = opts;
+export function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boolean; hidden: boolean }) {
+  const { colorize, withLabel, debug, hidden } = opts;
   const ctx = new chalk.constructor({
     enabled: !!(chalk.supportsColor && colorize)
   });
@@ -47,14 +48,37 @@ export default function pretty(opts: { colorize: boolean; withLabel: boolean; de
       if (!debug && logObj.level <= 20) {
         return '';
       }
+      if (hidden && logObj.hidden) {
+        return '';
+      }
       const dateString = formatDate(new Date(logObj.time), dateFormat);
       const levelString = levelColors[logObj.level](levels[logObj.level]);
       const labelString = withLabel ? `[${logObj.label}] ` : '';
       return `${dateString} ${levelString} ${labelString}${logObj.msg}${EOL}`;
     } catch (ex) {
-      if (ex && ex.message) {
-        console.log(ex.message);
+      return '';
+    }
+  });
+  return stream;
+}
+
+export function splitToJson() {
+  const stream = split((json: string): string => {
+    try {
+      const parsed = new Parse(json);
+      const logObj: LogObject = parsed.value;
+      if (parsed.err) {
+        return json + EOL;
       }
+      if (logObj.level <= 20 || logObj.hidden) {
+        return '';
+      }
+      return JSON.stringify({
+        time: logObj.time,
+        level: levels[logObj.level],
+        msg: logObj.msg
+      });
+    } catch (ex) {
       return '';
     }
   });

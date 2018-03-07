@@ -8,9 +8,10 @@ import symbols from './symbols';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import BrokerStabilityTracker from './BrokerStabilityTracker';
 import t from './intl';
+import { EventEmitter } from 'events';
 
 @injectable()
-export default class PositionService {
+export default class PositionService extends EventEmitter {
   private readonly log = getLogger(this.constructor.name);
   private timer;
   private isRefreshing: boolean;
@@ -20,7 +21,9 @@ export default class PositionService {
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     private readonly brokerAdapterRouter: BrokerAdapterRouter,
     private readonly brokerStabilityTracker: BrokerStabilityTracker
-  ) {}
+  ) {
+    super();
+  }
 
   async start(): Promise<void> {
     this.log.debug('Starting PositionService...');
@@ -45,13 +48,13 @@ export default class PositionService {
       `${t`LongAllowed`}: ${isOk(brokerPosition.longAllowed)}, ` +
       `${t`ShortAllowed`}: ${isOk(brokerPosition.shortAllowed)}`;
 
-    this.log.info(hr(21) + 'POSITION' + hr(21));
-    this.log.info(`Net Exposure: ${_.round(this.netExposure, 3)} ${baseCcy}`);
+    this.log.info({ hidden: true }, hr(21) + 'POSITION' + hr(21));
+    this.log.info({ hidden: true }, `Net Exposure: ${_.round(this.netExposure, 3)} ${baseCcy}`);
     _.each(this.positionMap, (position: BrokerPosition) => {
       const stability = this.brokerStabilityTracker.stability(position.broker);
-      this.log.info(`${formatBrokerPosition(position)} (Stability: ${stability})`);
+      this.log.info({ hidden: true }, `${formatBrokerPosition(position)} (Stability: ${stability})`);
     });
-    this.log.info(hr(50));
+    this.log.info({ hidden: true }, hr(50));
     this.log.debug(JSON.stringify(this.positionMap));
   }
 
@@ -79,6 +82,7 @@ export default class PositionService {
         .map((p: BrokerPosition) => [p.broker, p])
         .fromPairs()
         .value();
+      await this.emit('positionUpdated', this.positionMap);
     } catch (ex) {
       this.log.error(ex.message);
       this.log.debug(ex.stack);
@@ -90,7 +94,7 @@ export default class PositionService {
 
   private async getBrokerPosition(brokerConfig: BrokerConfig, minSize: number): Promise<BrokerPosition> {
     const { baseCcy } = splitSymbol(this.configStore.config.symbol);
-    const positions =  await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
+    const positions = await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
     const baseCcyPosition = positions.get(baseCcy);
     if (baseCcyPosition === undefined) {
       throw new Error(`Unable to find base ccy position in ${brokerConfig.broker}. ${JSON.stringify([...positions])}`);

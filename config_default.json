@@ -16,7 +16,7 @@
   "orderStatusCheckInterval": 3000,
   "stabilityTracker": {
     "threshold": 8,
-    "recoveryInterval": 300000 
+    "recoveryInterval": 300000
   },
   "onSingleLeg": {
     "action": "Reverse",
@@ -30,6 +30,11 @@
     "enabled": false,
     "plugin": "SimpleSpreadStatHandler.js",
     "initialHistory": { "minutes": 30 }
+  },
+  "webGateway": {
+    "enabled": false,
+    "host": "127.0.0.1",
+    "openBrowser": true
   },
   "brokers": [
     {

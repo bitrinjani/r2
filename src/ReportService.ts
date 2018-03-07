@@ -67,7 +67,7 @@ export default class ReportService {
 
   async stop() {
     this.log.debug('Stopping ReportService...');
-    this.quoteAggregator.removeListener('quoteUpdated', this.handlerRef)
+    this.quoteAggregator.removeListener('quoteUpdated', this.handlerRef);
     this.spreadStatWriteStream.close();
     if (this.analyticsProcess) {
       await promisify(this.analyticsProcess.send).bind(this.analyticsProcess)('stop');

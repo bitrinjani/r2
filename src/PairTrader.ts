@@ -20,6 +20,7 @@ import { findBrokerConfig } from './configUtil';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import { EventEmitter } from 'events';
 import { calcProfit } from './pnl';
+import * as OrderUtil from './OrderUtil';
 
 @injectable()
 export default class PairTrader extends EventEmitter {
@@ -118,9 +119,9 @@ export default class PairTrader extends EventEmitter {
   private printOrderSummary(orders: OrderImpl[]) {
     orders.forEach(o => {
       if (o.filled) {
-        this.log.info(o.toExecSummary());
+        this.log.info(OrderUtil.toExecSummary(o));
       } else {
-        this.log.warn(o.toExecSummary());
+        this.log.warn(OrderUtil.toExecSummary(o));
       }
     });
   }
