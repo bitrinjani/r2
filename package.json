@@ -98,7 +98,8 @@
       "!**/__tests__/**",
       "!**/node_modules/**",
       "!**/vendor/**",
-      "!tools/**"
+      "!tools/**",
+      "!webui/**"
     ]
   }
 }
