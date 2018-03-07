@@ -85,6 +85,27 @@ onSingleLeg設定で裁定ペアの片側だけ約定したときの動作を指
     - limitMovePercent: もとのオーダーよりも指定%だけ不利な方向に指値価格を指定する。
     - ttl: Actionにより作られた指値注文がこのミリ秒後に約定していない場合、キャンセルする。Time to Live。
 
+#### webGateway設定詳細
+
+既定値:
+
+```json
+// config.json
+...
+  "webGateway": {
+    "enabled": false,
+    "host": "127.0.0.1",
+    "openBrowser": true
+  },
+...
+```
+
+- enabled: true for Web UI mode, false for console mode.
+- host: リッスンするIPアドレス。既定ではlocalhost。
+- openBrowser: trueのとき、ブラウザタブを自動的に開く。非GUI環境ではfalseにする必要がある。 
+
+Web UI URLは既定では http://127.0.0.1:8720 で、TCPポート8720と8721が開いている必要がある。
+
 ### 取引所設定
 |Name|Values|Description|
 |----|------|-----------|

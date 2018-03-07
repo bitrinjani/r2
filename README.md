@@ -5,11 +5,17 @@
 
 R2 Bitcoin Arbitrager is an automatic arbitrage trading application targeting Bitcoin exchanges.
 
-## Console Mode
-![Screenshot](screenshot.gif)
-
 ## Web UI Mode
+
+Web UI mode is for browser clients.
+
 ![webui](webui.png)
+
+## Console Mode
+
+Console mode is for CUI-only environment like Linux boxes with no GUI.
+
+![Screenshot](screenshot.gif)
 
 ## Getting Started
 
@@ -27,9 +33,12 @@ npm install
 5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. Set `enabled` to `false` for exchanges you do not use.
 6. To run R2 in Web UI mode, set `webGateway.enabled` to true. By default, R2 starts in Console mode. 
 7. Start the application by `npm start` or `yarn start`.
+
 ```bash
 npm start
 ```
+
+8. Open http://127.0.0.1:8720 in Chrome.
 
 or
 
@@ -50,6 +59,8 @@ R2 works on any OS that supports Node.js, such as:
 - Windows
 - Mac OS
 - Linux
+
+Web UI works on the latest version of Google Chrome.
 
 #### Supported Exchanges
 R2 supports the following exchanges.
