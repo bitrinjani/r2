@@ -18,7 +18,6 @@
       <th>Entry PL</th>
       <th>Entry PL %</th>
       <th>Current Exit Cost</th>
-      <th>Current Exit Net Profit %</th>
     </tr>
     <tr *ngFor="let pair of pairs">
       <td>{{pair.pair[0].broker}}</td>
@@ -30,7 +29,6 @@
       <td>{{pair.pairSummary.entryProfit | currency:'JPY':'symbol':'.0-0'}}</td>
       <td>{{pair.pairSummary.entryProfitRatio | number:'.3-3'}}%</td>
       <td>{{pair.pairSummary.currentExitCost | currency:'JPY':'symbol':'.0-0'}}</td>
-      <td>{{pair.pairSummary.currentExitNetProfitRatio | number:'.3-3'}}%</td>
     </tr>
   </table>
 </div>
