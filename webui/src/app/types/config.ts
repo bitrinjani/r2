@@ -101,6 +101,7 @@ export class ConfigRoot extends Castable {
   @cast maxTargetProfit: number;
   @cast maxTargetProfitPercent: number;
   @cast maxTargetVolumePercent: number;
+  @cast AcceptablePriceRange: number;
   @cast iterationInterval: number;
   @cast positionRefreshInterval: number;
   @cast sleepAfterSend: number;

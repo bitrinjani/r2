@@ -100,14 +100,21 @@ export default class PairTrader extends EventEmitter {
   private async sendOrder(quote: Quote, targetVolume: number, orderType: OrderType): Promise<OrderImpl> {
     this.log.info(t`SendingOrderTargettingQuote`, formatQuote(quote));
     const brokerConfig = findBrokerConfig(this.configStore.config, quote.broker);
+    const { config } = this.configStore;
     const { cashMarginType, leverageLevel } = brokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
+    const orderPrice = 
+     (quote.side == QuoteSide.Ask && config.AcceptablePriceRange != undefined)
+     ? _.round(quote.price * (1 + config.AcceptablePriceRange/100)) as number
+     : (quote.side == QuoteSide.Bid && config.AcceptablePriceRange != undefined)
+     ? _.round(quote.price * (1 - config.AcceptablePriceRange/100)) as number
+     : quote.price;
     const order = new OrderImpl({
       symbol: this.configStore.config.symbol,
       broker: quote.broker,
       side: orderSide,
       size: targetVolume,
-      price: quote.price,
+      price: orderPrice,
       cashMarginType,
       type: orderType,
       leverageLevel
