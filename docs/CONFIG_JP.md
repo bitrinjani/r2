@@ -15,6 +15,7 @@
 |maxTargetProfitPercent|number|[Optional] 最大目標収益割合。期待収益の裁定取引の円換算(取引価格*数量)に対する割合(%)がこれより大きい場合、取引を行わない。取引所が不正な価格を提示した場合の安全弁。maxTargetProfitとmaxTargetProfitPercentの両方が設定されている場合、両方を下回らない限り取引を行わない。|
 |exitNetProfitRatio|number|オープン時の収益に対し、クローズによって何%の利益を確定するか指定する。このパーセンテージ分だけオープン時からスプレッドが縮小した時、そのオープンペアをクローズする。例えば、オープン時の収益が200かつexitNetProfitRatio=20とすると、クローズのコストが160を下回ったときにR2はクローズオーダーを送信し、40の利益を確定しようとする。(オープンによる収益200, クローズによる費用160 -> 利益40)|
 |maxTargetVolumePercent|number|[Optional]  数量不足による約定しない状況を回避する為に、裁定可能数量に対する注文量の割合に制限を設ける。この割合を上回らない限り取引を行わない。例えば、maxTargetVolumePercent=50の場合、裁定可能数量が1.00BTCだと注文量は0.5BTC(50%)以下でなければ取引を行わない。|
+|acceptablePriceRange|number|[Optional]  目標価格から設定値(%)の分だけ不利な方向による約定を許容する。例えば、0.1を設定した場合、買い注文であれば目標価格に1.001を掛けた価格まで、売り注文であれば目標価格に0.999を掛けた価格までの範囲で約定するようになる。(擬似的な成行注文)|
 |iterationInterval|Millisecond|裁定プロセスのインターバル。この値が3000に設定されている場合、3秒に一回板情報を取得し裁定機会を探る。|
 |positionRefreshInterval|Millisecond|ポジション更新インターバル。|
 |sleepAfterSend|Millisecond|裁定取引完了後、このミリ秒だけ休止する。|
