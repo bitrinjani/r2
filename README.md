@@ -109,6 +109,7 @@ All configurations are stored in `config.json`.
 |maxTargetProfitPercent|number|[Optional] Max target profit in percent.|
 |exitNetProfitRatio|number|R2 attempts to close open pairs when the spread has decreased by this percentage. For example, when the open profit of an open pair is 200 JPY and exitNetProfitRatio is 20(%), R2 closes the pair once the closing cost has became 160.|
 |maxTargetVolumePercent|number|[Optional]  In order to execute orders as fast as possible and avoid slippage, R2 checks the volume of the quotes from the exchanges and makes sure the target volume consumes less than this percentage of the volume of the target quote before executing the order|
+|acceptablePriceRange|number|[Optional] Allows execution with price that is disadvantageous by the set value(%) from target price. (Like a market order.)|
 |iterationInterval|Millisecond|Time lapse in milliseconds of an iteration. When it's set to 3000, the quotes fetch and the spreads analysis for all the brokers are done every 3 seconds|
 |positionRefreshInterval|Millisecond|Time lapse in milliseconds of position data refresh. Position data is used to check max exposure and long/short availability for each broker.|
 |sleepAfterSend|Millisecond|Time lapse in milliseconds after one arbitrage is done.|
