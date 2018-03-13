@@ -104,10 +104,10 @@ export default class PairTrader extends EventEmitter {
     const { cashMarginType, leverageLevel } = brokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
     const orderPrice = 
-     (quote.side == QuoteSide.Ask && config.AcceptablePriceRange != undefined)
-     ? _.round(quote.price * (1 + config.AcceptablePriceRange/100)) as number
-     : (quote.side == QuoteSide.Bid && config.AcceptablePriceRange != undefined)
-     ? _.round(quote.price * (1 - config.AcceptablePriceRange/100)) as number
+     (quote.side === QuoteSide.Ask && config.acceptablePriceRange !== undefined)
+     ? _.round(quote.price * (1 + config.acceptablePriceRange/100)) as number
+     : (quote.side === QuoteSide.Bid && config.acceptablePriceRange !== undefined)
+     ? _.round(quote.price * (1 - config.acceptablePriceRange/100)) as number
      : quote.price;
     const order = new OrderImpl({
       symbol: this.configStore.config.symbol,
