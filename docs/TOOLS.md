@@ -24,6 +24,8 @@ Coincheck, BTC, Leverage Position, 3.456
 Quoine, JPY, Margin, 300000
 Quoine, JPY, Free Margin, 123456
 Quoine, BTC, Leverage Position, 0.01
+Bitbankcc, JPY, Cash, 123456
+Bitbankcc, BTC, Cash, 0.123
 ```
 
 ## closeCcPosition - close all leverage positions by market orders in Coincheck
@@ -44,13 +46,19 @@ npm run closeBfPosition
 npm run closeQuPosition
 ```
 
+## closeBbPosition - sell out all cache positions by market orders in Bitbankcc
+
+```bash
+npm run closeBbPosition
+```
+
 ## clearPairs - clear open pair data in R2 internal database. This doesn't send any orders.
 
 ```bash
 npm run clearPairs
 ```
 
-## closeAll - execute the three close scripts above, execute clearPairs, then show balances by getBalance.
+## closeAll - execute the four close scripts above, execute clearPairs, then show balances by getBalance.
 
 ```bash
 npm run closeAll

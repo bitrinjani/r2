@@ -14,7 +14,8 @@
     "closeCcPosition": "ts-node ./tools/closeCcPosition.ts",
     "closeBfPosition": "ts-node ./tools/closeBfPosition.ts",
     "closeQuPosition": "ts-node ./tools/closeQuPosition.ts",
-    "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run clearPairs && npm run getBalance"
+    "closeBbPosition": "ts-node ./tools/closeBbPosition.ts",
+    "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run closeBbPosition && npm run clearPairs && npm run getBalance"
   },
   "dependencies": {
     "@bitr/awaitable-event-emitter": "^1.0.3",
