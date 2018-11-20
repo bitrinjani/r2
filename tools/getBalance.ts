@@ -5,9 +5,11 @@ import { getConfigRoot, findBrokerConfig } from '../src/configUtil';
 import BitflyerApi from '../src/Bitflyer/BrokerApi';
 import CoincheckApi from '../src/Coincheck/BrokerApi';
 import QuoineApi from '../src/Quoine/BrokerApi';
+import BitbankccApi from '@bitr/bitbankcc-api';
 import { Balance } from '../src/Bitflyer/types';
 import { TradingAccount, AccountBalance } from '../src/Quoine/types';
 import { options } from '@bitr/logger';
+import { Asset } from '@bitr/bitbankcc-api';
 
 options.enabled = false;
 
@@ -16,10 +18,12 @@ async function main() {
   const bfConfig = findBrokerConfig(config, 'Bitflyer');
   const ccConfig = findBrokerConfig(config, 'Coincheck');
   const quConfig = findBrokerConfig(config, 'Quoine');
+  const bbConfig = findBrokerConfig(config, 'Bitbankcc');
 
   const bfApi = new BitflyerApi(bfConfig.key, bfConfig.secret);
   const ccApi = new CoincheckApi(ccConfig.key, ccConfig.secret);
   const quApi = new QuoineApi(quConfig.key, quConfig.secret);
+  const bbApi = new BitbankccApi(bbConfig.key, bbConfig.secret);
 
   // csv header
   process.stdout.write('Exchange, Currency, Type, Amount\n');
@@ -63,6 +67,15 @@ async function main() {
     process.stdout.write(`Quoine, JPY, Margin, ${_.round(quBtcJpyBalance.balance)}\n`);
     process.stdout.write(`Quoine, JPY, Free Margin, ${_.round(quBtcJpyBalance.free_margin)}\n`);
     process.stdout.write(`Quoine, BTC, Leverage Position, ${quBtcJpyBalance.position}\n`);
+  }
+
+  if (bbConfig.enabled) {
+    // bitbankcc cash balance
+    const bbAssetsResponse = await bbApi.getAssets();
+    const bbJpyCash = bbAssetsResponse.assets.find(b => b.asset === 'jpy') as Asset;
+    const bbBtcCash = bbAssetsResponse.assets.find(b => b.asset === 'btc') as Asset;
+    process.stdout.write(`Bitbankcc, JPY, Cash, ${_.round(bbJpyCash.free_amount)}\n`);
+    process.stdout.write(`Bitbankcc, BTC, Cash, ${bbBtcCash.free_amount}\n`);
   }
 }
 
