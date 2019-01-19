@@ -3,7 +3,7 @@
 import * as nock from 'nock';
 
 function nocksetup() {
-  const quoine = nock('https://api.quoine.com');
+  const quoine = nock('https://api.liquid.com');
   quoine.get('/orders/118573146').reply(200, {
     id: 118573146,
     order_type: 'limit',

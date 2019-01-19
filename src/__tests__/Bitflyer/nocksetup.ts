@@ -2,7 +2,7 @@
 import * as nock from 'nock';
 
 function nocksetup() {
-  const api = nock('https://api.bitflyer.jp');
+  const api = nock('https://api.bitflyer.com');
   api
     .get('/v1/me/getbalance')
     .reply(200, [
