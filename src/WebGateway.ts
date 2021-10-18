@@ -140,9 +140,12 @@ export default class WebGateway {
   private sanitize(config: ConfigRoot): ConfigRoot {
     const copy = _.cloneDeep(config);
     for (const brokerConfig of copy.brokers) {
+      // @ts-ignore
       delete brokerConfig.key;
+      // @ts-ignore
       delete brokerConfig.secret;
     }
+    // @ts-ignore
     delete copy.logging;
     return copy;
   }

@@ -19,7 +19,7 @@ Console mode is for CUI-only environment like Linux boxes with no GUI.
 
 ## Getting Started
 
-1. Install [Node.js](https://nodejs.org) 8.5 or newer.
+1. Install [Node.js](https://nodejs.org) lts/dubnium.
 2. Clone this repository.
   ```bash
   git clone https://github.com/bitrinjani/r2.git
