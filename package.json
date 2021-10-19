@@ -28,6 +28,7 @@
     "@bitr/chronodb": "^1.0.2",
     "@bitr/logger": "^1.0.1",
     "@bitr/zmq": "^1.1.0",
+    "bitfinex-api-node": "^5.0.2",
     "chalk": "^2.3.0",
     "core-decorators": "^0.20.0",
     "date-fns": "^1.28.5",

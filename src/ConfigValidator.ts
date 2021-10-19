@@ -20,30 +20,46 @@ export default class ConfigValidator {
     this.mustBePositive(config.priceMergeSize, 'priceMergeSize');
     this.mustBePositive(config.sleepAfterSend, 'sleepAfterSend');
 
-    const bitflyer = findBrokerConfig(config, 'Bitflyer');
-    if (this.isEnabled(bitflyer)) {
-      this.throwIf(bitflyer.cashMarginType !== CashMarginType.Cash, 'CashMarginType must be Cash for Bitflyer.');
-      this.validateBrokerConfigCommon(bitflyer);
-    }
+    // const bitflyer = findBrokerConfig(config, 'Bitflyer');
+    // if (this.isEnabled(bitflyer)) {
+    //   this.throwIf(bitflyer.cashMarginType !== CashMarginType.Cash, 'CashMarginType must be Cash for Bitflyer.');
+    //   this.validateBrokerConfigCommon(bitflyer);
+    // }
 
-    const coincheck = findBrokerConfig(config, 'Coincheck');
-    if (this.isEnabled(coincheck)) {
-      const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.MarginOpen, CashMarginType.NetOut];
-      this.throwIf(
-        !_.includes(allowedCashMarginType, coincheck.cashMarginType),
-        'CashMarginType must be Cash, NetOut or MarginOpen for Coincheck.'
-      );
-      this.validateBrokerConfigCommon(coincheck);
-    }
+    // const coincheck = findBrokerConfig(config, 'Coincheck');
+    // if (this.isEnabled(coincheck)) {
+    //   const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.MarginOpen, CashMarginType.NetOut];
+    //   this.throwIf(
+    //     !_.includes(allowedCashMarginType, coincheck.cashMarginType),
+    //     'CashMarginType must be Cash, NetOut or MarginOpen for Coincheck.'
+    //   );
+    //   this.validateBrokerConfigCommon(coincheck);
+    // }
 
-    const quoine = findBrokerConfig(config, 'Quoine');
-    if (this.isEnabled(quoine)) {
-      const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.NetOut];
-      this.throwIf(
-        !_.includes(allowedCashMarginType, quoine.cashMarginType),
-        'CashMarginType must be Cash or NetOut for Quoine.'
-      );
-      this.validateBrokerConfigCommon(quoine);
+    // const quoine = findBrokerConfig(config, 'Quoine');
+    // if (this.isEnabled(quoine)) {
+    //   const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.NetOut];
+    //   this.throwIf(
+    //     !_.includes(allowedCashMarginType, quoine.cashMarginType),
+    //     'CashMarginType must be Cash or NetOut for Quoine.'
+    //   );
+    //   this.validateBrokerConfigCommon(quoine);
+    // }
+
+    const brokerRules = [
+      { id: 'Binance', allowedCashMarginType: [CashMarginType.Cash] },
+      { id: 'Bitfinex', allowedCashMarginType: [CashMarginType.Cash] }
+    ];
+    for (let i = 0; i < brokerRules.length; i++) {
+      const rule = brokerRules[i];
+      const broker = findBrokerConfig(config, rule.id);
+      if (this.isEnabled(broker)) {
+        this.throwIf(
+          !_.includes(rule.allowedCashMarginType, broker.cashMarginType),
+          `CashMarginType must be ${rule.allowedCashMarginType.join(', ')} for ${rule.id}`
+        );
+        this.validateBrokerConfigCommon(broker);
+      }
     }
   }
 
