@@ -65,7 +65,7 @@ export default class AppRoot {
       if (brokerModule === undefined) {
         throw new Error(`Unable to find ${brokerName} package.`);
       }
-      const brokerAdapter = brokerModule.create(brokerConfig);
+      const brokerAdapter = brokerModule.create(brokerConfig, configStore.config.symbol);
       this.ioc.bind<BrokerAdapter>(symbols.BrokerAdapter).toConstantValue(brokerAdapter);
     });
     await Promise.all(bindTasks);
