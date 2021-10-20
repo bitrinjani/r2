@@ -18,7 +18,7 @@ export class DepthPriceCellComponent implements OnInit {
       this.formattedPrice = '⋮';
       this.tradable = true;
     } else {
-      this.formattedPrice = this.priceCell.value.toLocaleString();
+      this.formattedPrice = this.priceCell.value.toPrecision(6);
       this.tradable = this.priceCell.askTradable || this.priceCell.bidTradable;
     }
   }
