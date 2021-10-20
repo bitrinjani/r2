@@ -13,19 +13,19 @@
       <tr>
         <td>Best Ask</td>
         <td>{{spread.ask.broker}}</td>
-        <td>{{spread.ask.price}}</td>
+        <td>{{spread.ask.price | number:'1.8-8'}}</td>
         <td>{{spread.ask.volume}} BTC</td>
       </tr>
       <tr>
         <td>Best Bid</td>
         <td>{{spread.bid.broker}}</td>
-        <td>{{spread.bid.price}}</td>
+        <td>{{spread.bid.price | number:'1.8-8'}}</td>
         <td>{{spread.bid.volume}} BTC</td>
       </tr>
       <tr>
         <td>Spread</td>
         <td></td>
-        <td>{{-spread.invertedSpread}}</td>
+        <td>{{-spread.invertedSpread | number:'1.8-8'}}</td>
       </tr>
     </table>
     <table class='spread-analysis'>
@@ -40,7 +40,7 @@
       </tr>
       <tr>
         <td>Expected Profit</td>
-        <td>{{spread.targetProfit}}</td>
+        <td>{{spread.targetProfit | number:'1.8-8'}}</td>
       </tr>
       <tr>
         <td>Expected Profit %</td>
