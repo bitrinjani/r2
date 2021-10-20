@@ -24,7 +24,10 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     throw new Error("Method not implemented.");
   }
   getPositions(): Promise<Map<string, number>> {
-    throw new Error('getPositions Method not implemented.');
+    const positionMap = new Map<string, number>();
+    positionMap.set('BTC', 1);
+    positionMap.set('ETH', 5);
+    return Promise.resolve(positionMap);
   }
   async fetchQuotes(): Promise<Quote[]> {
     const res = await this.brokerApi.getOrderBook();
