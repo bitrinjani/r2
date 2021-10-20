@@ -78,7 +78,8 @@ export default class SpreadAnalyzer {
       targetVolume = closingPair[0].size;
     }
     const commission = this.calculateTotalCommission([bid, ask], targetVolume);
-    const targetProfit = _.round(invertedSpread * targetVolume - commission);
+    // const targetProfit = _.round(invertedSpread * targetVolume - commission);
+    const targetProfit = this.calcTargetProfit(invertedSpread, targetVolume, commission);
     const midNotional = _.mean([ask.price, bid.price]) * targetVolume;
     const profitPercentAgainstNotional = _.round(targetProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
     const spreadAnalysisResult = {
@@ -136,7 +137,8 @@ export default class SpreadAnalyzer {
     let targetVolume = _.min([availableVolume, this.configStore.config.maxSize]) as number;
     targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
     const commission = this.calculateTotalCommission([bid, ask], targetVolume);
-    const targetProfit = _.round(invertedSpread * targetVolume - commission);
+    // const targetProfit = _.round(invertedSpread * targetVolume - commission);
+    const targetProfit = this.calcTargetProfit(invertedSpread, targetVolume, commission);
     const midNotional = _.mean([ask.price, bid.price]) * targetVolume;
     const profitPercentAgainstNotional = _.round(targetProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
     return {
@@ -173,13 +175,18 @@ export default class SpreadAnalyzer {
   }
 
   private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {
-    return _(quotes).sumBy(q => {
+    return _(quotes).reduce((sum, q) => {
       const brokerConfig = findBrokerConfig(this.configStore.config, q.broker);
-      return calcCommission(q.price, targetVolume, brokerConfig.commissionPercent);
-    });
+      const commission = calcCommission(q.price, targetVolume, brokerConfig.commissionPercent);
+      return sum.add(commission);
+    }, new Decimal(0)).toNumber();
   }
 
   private isAllowedByCurrentPosition(q: Quote, pos: BrokerPosition): boolean {
     return q.side === QuoteSide.Bid ? pos.shortAllowed : pos.longAllowed;
+  }
+
+  private calcTargetProfit(invertedSpread: number, targetVolume: number, commission: number) {
+    return new Decimal(invertedSpread).times(targetVolume).minus(commission).toNumber();
   }
 } /* istanbul ignore next */
