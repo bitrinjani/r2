@@ -20,6 +20,7 @@
     "closeAll": "npm run closeCcPosition && npm run closeBfPosition && npm run closeQuPosition && npm run clearPairs && npm run getBalance"
   },
   "dependencies": {
+    "@binance/connector": "^1.5.0",
     "@bitr/awaitable-event-emitter": "^1.0.3",
     "@bitr/bitbankcc": "^1.0.5",
     "@bitr/bitflyer-fx": "^1.0.4",
