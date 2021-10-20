@@ -101,6 +101,6 @@ export function splitSymbol(symbol: string): { baseCcy: string; quoteCcy: string
 export function formatQuote(quote: Quote) {
   return (
     `${padEnd(quote.broker, 10)} ${quote.side} ` +
-    `${padStart(quote.price.toLocaleString(), 7)} ${_.round(quote.volume, 3)}`
+    `${padStart(quote.price.toPrecision(8), 10)} ${_.round(quote.volume, 3)}`
   );
 }

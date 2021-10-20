@@ -68,7 +68,7 @@ export default class SpreadAnalyzer {
       throw new Error(t`NoBestAskWasFound`);
     }
 
-    const invertedSpread = bid.price - ask.price;
+    const invertedSpread = new Decimal(bid.price).minus(ask.price).toNumber();
     const availableVolume = _.floor(_.min([bid.volume, ask.volume]) as number, LOT_MIN_DECIMAL_PLACE);
     const allowedShortSize = positionMap[bid.broker].allowedShortSize;
     const allowedLongSize = positionMap[ask.broker].allowedLongSize;

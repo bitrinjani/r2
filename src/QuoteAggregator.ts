@@ -6,6 +6,7 @@ import symbols from './symbols';
 import BrokerAdapterRouter from './BrokerAdapterRouter';
 import { DateTime, Interval } from 'luxon';
 import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
+import Decimal from 'decimal.js';
 
 @injectable()
 export default class QuoteAggregator extends AwaitableEventEmitter {
@@ -95,7 +96,7 @@ export default class QuoteAggregator extends AwaitableEventEmitter {
   private fold(quotes: Quote[], step: number): Quote[] {
     return _(quotes)
       .groupBy((q: Quote) => {
-        const price = q.side === QuoteSide.Ask ? _.ceil(q.price / step) * step : _.floor(q.price / step) * step;
+        const price = q.side === QuoteSide.Ask ? this.ceil(q.price, step) : this.floor(q.price, step);
         return _.join([price, q.broker, QuoteSide[q.side]], '#');
       })
       .map((value: Quote[], key) => ({
@@ -105,5 +106,13 @@ export default class QuoteAggregator extends AwaitableEventEmitter {
         volume: _.sumBy(value, q => q.volume)
       }))
       .value();
+  }
+
+  private ceil(price: number, step: number) {
+    return new Decimal(price).div(step).ceil().times(step).toNumber();
+  }
+
+  private floor(price: number, step: number) {
+    return new Decimal(price).div(step).floor().times(step).toNumber();
   }
 } /* istanbul ignore next */
