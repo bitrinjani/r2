@@ -65,7 +65,7 @@ export default class OppotunitySearcher extends EventEmitter {
         this.emit('limitCheckDone', limitCheckResult);
         return { found: false };
       }
-      this.log.info(t`FoundArbitrageOppotunity`);
+      this.log.info(t`FoundArbitrageOppotunity` + ` => ${spreadAnalysisResult.bid}/${spreadAnalysisResult.ask}, profit: ${spreadAnalysisResult.targetProfit}(${spreadAnalysisResult.profitPercentAgainstNotional}%)`);
       this.emit('limitCheckDone', { ...limitCheckResult, message: t`FoundArbitrageOppotunity` });
       return { found: true, spreadAnalysisResult, closable };
     } catch (ex) {

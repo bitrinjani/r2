@@ -1,4 +1,4 @@
-FROM node:9.3.0
+FROM node:10.24.1
 
 ENV HOME /r2
 WORKDIR $HOME
