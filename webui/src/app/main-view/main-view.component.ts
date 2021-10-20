@@ -3,6 +3,7 @@ import { WsService } from '../ws.service';
 import { filter, map } from 'rxjs/operators';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { splitSymbol } from '../util';
 
 @Component({
   selector: 'app-main-view',
@@ -13,6 +14,8 @@ export class MainViewComponent implements OnInit, OnDestroy {
   private errorCacheTime = 8000;
   errorMessage: string;
   logAutoScroll: boolean = true;
+  baseCcy: string;
+  quoteCcy: string;
 
   constructor(private readonly wsService: WsService) {}
 
@@ -29,6 +32,12 @@ export class MainViewComponent implements OnInit, OnDestroy {
         timer = undefined;
       }, this.errorCacheTime);
     });
+    const configSubscription = this.wsService.config$.subscribe(config => {
+      const { baseCcy, quoteCcy } = splitSymbol(config.symbol);
+      this.baseCcy = baseCcy;
+      this.quoteCcy = quoteCcy;
+    });
+    this.subscription.add(configSubscription);
   }
 
   ngOnDestroy(): void {

@@ -14,13 +14,13 @@
         <td>Best Ask</td>
         <td>{{spread.ask.broker}}</td>
         <td>{{spread.ask.price | number:'1.8-8'}}</td>
-        <td>{{spread.ask.volume}} BTC</td>
+        <td>{{spread.ask.volume}} {{baseCcy}}</td>
       </tr>
       <tr>
         <td>Best Bid</td>
         <td>{{spread.bid.broker}}</td>
         <td>{{spread.bid.price | number:'1.8-8'}}</td>
-        <td>{{spread.bid.volume}} BTC</td>
+        <td>{{spread.bid.volume}} {{baseCcy}}</td>
       </tr>
       <tr>
         <td>Spread</td>
@@ -32,19 +32,19 @@
 
       <tr>
         <td>Available Volume</td>
-        <td>{{spread.availableVolume}} BTC</td>
+        <td>{{spread.availableVolume}} {{baseCcy}}</td>
       </tr>
       <tr>
         <td>Target Volume</td>
-        <td>{{spread.targetVolume}} BTC</td>
+        <td>{{spread.targetVolume}} {{baseCcy}}</td>
       </tr>
       <tr>
         <td>Expected Profit</td>
-        <td>{{spread.targetProfit | number:'1.8-8'}}</td>
+        <td>{{spread.targetProfit | number:'1.8-8'}} {{quoteCcy}}</td>
       </tr>
       <tr>
         <td>Expected Profit %</td>
-        <td>{{spread.profitPercentAgainstNotional}}%</td>
+        <td>{{spread.profitPercentAgainstNotional}}% {{baseCcy}}</td>
       </tr>
     </table>
     <div>
