@@ -65,11 +65,11 @@ export default class OppotunitySearcher extends EventEmitter {
         this.emit('limitCheckDone', limitCheckResult);
         // output profit in demo mode, so that report can pick up
         if (limitCheckResult.reason === 'Demo mode') {
-          this.logProfit(spreadAnalysisResult);
+          this.logOppotunity(spreadAnalysisResult);
         }
         return { found: false };
       }
-      this.logProfit(spreadAnalysisResult);
+      this.logOppotunity(spreadAnalysisResult);
       this.emit('limitCheckDone', { ...limitCheckResult, message: t`FoundArbitrageOppotunity` });
       return { found: true, spreadAnalysisResult, closable };
     } catch (ex) {
@@ -178,7 +178,7 @@ export default class OppotunitySearcher extends EventEmitter {
     );
   }
 
-  private logProfit(spreadAnalysisResult: SpreadAnalysisResult) {
+  private logOppotunity(spreadAnalysisResult: SpreadAnalysisResult) {
     this.log.info(t`FoundArbitrageOppotunity` + ` => ${spreadAnalysisResult.bid.price}@${spreadAnalysisResult.bid.broker}/${spreadAnalysisResult.ask.price}@${spreadAnalysisResult.ask.broker}, profit: ${spreadAnalysisResult.targetProfit}(${spreadAnalysisResult.profitPercentAgainstNotional}%)`);
   }
 } /* istanbul ignore next */
