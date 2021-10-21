@@ -2,7 +2,7 @@
 import t from './intl';
 import * as _ from 'lodash';
 import { injectable } from 'inversify';
-import { findBrokerConfig } from './configUtil';
+import CCXTBrokerFactory from './CCXTBrokerFactory';
 
 @injectable()
 export default class ConfigValidator {
@@ -46,19 +46,24 @@ export default class ConfigValidator {
     //   this.validateBrokerConfigCommon(quoine);
     // }
 
-    const brokerRules = [
+    const brokerRules = CCXTBrokerFactory.brokerRules();
+    brokerRules.concat([
       { id: 'Binance', allowedCashMarginType: [CashMarginType.Cash] },
       { id: 'Bitfinex', allowedCashMarginType: [CashMarginType.Cash] }
-    ];
-    for (let i = 0; i < brokerRules.length; i++) {
-      const rule = brokerRules[i];
-      const broker = findBrokerConfig(config, rule.id);
-      if (this.isEnabled(broker)) {
+    ]);
+
+    for (let i = 0; i < config.brokers.length; i++) {
+      const brokerConfig = config.brokers[i];
+      const rule = brokerRules.find(rule => rule.id === brokerConfig.broker);
+      if (!rule) {
+        throw new Error(`Unable to find config rule for ${brokerConfig.broker}`);
+      }
+      if (this.isEnabled(brokerConfig)) {
         this.throwIf(
-          !_.includes(rule.allowedCashMarginType, broker.cashMarginType),
+          !_.includes(rule.allowedCashMarginType, brokerConfig.cashMarginType),
           `CashMarginType must be ${rule.allowedCashMarginType.join(', ')} for ${rule.id}`
         );
-        this.validateBrokerConfigCommon(broker);
+        this.validateBrokerConfigCommon(brokerConfig);
       }
     }
   }

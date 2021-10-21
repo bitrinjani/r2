@@ -39,7 +39,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
   async fetchQuotes(): Promise<Quote[]> {
     this.log.debug(`Sending ${this.broker}.fetchQuotes request...`);
-    const res = await this.brokerApi.fetchOrderBook(this.symbol, 5);
+    const res = await this.brokerApi.fetchOrderBook(this.symbol);
     this.log.debug(`Received ${this.broker}.fetchQuotes response, ${JSON.stringify(res)}`);
 
     const bids = map(res.bids, (order) => {
@@ -54,7 +54,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       return {
         broker: this.broker,
         price: order[0],
-        side: QuoteSide.Bid,
+        side: QuoteSide.Ask,
         volume: Math.abs(order[1])
       };
     });

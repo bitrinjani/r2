@@ -81,3 +81,8 @@ export enum OrderStatus {
 }
 
 export type Broker = string;
+
+export interface BrokerRule {
+  id: Broker;
+  allowedCashMarginType: CashMarginType[];
+}
