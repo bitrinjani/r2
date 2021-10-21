@@ -63,6 +63,10 @@ export default class OppotunitySearcher extends EventEmitter {
         this.status = limitCheckResult.reason;
         this.log.info(limitCheckResult.message);
         this.emit('limitCheckDone', limitCheckResult);
+        // output profit in demo mode, so that report can pick up
+        if (limitCheckResult.reason === 'Demo mode') {
+          this.log.info(t`FoundArbitrageOppotunity` + ` => ${spreadAnalysisResult.bid}/${spreadAnalysisResult.ask}, profit: ${spreadAnalysisResult.targetProfit}(${spreadAnalysisResult.profitPercentAgainstNotional}%)`);
+        }
         return { found: false };
       }
       this.log.info(t`FoundArbitrageOppotunity` + ` => ${spreadAnalysisResult.bid}/${spreadAnalysisResult.ask}, profit: ${spreadAnalysisResult.targetProfit}(${spreadAnalysisResult.profitPercentAgainstNotional}%)`);
