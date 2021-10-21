@@ -179,6 +179,6 @@ export default class OppotunitySearcher extends EventEmitter {
   }
 
   private logOppotunity(spreadAnalysisResult: SpreadAnalysisResult) {
-    this.log.info(t`FoundArbitrageOppotunity` + ` => ${spreadAnalysisResult.bid.price}@${spreadAnalysisResult.bid.broker}/${spreadAnalysisResult.ask.price}@${spreadAnalysisResult.ask.broker}, profit: ${spreadAnalysisResult.targetProfit}(${spreadAnalysisResult.profitPercentAgainstNotional}%)`);
+    this.log.info(t`FoundArbitrageOppotunity` + ` => ${spreadAnalysisResult.bid.price}@${spreadAnalysisResult.bid.broker}/${spreadAnalysisResult.ask.price}@${spreadAnalysisResult.ask.broker}, profit: ${spreadAnalysisResult.targetProfit}(${spreadAnalysisResult.profitPercentAgainstNotional}%), volume: ${spreadAnalysisResult.targetVolume}(${spreadAnalysisResult.availableVolume})`);
   }
 } /* istanbul ignore next */
