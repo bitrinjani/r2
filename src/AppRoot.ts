@@ -11,9 +11,11 @@ import Arbitrager from './Arbitrager';
 import ReportService from './ReportService';
 import BrokerStabilityTracker from './BrokerStabilityTracker';
 import WebGateway from './WebGateway';
+import CCXTBrokerFactory from './CCXTBrokerFactory';
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
+  private readonly brokerFactory = new CCXTBrokerFactory();
   private services: { start: () => Promise<void>; stop: () => Promise<void> }[];
 
   constructor(private readonly ioc: Container) {}
@@ -59,9 +61,13 @@ export default class AppRoot {
     const brokerConfigs = configStore.config.brokers;
     const bindTasks = brokerConfigs.map(async brokerConfig => {
       const brokerName = brokerConfig.broker;
-      const brokerModule = brokerConfig.npmPath
-        ? await this.tryImport(brokerConfig.npmPath)
-        : (await this.tryImport(`./${brokerName}`)) || (await this.tryImport(`@bitr/${brokerName}`));
+      let brokerModule = this.brokerFactory.create(brokerName);
+      // for back compatability
+      if (!brokerModule) {
+        brokerModule = brokerConfig.npmPath
+          ? await this.tryImport(brokerConfig.npmPath)
+          : (await this.tryImport(`./${brokerName}`)) || (await this.tryImport(`@bitr/${brokerName}`));
+      }
       if (brokerModule === undefined) {
         throw new Error(`Unable to find ${brokerName} package.`);
       }
