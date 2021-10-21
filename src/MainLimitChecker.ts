@@ -87,7 +87,7 @@ class MinExitTargetProfitLimit implements LimitChecker {
     return _.max([
       minExitTargetProfit,
       minExitTargetProfitPercent !== undefined
-        ? _.round(minExitTargetProfitPercent / 100 * targetVolumeNotional)
+        ? minExitTargetProfitPercent / 100 * targetVolumeNotional
         : Number.MIN_SAFE_INTEGER,
       exitNetProfitRatio !== undefined ? openProfit * (exitNetProfitRatio / 100 - 1) : Number.MIN_SAFE_INTEGER
     ]) as number;
@@ -142,7 +142,7 @@ class MinTargetProfitLimit implements LimitChecker {
     const effectiveMinTargetProfit = _.max([
       config.minTargetProfit,
       config.minTargetProfitPercent !== undefined
-        ? _.round(config.minTargetProfitPercent / 100 * targetVolumeNotional)
+        ? config.minTargetProfitPercent / 100 * targetVolumeNotional
         : 0
     ]) as number;
     return targetProfit >= effectiveMinTargetProfit;
@@ -168,7 +168,7 @@ class MaxTargetProfitLimit implements LimitChecker {
     const maxTargetProfit = _.min([
       config.maxTargetProfit,
       config.maxTargetProfitPercent !== undefined
-        ? _.round(config.maxTargetProfitPercent / 100 * _.mean([ask.price, bid.price]) * targetVolume)
+        ? config.maxTargetProfitPercent / 100 * _.mean([ask.price, bid.price]) * targetVolume
         : Number.MAX_SAFE_INTEGER
     ]) as number;
     return targetProfit <= maxTargetProfit;

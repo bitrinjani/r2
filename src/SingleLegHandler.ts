@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import { OnSingleLegConfig, ReverseOption, ProceedOption, OrderSide, OrderType, OrderPair, ConfigStore } from './types';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
 import OrderImpl from './OrderImpl';
@@ -47,8 +48,10 @@ export default class SingleLegHandler {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
     const sign = largeLeg.side === OrderSide.Buy ? -1 : 1;
-    const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
-    const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
+    // const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
+    const price = new Decimal(sign).times(options.limitMovePercent).div(100).plus(1).times(largeLeg.price).toNumber();
+    // const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
+    const size = new Decimal(largeLeg.filledSize).minus(smallLeg.filledSize).toNumber();
     const { baseCcy } = splitSymbol(this.symbol);
     this.log.info(t`ReverseFilledLeg`, OrderUtil.toShortString(largeLeg), price.toLocaleString(), size, baseCcy);
     const reversalOrder = new OrderImpl({

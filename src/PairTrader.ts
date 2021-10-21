@@ -1,6 +1,7 @@
 import { getLogger } from '@bitr/logger';
 import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
+import Decimal from 'decimal.js';
 import OrderImpl from './OrderImpl';
 import {
   ConfigStore,
@@ -105,9 +106,11 @@ export default class PairTrader extends EventEmitter {
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
     const orderPrice = 
      (quote.side === QuoteSide.Ask && config.acceptablePriceRange !== undefined)
-     ? _.round(quote.price * (1 + config.acceptablePriceRange/100)) as number
+    //  ? _.round(quote.price * (1 + config.acceptablePriceRange/100)) as number
+     ? new Decimal(config.acceptablePriceRange).div(100).plus(1).times(quote.price).toNumber()
      : (quote.side === QuoteSide.Bid && config.acceptablePriceRange !== undefined)
-     ? _.round(quote.price * (1 - config.acceptablePriceRange/100)) as number
+    //  ? _.round(quote.price * (1 - config.acceptablePriceRange/100)) as number
+     ? new Decimal(-config.acceptablePriceRange).div(100).plus(1).times(quote.price).toNumber()
      : quote.price;
     const order = new OrderImpl({
       symbol: this.configStore.config.symbol,
@@ -135,9 +138,9 @@ export default class PairTrader extends EventEmitter {
 
   private printProfit(orders: OrderImpl[]): void {
     const { profit, commission } = calcProfit(orders, this.configStore.config);
-    this.log.info(t`ProfitIs`, _.round(profit));
+    this.log.info(t`ProfitIs`, profit);
     if (commission !== 0) {
-      this.log.info(t`CommissionIs`, _.round(commission));
+      this.log.info(t`CommissionIs`, commission);
     }
   }
 } /* istanbul ignore next */
