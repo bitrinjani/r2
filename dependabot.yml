@@ -1,0 +1,76 @@
+version: 2
+updates:
+  # master branch
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update:"
+    target-branch: "master"
+    open-pull-requests-limit: 100
+    labels:
+      - "dependencies"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "sodium-native"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "p-queue"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "p-event"
+        update-types: ["version-update:semver-major"]
+
+  # actions (master)
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update(action):"
+    target-branch: "master"
+    labels:
+      - "dependencies"
+      - "github_actions"
+      
+updates:
+  # webui
+  - package-ecosystem: npm
+    directory: "/webui"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update:"
+    target-branch: "master"
+    open-pull-requests-limit: 100
+    labels:
+      - "dependencies"
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-name: "sodium-native"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "p-queue"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "p-event"
+        update-types: ["version-update:semver-major"]
+
+  # actions (webui)
+  - package-ecosystem: github-actions
+    directory: "/webui"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    commit-message:
+      prefix: "Update(action):"
+    target-branch: "master"
+    labels:
+      - "dependencies"
+      - "github_actions"
