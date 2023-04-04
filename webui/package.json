@@ -42,7 +42,7 @@
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage-istanbul-reporter": "^1.2.1",
-    "karma-jasmine": "^1.1.0",
+    "karma-jasmine": "^5.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
     "lite-server": "^2.3.0",
     "protractor": "^7.0.0",
