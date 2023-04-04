@@ -5,7 +5,7 @@ const fs = require("fs");
 const SlackIntegration_1 = require("./SlackIntegration");
 const LineIntegration_1 = require("./LineIntegration");
 const configUtil_1 = require("../configUtil");
-const mkdirp = require("mkdirp");
+const mkdirp_1 = require("mkdirp");
 const _ = require("lodash");
 const WebSocket = require("ws");
 const constants_1 = require("../constants");
@@ -22,7 +22,7 @@ process.on('SIGINT', () => {
     }
 });
 const logdir = './logs';
-mkdirp.sync(logdir);
+mkdirp_1.default.sync(logdir);
 let configRoot;
 try {
     configRoot = (0, configUtil_1.getConfigRoot)();

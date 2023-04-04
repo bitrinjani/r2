@@ -4,7 +4,7 @@ import SlackIntegration from './SlackIntegration';
 import LineIntegration from './LineIntegration';
 import { SlackConfig, LineConfig } from '../types';
 import { getConfigRoot } from '../configUtil';
-import * as mkdirp from 'mkdirp';
+import mkdirp from 'mkdirp';
 import * as _ from 'lodash';
 import * as WebSocket from 'ws';
 import { wssLogPort } from '../constants';

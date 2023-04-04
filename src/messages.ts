@@ -1,5 +1,5 @@
 import { ConfigRoot, SpreadStat } from './types';
-import { ZmqResponder, ZmqRequester } from '@bitr/zmq';
+import { ZmqResponder, ZmqRequester } from './zmq';
 
 export interface GenericRequest<T> {
   type: string;

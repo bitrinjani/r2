@@ -10,13 +10,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.closeChronoDB = exports.getChronoDB = void 0;
-const mkdirp = require("mkdirp");
+const mkdirp_1 = require("mkdirp");
 const chronodb_1 = require("@bitr/chronodb");
 const prodPath = `${process.cwd()}/datastore/main`;
 let chronoDB;
 function getChronoDB(path = prodPath) {
     if (chronoDB === undefined) {
-        mkdirp.sync(path);
+        mkdirp_1.default.sync(path);
         chronoDB = new chronodb_1.ChronoDB(path);
     }
     return chronoDB;

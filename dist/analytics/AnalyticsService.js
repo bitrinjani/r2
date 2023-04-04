@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const logger_1 = require("@bitr/logger");
 const constants_1 = require("../constants");
 const messages_1 = require("../messages");
-const ZmqSubscriber_1 = require("@bitr/zmq/dist/ZmqSubscriber");
+const ZmqSubscriber_1 = require("../zmq/ZmqSubscriber");
 class AnalyticsService {
     constructor() {
         this.log = (0, logger_1.getLogger)(this.constructor.name);

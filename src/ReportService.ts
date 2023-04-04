@@ -5,7 +5,7 @@ import { SpreadStatTimeSeries, Quote, ConfigStore } from './types';
 import QuoteAggregator from './QuoteAggregator';
 import { spreadStatToCsv, spreadStatCsvHeader } from './SpreadStatTimeSeries';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
+import mkdirp from 'mkdirp';
 import { promisify } from 'util';
 import { fork, ChildProcess } from 'child_process';
 import { reportServicePubUrl, reportServiceRepUrl } from './constants';
@@ -13,7 +13,7 @@ import { getLogger } from '@bitr/logger';
 import { cwd } from './util';
 import { Duration, DateTime } from 'luxon';
 import { SnapshotResponder } from './messages';
-import { ZmqPublisher } from '@bitr/zmq';
+import { ZmqPublisher } from './zmq';
 
 const writeFile = promisify(fs.writeFile);
 

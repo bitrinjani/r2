@@ -27,7 +27,7 @@ const symbols_1 = require("./symbols");
 const QuoteAggregator_1 = require("./QuoteAggregator");
 const SpreadStatTimeSeries_1 = require("./SpreadStatTimeSeries");
 const fs = require("fs");
-const mkdirp = require("mkdirp");
+const mkdirp_1 = require("mkdirp");
 const util_1 = require("util");
 const child_process_1 = require("child_process");
 const constants_1 = require("./constants");
@@ -35,7 +35,7 @@ const logger_1 = require("@bitr/logger");
 const util_2 = require("./util");
 const luxon_1 = require("luxon");
 const messages_1 = require("./messages");
-const zmq_1 = require("@bitr/zmq");
+const zmq_1 = require("./zmq");
 const writeFile = (0, util_1.promisify)(fs.writeFile);
 let ReportService = class ReportService {
     constructor(quoteAggregator, spreadAnalyzer, spreadStatTimeSeries, configStore) {
@@ -51,7 +51,7 @@ let ReportService = class ReportService {
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             this.log.debug('Starting ReportService...');
-            mkdirp.sync(this.reportDir);
+            mkdirp_1.default.sync(this.reportDir);
             if (!fs.existsSync(this.spreadStatReport)) {
                 yield writeFile(this.spreadStatReport, SpreadStatTimeSeries_1.spreadStatCsvHeader, { flag: 'a' });
             }

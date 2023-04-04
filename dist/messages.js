@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SnapshotResponder = exports.SnapshotRequester = exports.ConfigResponder = exports.ConfigRequester = void 0;
-const zmq_1 = require("@bitr/zmq");
+const zmq_1 = require("./zmq");
 class ConfigRequester extends zmq_1.ZmqRequester {
 }
 exports.ConfigRequester = ConfigRequester;

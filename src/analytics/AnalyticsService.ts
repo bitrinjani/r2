@@ -2,7 +2,7 @@ import { SpreadStat,  AnalyticsConfig } from '../types';
 import { getLogger } from '@bitr/logger';
 import { reportServicePubUrl, reportServiceRepUrl, configStoreSocketUrl } from '../constants';
 import { SnapshotRequester, ConfigRequester } from '../messages';
-import ZmqSubscriber from '@bitr/zmq/dist/ZmqSubscriber';
+import ZmqSubscriber from '../zmq/ZmqSubscriber';
 
 export interface SpreadStatHandlerPlugin {
   handle: (spreadStat: SpreadStat) => any;
