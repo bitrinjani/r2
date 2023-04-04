@@ -115,5 +115,5 @@ export class ConfigRoot extends Castable {
   @cast
   @element(BrokerConfig)
   brokers: BrokerConfig[];
-  @cast logging: LoggingConfig;
+  @cast logging?: LoggingConfig;
 }

@@ -136,10 +136,6 @@ let WebGateway = class WebGateway {
     }
     sanitize(config) {
         const copy = _.cloneDeep(config);
-        for (const brokerConfig of copy.brokers) {
-            delete brokerConfig.key;
-            delete brokerConfig.secret;
-        }
         delete copy.logging;
         return copy;
     }

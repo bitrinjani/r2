@@ -4,7 +4,6 @@ exports.splitToJson = exports.pretty = void 0;
 const os_1 = require("os");
 const split = require("split2");
 const Parse = require("fast-json-parse");
-const chalk_1 = require("chalk");
 const date_fns_1 = require("date-fns");
 const dateFormat = 'YYYY-MM-DD HH:mm:ss.SSS';
 const levels = {
@@ -17,19 +16,7 @@ const levels = {
     10: 'TRACE'
 };
 function pretty(opts) {
-    const { colorize, withLabel, debug, hidden } = opts;
-    const ctx = new chalk_1.default.constructor({
-        enabled: !!(chalk_1.default.supportsColor && colorize)
-    });
-    const levelColors = {
-        default: ctx.white,
-        60: ctx.bgRed,
-        50: ctx.red,
-        40: ctx.yellow,
-        30: ctx.green,
-        20: ctx.blue,
-        10: ctx.grey
-    };
+    const { withLabel, debug, hidden } = opts;
     const stream = split((json) => {
         try {
             const parsed = new Parse(json);
@@ -44,7 +31,7 @@ function pretty(opts) {
                 return '';
             }
             const dateString = (0, date_fns_1.format)(new Date(logObj.time), dateFormat);
-            const levelString = levelColors[logObj.level](levels[logObj.level]);
+            const levelString = levels[logObj.level];
             const labelString = withLabel ? `[${logObj.label}] ` : '';
             return `${dateString} ${levelString} ${labelString}${logObj.msg}${os_1.EOL}`;
         }

@@ -31,12 +31,12 @@ catch (ex) {
     console.log(ex.message);
 }
 // console output
-process.stdin.pipe((0, transform_1.pretty)({ colorize: true, withLabel: false, debug: false, hidden: false })).pipe(process.stdout);
+process.stdin.pipe((0, transform_1.pretty)({ withLabel: false, debug: false, hidden: false })).pipe(process.stdout);
 // debug.log
 const debugFile = fs.createWriteStream('logs/debug.log', { flags: 'a' });
-process.stdin.pipe((0, transform_1.pretty)({ colorize: false, withLabel: true, debug: true, hidden: false })).pipe(debugFile);
+process.stdin.pipe((0, transform_1.pretty)({ withLabel: true, debug: true, hidden: false })).pipe(debugFile);
 // info.log
-const infoTransform = process.stdin.pipe((0, transform_1.pretty)({ colorize: false, withLabel: true, debug: false, hidden: false }));
+const infoTransform = process.stdin.pipe((0, transform_1.pretty)({ withLabel: true, debug: false, hidden: false }));
 const infoFile = fs.createWriteStream('logs/info.log', { flags: 'a' });
 infoTransform.pipe(infoFile);
 // notification integrations

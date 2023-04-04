@@ -26,7 +26,6 @@
     "@bitr/logger": "^1.0.1",
     "abstract-level": "^1.0.3",
     "ccxt": "^3.0.44",
-    "chalk": "^5.2.0",
     "core-decorators": "^0.20.0",
     "date-fns": "^2.29.3",
     "decimal.js": "^10.4.3",
