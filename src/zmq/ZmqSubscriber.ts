@@ -26,7 +26,7 @@ export default class ZmqSubscriber {
       }
       const message = parseBuffer<T>(messageBuffer);
       handler(message);
-    })
+    });
   }
 
   unsubscribe(topic: string) {

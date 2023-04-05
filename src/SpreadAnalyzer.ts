@@ -118,8 +118,8 @@ export default class SpreadAnalyzer {
       .flatten()      
       .filter(q => q !== undefined)
       .value() as Quote[];
-    const { ask: bestAsk, bid: bestBid } = this.getBest(flattened) as { ask: Quote, bid: Quote };
-    const { ask: worstAsk, bid: worstBid } = this.getWorst(flattened) as { ask: Quote, bid: Quote };
+    const { ask: bestAsk, bid: bestBid } = this.getBest(flattened) as { ask: Quote; bid: Quote };
+    const { ask: worstAsk, bid: worstBid } = this.getWorst(flattened) as { ask: Quote; bid: Quote };
     const bestCase = this.getEstimate(bestAsk, bestBid);
     const worstCase = this.getEstimate(worstAsk, worstBid);
     return {

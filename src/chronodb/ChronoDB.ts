@@ -1,6 +1,6 @@
 import { Level } from 'level';
 import mkdirp from 'mkdirp';
-import { LevelUp } from "./types";
+import { LevelUp } from './types';
 import { TimeSeries } from './TimeSeries';
 import { EntryStream, KeyStream } from 'level-read-stream';
 import { Readable } from 'stream';
@@ -15,7 +15,7 @@ export class ChronoDB {
       put: store.put.bind(store),
       del: store.del.bind(store),
       get: store.get.bind(store),
-      isClosed: () => store.status === "closing" || store.status === "closed",
+      isClosed: () => store.status === 'closing' || store.status === 'closed',
       close: store.close.bind(store),
       createReadStream: (options) => {
         return new EntryStream(options) as unknown as Readable;

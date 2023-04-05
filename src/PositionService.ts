@@ -48,7 +48,7 @@ export default class PositionService extends EventEmitter {
       `${t`LongAllowed`}: ${isOk(brokerPosition.longAllowed)}, ` +
       `${t`ShortAllowed`}: ${isOk(brokerPosition.shortAllowed)}`;
 
-    this.log.info({ hidden: true }, hr(21) + 'POSITION' + hr(21));
+    this.log.info({ hidden: true }, `${hr(21)  }POSITION${  hr(21)}`);
     this.log.info({ hidden: true }, `Net Exposure: ${_.round(this.netExposure, 3)} ${baseCcy}`);
     _.each(this.positionMap, (position: BrokerPosition) => {
       const stability = this.brokerStabilityTracker.stability(position.broker);

@@ -50,7 +50,7 @@ export default class JsonConfigStore extends EventEmitter implements ConfigStore
 
   private async requestHandler(request: ConfigRequest | undefined, respond: (response: ConfigResponse) => void) {
     if (request === undefined) {
-      this.log.debug(`Invalid message received.`);
+      this.log.debug('Invalid message received.');
       respond({ success: false, reason: 'invalid message' });
       return;
     }
