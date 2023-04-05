@@ -21,7 +21,7 @@ import OrderImpl from './OrderImpl';
 import * as express from 'express';
 import * as http from 'http';
 import { autobind } from 'core-decorators';
-const opn = require('opn');
+const opn = require('open');
 
 @injectable()
 @autobind
