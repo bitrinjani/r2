@@ -1,6 +1,7 @@
 import { EOL } from 'os';
 import * as split from 'split2';
 import * as Parse from 'fast-json-parse';
+import chalk from 'chalk';
 import { format as formatDate } from 'date-fns';
 
 interface LogObject {
@@ -23,8 +24,20 @@ const levels = {
   10: 'TRACE'
 };
 
-export function pretty(opts: { withLabel: boolean; debug: boolean; hidden: boolean }) {
-  const { withLabel, debug, hidden } = opts;
+export function pretty(opts: { colorize: boolean; withLabel: boolean; debug: boolean; hidden: boolean }) {
+  const { colorize, withLabel, debug, hidden } = opts;
+  const ctx = new chalk.constructor({
+    enabled: !!(chalk.supportsColor && colorize)
+  });
+  const levelColors = {
+    default: ctx.white,
+    60: ctx.bgRed,
+    50: ctx.red,
+    40: ctx.yellow,
+    30: ctx.green,
+    20: ctx.blue,
+    10: ctx.grey
+  };
   const stream = split((json: string): string => {
     try {
       const parsed = new Parse(json);
@@ -39,7 +52,7 @@ export function pretty(opts: { withLabel: boolean; debug: boolean; hidden: boole
         return '';
       }
       const dateString = formatDate(new Date(logObj.time), dateFormat);
-      const levelString = levels[logObj.level];
+      const levelString = levelColors[logObj.level](levels[logObj.level]);
       const labelString = withLabel ? `[${logObj.label}] ` : '';
       return `${dateString} ${levelString} ${labelString}${logObj.msg}${EOL}`;
     } catch (ex) {

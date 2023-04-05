@@ -36,14 +36,14 @@ try {
 }
 
 // console output
-process.stdin.pipe(pretty({ withLabel: false, debug: false, hidden: false })).pipe(process.stdout);
+process.stdin.pipe(pretty({ colorize: true, withLabel: false, debug: false, hidden: false })).pipe(process.stdout);
 
 // debug.log
 const debugFile = fs.createWriteStream('logs/debug.log', { flags: 'a' });
-process.stdin.pipe(pretty({ withLabel: true, debug: true, hidden: false })).pipe(debugFile);
+process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: true, hidden: false })).pipe(debugFile);
 
 // info.log
-const infoTransform = process.stdin.pipe(pretty({ withLabel: true, debug: false, hidden: false }));
+const infoTransform = process.stdin.pipe(pretty({ colorize: false, withLabel: true, debug: false, hidden: false }));
 const infoFile = fs.createWriteStream('logs/info.log', { flags: 'a' });
 infoTransform.pipe(infoFile);
 
