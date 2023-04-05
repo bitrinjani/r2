@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.closeChronoDB = exports.getChronoDB = void 0;
 const mkdirp_1 = require("mkdirp");
-const chronodb_1 = require("@bitr/chronodb");
+const chronodb_1 = require("./chronodb");
 const prodPath = `${process.cwd()}/datastore/main`;
 let chronoDB;
 function getChronoDB(path = prodPath) {

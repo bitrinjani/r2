@@ -1,7 +1,7 @@
 ﻿import { Quote, Broker, Order } from './common';
 import { ConfigRoot } from './config';
 import OrderImpl from '../OrderImpl';
-import { TimeSeries } from '@bitr/chronodb';
+import { TimeSeries } from '../chronodb';
 import { EventEmitter } from 'events';
 
 export interface BrokerAdapter {

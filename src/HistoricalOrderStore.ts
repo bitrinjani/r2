@@ -1,6 +1,6 @@
 import { HistoricalOrderStore, Order } from './types';
 import { reviveOrder } from './OrderImpl';
-import { ChronoDB, TimeSeries } from '@bitr/chronodb';
+import { ChronoDB, TimeSeries } from './chronodb';
 import { EventEmitter } from 'events';
 
 class EmittableHistoricalOrderStore extends EventEmitter implements HistoricalOrderStore {

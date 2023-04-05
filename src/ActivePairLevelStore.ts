@@ -1,6 +1,6 @@
 import { ActivePairStore, OrderPair } from './types';
 import { reviveOrder } from './OrderImpl';
-import { ChronoDB, TimeSeries } from '@bitr/chronodb';
+import { ChronoDB, TimeSeries } from './chronodb';
 import { EventEmitter } from 'events';
 
 class EmittableActivePairStore extends EventEmitter implements ActivePairStore {
