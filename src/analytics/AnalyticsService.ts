@@ -36,7 +36,7 @@ export default class AnalyticsService {
     process.on('message', message => {
       if (message === 'stop') {
         this.log.info('Analysis process received stop message.');
-        this.stop();
+        this.stop().catch(this.log.error.bind(this.log));
       }
     });
     this.log.debug('Started.');

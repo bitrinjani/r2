@@ -35,7 +35,11 @@ export default class LineIntegration {
     fetch(LineIntegration.apiUrl, init)
       .then(res => {
         if (!res.ok) {
-          res.text().then(s => console.log(`LINE notify failed. ${res.statusText}: ${s}`));
+          res
+            .text()
+            .catch(e => typeof e === 'object' && 'message' in e ? e.message : Object.prototype.toString.call(e))
+            .then(s => console.log(`LINE notify failed. ${res.statusText}: ${s}`))
+            .catch(() => { /* empty */});
         }
       })
       .catch(ex => console.log(`LINE notify failed. ${ex}`));

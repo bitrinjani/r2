@@ -22,9 +22,9 @@ export default class ZmqRequester<Request, Response> {
     const reply = await new Promise<Buffer>((resolve, reject) => {
       const rejectTimer = setTimeout(() => reject(new Error('Request timed out.')), this.timeout);
       const clearTimer = () => clearTimeout(rejectTimer);
-      this.socket.once('message', message => {
+      this.socket.once('message', mes => {
         clearTimer();
-        resolve(message);
+        resolve(mes);
       });
       this.socket.send(JSON.stringify(message));
     });

@@ -10,6 +10,7 @@ try {
   console.log(ex.message);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 i18next.init({
   lng,
   fallbackLng: 'en',

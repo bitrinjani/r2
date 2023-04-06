@@ -62,9 +62,10 @@ export class TimeSeries<T> {
   queryStream(options: QueryOptions): NodeJS.ReadableStream {
     const gt = `${this.name}/${this.dateToTimestamp(options.start)}/${firstUuid}`;
     const lt = `${this.name}/${this.dateToTimestamp(options.end)}/${lastUuid}`;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     return this.store.createReadStream({ gt, lt }).pipe(
-      through2.obj(function(kv) {
+      through2.obj(function(kv: any) {
         this.push({
           key: kv.key,
           value: that.reviver ? that.reviver(kv.value) : kv.value
