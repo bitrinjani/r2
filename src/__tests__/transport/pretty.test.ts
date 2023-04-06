@@ -1,56 +1,56 @@
 import { pretty } from '../../transport/transform';
 import { Readable } from 'stream';
 
-test('pretty', () => {
-  const result = pretty({ colorize: true, withLabel: true, debug: true });  
+it('pretty', () => {
+  const result = pretty({ colorize: true, withLabel: true, debug: true } as any);  
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 40, "label": "TestStream" }');
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);  
 });
 
-test('pretty no label', () => {
-  const result = pretty({ colorize: true, withLabel: false, debug: true });  
+it('pretty no label', () => {
+  const result = pretty({ colorize: true, withLabel: false, debug: true } as any);  
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 40, "label": "TestStream" }');
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);  
 });
 
-test('pretty debug', () => {
-  const result = pretty({ colorize: true, withLabel: true, debug: true });  
+it('pretty debug', () => {
+  const result = pretty({ colorize: true, withLabel: true, debug: true } as any);  
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 20, "label": "TestStream" }');
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);  
 });
 
-test('pretty no debug', () => {
-  const result = pretty({ colorize: true, withLabel: true, debug: false });  
+it('pretty no debug', () => {
+  const result = pretty({ colorize: true, withLabel: true, debug: false } as any);  
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 20, "label": "TestStream" }');
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);  
 });
 
-test('pretty no label/debug', () => {
-  const result = pretty({ colorize: true, withLabel: false, debug: false });  
+it('pretty no label/debug', () => {
+  const result = pretty({ colorize: true, withLabel: false, debug: false } as any);  
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 20, "label": "TestStream" }');
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);  
 });
 
-test('pretty no color/label/debug', () => {
-  const result = pretty({ colorize: false, withLabel: false, debug: false });  
+it('pretty no color/label/debug', () => {
+  const result = pretty({ colorize: false, withLabel: false, debug: false } as any);  
   const stream = new Readable();
   stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 20, "label": "TestStream" }');
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);  
 });
 
-test('pretty invalid json', () => {
-  const result = pretty({ colorize: true, withLabel: true, debug: true });  
+it('pretty invalid json', () => {
+  const result = pretty({ colorize: true, withLabel: true, debug: true } as any);  
   const stream = new Readable();
   stream.push('{ "msg": Test message", "time": 1514074545477, "level": 40, "label": "TestStream" }');
   stream.push(null);

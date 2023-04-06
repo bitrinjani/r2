@@ -3,13 +3,13 @@ import { socket } from 'zeromq';
 import { configStoreSocketUrl, reportServicePubUrl, reportServiceRepUrl } from '../constants';
 import { delay } from '../util';
 import { options } from '@bitr/logger';
-import ZmqResponder from '@bitr/zmq/dist/ZmqResponder';
 import { ConfigResponder, SnapshotResponder } from '../messages';
+import { expect } from 'chai';
 
 options.enabled = false;
 
 describe('AnalyticsService', () => {
-  test('start/stop', async () => {
+  it('start/stop', async () => {
     const config = {
       analytics: {
         enabled: true,
@@ -21,7 +21,7 @@ describe('AnalyticsService', () => {
     let configServer, rsPub, rsRep, as;
     try {
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-        respond({ success: true, data: config });
+        respond({ success: true, data: config } as any);
       });
   
       rsPub = socket('pub');
@@ -37,7 +37,7 @@ describe('AnalyticsService', () => {
       console.log(ex);
       if (process.env.CI && ex.message === 'Address already in use') return;
       console.log(ex);
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } finally {
       rsPub.unbindSync(reportServicePubUrl);
       configServer.dispose();
@@ -47,7 +47,7 @@ describe('AnalyticsService', () => {
     }
   });
 
-  test('snapshot fail', async () => {
+  it('snapshot fail', async () => {
     const config = {
       analytics: {
         enabled: true,
@@ -59,7 +59,7 @@ describe('AnalyticsService', () => {
     let configServer, rsPub, rsRep, as;
     try {
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-        respond({ success: true, data: config });
+        respond({ success: true, data: config } as any);
       });
 
       rsPub = socket('pub');
@@ -72,7 +72,7 @@ describe('AnalyticsService', () => {
       await as.start();
     } catch (ex) {
       if (process.env.CI && ex.message === 'Address already in use') return;
-      expect(ex.message).toBe('Failed to initial snapshot message.');
+      expect(ex.message).to.equal('Failed to initial snapshot message.');
     } finally {
       if (as) await as.stop();
       await delay(10);
@@ -83,7 +83,7 @@ describe('AnalyticsService', () => {
     }
   });
 
-  test('invalid config', async () => {
+  it('invalid config', async () => {
     const config = {
       analytics: {
         enabled: true,
@@ -95,7 +95,7 @@ describe('AnalyticsService', () => {
 
     try {
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-        respond({ success: false, data: config });
+        respond({ success: false, data: config } as any);
       });
   
       rsPub = socket('pub');
@@ -107,9 +107,9 @@ describe('AnalyticsService', () => {
   
       as = new AnalyticsService();
       await as.start();
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } catch (ex) {
-      expect(ex.message).toBe('Analytics failed to get the config.');
+      expect(ex.message).to.equal('Analytics failed to get the config.');
     } finally {
       if (as) await as.stop();
       await delay(10);
@@ -120,7 +120,7 @@ describe('AnalyticsService', () => {
     }
   });
 
-  test('invalid config json', async () => {
+  it('invalid config json', async () => {
     const config = {
       analytics: {
         enabled: true,
@@ -132,7 +132,7 @@ describe('AnalyticsService', () => {
     let configServer, rsPub, rsRep, as;
     try {
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-        respond({ success: true, data: config });
+        respond({ success: true, data: config } as any);
       });
   
       rsPub = socket('pub');
@@ -145,9 +145,9 @@ describe('AnalyticsService', () => {
       });
       as = new AnalyticsService();
       await as.start();
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } catch (ex) {
-      expect(ex.message).toBe('Invalid JSON string received.');
+      expect(ex.message).to.equal('Invalid JSON string received.');
     } finally {
       if (as) await as.stop();
       await delay(10);
@@ -159,7 +159,7 @@ describe('AnalyticsService', () => {
     }
   });
 
-  test('handleStream', async () => {
+  it('handleStream', async () => {
     const config = {
       analytics: {
         enabled: true,
@@ -170,7 +170,7 @@ describe('AnalyticsService', () => {
     let configServer, rsPub, rsRep, as;
     try {
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-        respond({ success: true, data: config });
+        respond({ success: true, data: config } as any);
       });
   
       rsPub = socket('pub');
@@ -200,7 +200,7 @@ describe('AnalyticsService', () => {
     } catch (ex) {
       console.log(ex);
       if (process.env.CI && ex.message === 'Address already in use') return;
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } finally {
       if (as) await as.stop();
       rsPub.unbindSync(reportServicePubUrl);
@@ -210,7 +210,7 @@ describe('AnalyticsService', () => {
     }
   });
 
-  test('stop message', async () => {
+  it('stop message', async () => {
     const config = {
       analytics: {
         enabled: true,
@@ -222,7 +222,7 @@ describe('AnalyticsService', () => {
     let configServer, rsPub, rsRep, as;
     try {
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
-        respond({ success: true, data: config });
+        respond({ success: true, data: config } as any);
       });
   
       rsPub = socket('pub');
@@ -238,7 +238,7 @@ describe('AnalyticsService', () => {
       await delay(10);
     } catch (ex) {
       if (process.env.CI && ex.message === 'Address already in use') return;
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } finally {
       if (as) await as.stop();
       rsPub.unbindSync(reportServicePubUrl);

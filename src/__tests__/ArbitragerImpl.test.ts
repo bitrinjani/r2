@@ -1,31 +1,25 @@
 import {
-  Broker,
   QuoteSide,
   ConfigRoot,
   ConfigStore,
   CashMarginType,
   OrderStatus,
   OrderSide,
-  OnSingleLegConfig,
   Order,
-  Execution,
-  Quote
-} from '../types';
+  Execution} from '../types';
 import Arbitrager from '../Arbitrager';
 import OppotunitySearcher from '../OpportunitySearcher';
 import PairTrader from '../PairTrader';
 import LimitCheckerFactory from '../LimitCheckerFactory';
 import SpreadAnalyzer from '../SpreadAnalyzer';
-import { delay, toQuote } from '../util';
+import { toQuote } from '../util';
 import { options } from '@bitr/logger';
 import { getActivePairStore } from '../ActivePairLevelStore';
-import { ChronoDB } from '@bitr/chronodb';
+import { ChronoDB } from '../chronodb';
 import QuoteAggregator from '../QuoteAggregator';
-import PositionService from '../PositionService';
-import BrokerAdapterRouter from '../BrokerAdapterRouter';
-import OrderImpl from '../OrderImpl';
 import SingleLegHandler from '../SingleLegHandler';
 import AwaitableEventEmitter from '@bitr/awaitable-event-emitter/dist/AwaitableEventEmitter';
+import { expect, spy } from 'chai';
 options.enabled = false;
 
 const chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
@@ -38,14 +32,17 @@ let quoteAggregator,
   positionService,
   baRouter,
   spreadAnalyzer,
+  // @ts-ignore
   quotes,
   limitCheckerFactory;
 
-describe('Arbitrager', () => {
-  beforeEach(async () => {
-    const aee: QuoteAggregator = new AwaitableEventEmitter();
-    aee.start = jest.fn();
-    aee.stop = jest.fn();
+describe('Arbitrager', function(){
+  this.beforeEach(async () => {
+    const aee: QuoteAggregator = new AwaitableEventEmitter() as QuoteAggregator;
+    // @ts-expect-error
+    aee.start = spy();
+    // @ts-expect-error
+    aee.stop = spy();
     quoteAggregator = aee as QuoteAggregator;
     config = {
       symbol: 'BTC/JPY',
@@ -97,23 +94,23 @@ describe('Arbitrager', () => {
     };
     positionService = {
       positionMap,
-      start: jest.fn(),
-      stop: jest.fn(),
-      print: jest.fn(),
+      start: spy(),
+      stop: spy(),
+      print: spy(),
       isStarted: true,
       netExposure: 0
     };
 
     baRouter = {
-      send: jest.fn(),
-      refresh: jest.fn(),
-      cancel: jest.fn(),
-      getBtcPosition: jest.fn(),
-      fetchQuotes: jest.fn()
+      send: spy(),
+      refresh: spy(),
+      cancel: spy(),
+      getBtcPosition: spy(),
+      fetchQuotes: spy()
     };
 
     spreadAnalyzer = {
-      analyze: jest.fn()
+      analyze: spy()
     };
 
     limitCheckerFactory = new LimitCheckerFactory(configStore, positionService);
@@ -128,12 +125,13 @@ describe('Arbitrager', () => {
     await activePairStore.delAll();
   });
 
-  afterEach(async () => {
+  this.afterEach(async () => {
     await activePairStore.delAll();
   });
 
-  afterAll(async () => await chronoDB.close());
-  test('start/stop', async () => {
+  this.afterAll(async () => await chronoDB.close());
+
+  it('start/stop', async () => {
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
@@ -144,13 +142,13 @@ describe('Arbitrager', () => {
     const trader = new PairTrader(configStore, baRouter, activePairStore, new SingleLegHandler(baRouter, configStore));
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     await arbitrager.start();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
-    expect(arbitrager.status).toBe('Started');
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(1);
+    expect(arbitrager.status).to.equal('Started');
     await arbitrager.stop();
-    expect(arbitrager.status).toBe('Stopped');
+    expect(arbitrager.status).to.equal('Stopped');
   });
 
-  test('stop without start', async () => {
+  it('stop without start', async () => {
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
@@ -161,10 +159,10 @@ describe('Arbitrager', () => {
     const trader = new PairTrader(configStore, baRouter, activePairStore, new SingleLegHandler(baRouter, configStore));
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     await arbitrager.stop();
-    expect(arbitrager.status).toBe('Stopped');
+    expect(arbitrager.status).to.equal('Stopped');
   });
 
-  test('SpreadAnalyzer throws', async () => {
+  it('SpreadAnalyzer throws', async () => {
     config.maxNetExposure = 10;
     spreadAnalyzer.analyze.mockImplementation(() => {
       throw new Error();
@@ -182,12 +180,12 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(spreadAnalyzer.analyze).toBeCalled();
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Spread analysis failed');
+    expect(spreadAnalyzer.analyze).to.be.called();
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Spread analysis failed');
   });
 
-  test('violate maxNetExposure', async () => {
+  it('violate maxNetExposure', async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
         bid: toQuote('Quoine', QuoteSide.Bid, 400, 4),
@@ -210,12 +208,12 @@ describe('Arbitrager', () => {
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(spreadAnalyzer.analyze).toBeCalled();
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Max exposure breached');
+    expect(spreadAnalyzer.analyze).to.be.called();
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Max exposure breached');
   });
 
-  test('Spread not inverted', async () => {
+  it('Spread not inverted', async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
         bid: toQuote('Quoine', QuoteSide.Bid, 400, 4),
@@ -237,12 +235,12 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(spreadAnalyzer.analyze).toBeCalled();
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Spread not inverted');
+    expect(spreadAnalyzer.analyze).to.be.called();
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Spread not inverted');
   });
 
-  test('Too small profit', async () => {
+  it('Too small profit', async () => {
     config.minTargetProfit = 1000;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -266,11 +264,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Too small profit');
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Too small profit');
   });
 
-  test('Too small profit by minTargetProfitPercent', async () => {
+  it('Too small profit by minTargetProfitPercent', async () => {
     config.minTargetProfit = 0;
     config.minTargetProfitPercent = 18.4;
     spreadAnalyzer.analyze.mockImplementation(() => {
@@ -295,11 +293,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Too small profit');
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Too small profit');
   });
 
-  test('Too small profit by minTargetProfit', async () => {
+  it('Too small profit by minTargetProfit', async () => {
     config.minTargetProfit = 101;
     config.minTargetProfitPercent = 10;
     spreadAnalyzer.analyze.mockImplementation(() => {
@@ -324,11 +322,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Too small profit');
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Too small profit');
   });
 
-  test('Too large profit by maxTargetProfit', async () => {
+  it('Too large profit by maxTargetProfit', async () => {
     config.maxTargetProfit = 99;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -352,11 +350,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Too large profit');
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Too large profit');
   });
 
-  test('Too large profit by maxTargetProfitPercent', async () => {
+  it('Too large profit by maxTargetProfitPercent', async () => {
     config.maxTargetProfitPercent = 15;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -380,11 +378,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Too large profit');
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Too large profit');
   });
 
-  test('Demo mode', async () => {
+  it('Demo mode', async () => {
     config.maxTargetProfitPercent = 20;
     config.demoMode = true;
     spreadAnalyzer.analyze.mockImplementation(() => {
@@ -409,13 +407,12 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(baRouter.send).not.toBeCalled();
-    expect(arbitrager.status).toBe('Demo mode');
+    expect(baRouter.send).not.to.be.called();
+    expect(arbitrager.status).to.equal('Demo mode');
   });
 
-  test('Send and both orders filled', async () => {
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(order => {
+  it('Send and both orders filled', async () => {
+    baRouter.refresh = spy(order => {
       order.status = OrderStatus.Filled;
     });
     config.maxRetryCount = 3;
@@ -441,20 +438,19 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Filled');
-    expect(baRouter.refresh.mock.calls.length).toBe(2);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(0);
+    expect(arbitrager.status).to.equal('Filled');
+    expect(baRouter.refresh).to.be.called.twice;
+    expect(baRouter.send).to.be.called.twice;
+    expect(baRouter.cancel).not.to.be.called();
   });
 
-  test('Send and both orders filled with different send size', async () => {
+  it('Send and both orders filled with different send size', async () => {
     const chronoDB = new ChronoDB(`${__dirname}/datastore/diff_size`);
     const activePairStore = getActivePairStore(chronoDB);
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(order => {
+    baRouter.refresh = spy(order => {
       order.status = OrderStatus.Filled;
     });
-    baRouter.send = jest.fn().mockImplementation(order => {
+    baRouter.send = spy(order => {
       if (order.side === OrderSide.Sell) {
         order.size += 0.0015;
       }
@@ -482,18 +478,17 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Filled');
-    expect(baRouter.refresh.mock.calls.length).toBe(2);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(0);
+    expect(arbitrager.status).to.equal('Filled');
+    expect(baRouter.refresh).to.be.called.twice;
+    expect(baRouter.send).to.be.called.twice;
+    expect(baRouter.cancel).to.be.called.exactly(0);
     const all = await activePairStore.getAll();
-    expect(all.length).toBe(0);
+    expect(all.length).to.equal(0);
     await activePairStore.delAll();
     await chronoDB.close();
   });
 
-  test('Send and only buy order filled', async () => {
-    let i = 1;
+  it('Send and only buy order filled', async () => {
     baRouter.refresh = order => {
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
@@ -522,12 +517,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
   });
 
-  test('Send and only sell order filled', async () => {
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(order => {
+  it('Send and only sell order filled', async () => {
+    baRouter.refresh = spy(order => {
       if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
       }
@@ -555,16 +549,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(6);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(1);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(6);
+    expect(baRouter.send).to.be.called.exactly(2);
+    expect(baRouter.cancel).to.be.called.exactly(1);
   });
 
-  test('Send and only sell order filled -> reverse', async () => {
+  it('Send and only sell order filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
@@ -594,16 +588,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and sell order filled and buy order partial filled -> reverse', async () => {
+  it('Send and sell order filled and buy order partial filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.3;
       if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
@@ -633,16 +627,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and sell order unfilled and buy order partial filled -> reverse', async () => {
+  it('Send and sell order unfilled and buy order partial filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.3;
       if (order.side === OrderSide.Sell) {
         order.filledSize = 0;
@@ -671,16 +665,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(3);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(3);
   });
 
-  test('Send and only buy order filled -> reverse', async () => {
+  it('Send and only buy order filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
@@ -710,16 +704,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and buy order filled and sel order partial filled -> reverse', async () => {
+  it('Send and buy order filled and sel order partial filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.3;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
@@ -749,16 +743,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and buy order unfilled and sel order partial filled -> reverse', async () => {
+  it('Send and buy order unfilled and sel order partial filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.3;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0;
@@ -787,16 +781,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(3);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(3);
   });
 
-  test('Send and both orders partial filled -> reverse', async () => {
+  it('Send and both orders partial filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.7;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0.2;
@@ -825,16 +819,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(3);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(3);
   });
 
-  test('Send and both orders same quantity partial filled -> reverse', async () => {
+  it('Send and both orders same quantity partial filled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.8;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0.8;
@@ -863,16 +857,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(6);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(6);
+    expect(baRouter.send).to.be.called.exactly(2);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and both orders unfilled -> reverse', async () => {
+  it('Send and both orders unfilled -> reverse', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0;
@@ -901,15 +895,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(6);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(6);
+    expect(baRouter.send).to.be.called.exactly(2);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and only buy order filled -> reverse -> fill', async () => {
+  it('Send and only buy order filled -> reverse -> fill', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
     const fillBuy = async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
@@ -917,13 +911,16 @@ describe('Arbitrager', () => {
         order.filledSize = 1;
       }
     };
-    baRouter.refresh = jest
-      .fn()
-      .mockImplementationOnce(fillBuy)
-      .mockImplementationOnce(fillBuy)
-      .mockImplementationOnce(async order => {
-        order.status = OrderStatus.Filled;
-      });
+    let count = 0;
+    baRouter.refresh = spy(function(...args: any[]){
+      count++;
+      if(count === 1 || count === 2){
+        // @ts-ignore
+        fillBuy.apply(this, args);
+      }else{
+        args[0].status = OrderStatus.Filled;
+      }
+    });
     config.maxRetryCount = 1;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -947,30 +944,28 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(3);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(1);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(3);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(1);
     baRouter.refresh.mockReset();
   });
 
-  test('Send and only buy order filled -> reverse -> send throws', async () => {
+  it('Send and only buy order filled -> reverse -> send throws', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Reverse', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
         order.filledSize = 1;
       }
     });
-    baRouter.send = jest
-      .fn()
-      .mockImplementationOnce(() => {})
-      .mockImplementationOnce(() => {})
-      .mockImplementationOnce(() => {
-        throw new Error();
-      });
+    let count = 0;
+    baRouter.send = spy(() => {
+      count++;
+      if(count === 3) throw new Error();
+    });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockReturnValue({
       bid: toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -992,17 +987,17 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(6);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(1);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(6);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(1);
     baRouter.send.mockReset();
   });
 
-  test('Send and only sell order filled -> proceed', async () => {
+  it('Send and only sell order filled -> proceed', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Sell) {
         order.status = OrderStatus.Filled;
@@ -1032,16 +1027,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and only buy order filled -> proceed', async () => {
+  it('Send and only buy order filled -> proceed', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
@@ -1071,16 +1066,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and buy order filled and sell order partial filled -> proceed', async () => {
+  it('Send and buy order filled and sell order partial filled -> proceed', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.3;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
@@ -1110,16 +1105,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and buy order unfilled and sell order partial filled -> proceed', async () => {
+  it('Send and buy order unfilled and sell order partial filled -> proceed', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.3;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0;
@@ -1148,16 +1143,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(3);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(3);
   });
 
-  test('Send and both orders partial filled -> proceed', async () => {
+  it('Send and both orders partial filled -> proceed', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.7;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0.2;
@@ -1186,16 +1181,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(7);
-    expect(baRouter.send.mock.calls.length).toBe(3);
-    expect(baRouter.cancel.mock.calls.length).toBe(3);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(7);
+    expect(baRouter.send).to.be.called.exactly(3);
+    expect(baRouter.cancel).to.be.called.exactly(3);
   });
 
-  test('Send and both orders same quantity partial filled -> proceed', async () => {
+  it('Send and both orders same quantity partial filled -> proceed', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0.8;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0.8;
@@ -1224,16 +1219,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(6);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(6);
+    expect(baRouter.send).to.be.called.exactly(2);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and both orders unfilled -> proceed', async () => {
+  it('Send and both orders unfilled -> proceed', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Proceed', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.filledSize = 0;
@@ -1262,16 +1257,16 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
-    expect(baRouter.refresh.mock.calls.length).toBe(6);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(2);
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
+    expect(baRouter.refresh).to.be.called.exactly(6);
+    expect(baRouter.send).to.be.called.exactly(2);
+    expect(baRouter.cancel).to.be.called.exactly(2);
   });
 
-  test('Send and only buy order filled -> invalid action', async () => {
+  it('Send and only buy order filled -> invalid action', async () => {
+    // @ts-expect-error
     config.onSingleLeg = { action: 'Invalid', options: { limitMovePercent: 10 } };
-    let i = 1;
-    baRouter.refresh = jest.fn().mockImplementation(async order => {
+    baRouter.refresh = spy(async order => {
       order.filledSize = 0;
       if (order.side === OrderSide.Buy) {
         order.status = OrderStatus.Filled;
@@ -1301,13 +1296,13 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Order send/refresh failed');
-    expect(baRouter.refresh.mock.calls.length).toBe(6);
-    expect(baRouter.send.mock.calls.length).toBe(2);
-    expect(baRouter.cancel.mock.calls.length).toBe(1);
+    expect(arbitrager.status).to.equal('Order send/refresh failed');
+    expect(baRouter.refresh).to.be.called.exactly(6);
+    expect(baRouter.send).to.be.called.exactly(2);
+    expect(baRouter.cancel).to.be.called.exactly(1);
   });
 
-  test('Send and not filled', async () => {
+  it('Send and not filled', async () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -1331,10 +1326,10 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
   });
 
-  test('Send throws', async () => {
+  it('Send throws', async () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -1361,10 +1356,10 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Order send/refresh failed');
+    expect(arbitrager.status).to.equal('Order send/refresh failed');
   });
 
-  test('Send throws', async () => {
+  it('Send throws', async () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -1392,10 +1387,10 @@ describe('Arbitrager', () => {
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.shouldStop).toBe(true);
+    expect(arbitrager["shouldStop"]).to.equal(true);
   });
 
-  test('Send and refresh throws', async () => {
+  it('Send and refresh throws', async () => {
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
@@ -1422,10 +1417,10 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('MaxRetryCount breached');
+    expect(arbitrager.status).to.equal('MaxRetryCount breached');
   });
 
-  test('Send and filled', async () => {
+  it('Send and filled', async () => {
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
@@ -1450,10 +1445,10 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.status).to.equal('Filled');
   });
 
-  test('Send and filled with commission', async () => {
+  it('Send and filled with commission', async () => {
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
     config.brokers[0].commissionPercent = 0.1;
@@ -1481,10 +1476,10 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Filled');
+    expect(arbitrager.status).to.equal('Filled');
   });
 
-  test('Close filled orders', async () => {
+  it('Close filled orders', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1508,15 +1503,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Closed');
-    expect((await activePairStore.getAll()).length).toBe(0);
+    expect(arbitrager.status).to.equal('Closed');
+    expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
-  test('Close two sets of filled orders', async () => {
+  it('Close two sets of filled orders', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1545,26 +1540,26 @@ describe('Arbitrager', () => {
     await arbitrager.start();
 
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
 
     await quoteAggregator.emitParallel('quoteUpdated', quotes2);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(2);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(2);
  
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Closed');
+    expect(arbitrager.status).to.equal('Closed');
     const pairs = await activePairStore.getAll();
-    expect(pairs.length).toBe(1);
-    expect(pairs[0].value[0].price).toBe(501);
+    expect(pairs.length).to.equal(1);
+    expect(pairs[0].value[0].price).to.equal(501);
  
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Closed');
-    expect((await activePairStore.getAll()).length).toBe(0);
+    expect(arbitrager.status).to.equal('Closed');
+    expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
-  test('Close filled orders with minExitTargetProfitPercent', async () => {
+  it('Close filled orders with minExitTargetProfitPercent', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1588,15 +1583,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Closed');
-    expect((await activePairStore.getAll()).length).toBe(0);
+    expect(arbitrager.status).to.equal('Closed');
+    expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
-  test('Not close filled orders with minExitTargetProfitPercent', async () => {
+  it('Not close filled orders with minExitTargetProfitPercent', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1620,15 +1615,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(2);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(2);
   });
 
-  test('Close two filled orders', async () => {
+  it('Close two filled orders', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1652,11 +1647,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(2);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(2);
 
     //closing
     const quotes2 = [
@@ -1666,14 +1661,14 @@ describe('Arbitrager', () => {
       toQuote('Coincheck', QuoteSide.Bid, 450, 1)
     ];
     await quoteAggregator.emitParallel('quoteUpdated', quotes2);
-    expect(arbitrager.status).toBe('Closed');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Closed');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     await quoteAggregator.emitParallel('quoteUpdated', quotes2);
-    expect(arbitrager.status).toBe('Closed');
-    expect((await activePairStore.getAll()).length).toBe(0);
+    expect(arbitrager.status).to.equal('Closed');
+    expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
-  test('Closing filled orders with no lastResult in spread analyzer', async () => {
+  it('Closing filled orders with no lastResult in spread analyzer', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1697,15 +1692,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Closed');
-    expect((await activePairStore.getAll()).length).toBe(0);
+    expect(arbitrager.status).to.equal('Closed');
+    expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
-  test('Closing filled orders when spread analyzer throws', async () => {
+  it('Closing filled orders when spread analyzer throws', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1729,23 +1724,24 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Spread analysis failed');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Spread analysis failed');
+    expect((await activePairStore.getAll()).length).to.equal(1);
   });
 
-  test('Not close filled orders with maxTargetVolumePercent', async () => {
+  it('Not close filled orders with maxTargetVolumePercent', async () => {
     baRouter.refresh.mockImplementation(order => (order.status = OrderStatus.Filled));
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
     config.maxTargetVolumePercent = 50.0;
-    spreadAnalyzer.analyze = jest
-      .fn()
-      .mockImplementationOnce(() => {
+    let count = 0;
+    spreadAnalyzer.analyze = spy(() => {
+      count++;
+      if(count === 1){
         return {
           bid: toQuote('Quoine', QuoteSide.Bid, 600, 3),
           ask: toQuote('Coincheck', QuoteSide.Ask, 500, 1),
@@ -1754,8 +1750,7 @@ describe('Arbitrager', () => {
           targetVolume: 1,
           targetProfit: 100
         };
-      })
-      .mockImplementation(() => {
+      }else{
         return {
           bid: toQuote('Quoine', QuoteSide.Bid, 700, 2),
           ask: toQuote('Coincheck', QuoteSide.Ask, 400, 1),
@@ -1764,7 +1759,8 @@ describe('Arbitrager', () => {
           targetVolume: 1,
           targetProfit: 100
         };
-      });
+      }
+    });
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
@@ -1777,15 +1773,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', []);
-    expect(arbitrager.status).toBe('Too large Volume');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Too large Volume');
+    expect((await activePairStore.getAll()).length).to.equal(1);
   });
 
-  test('Close filled orders with exitNetProfitRatio', async () => {
+  it('Close filled orders with exitNetProfitRatio', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1813,15 +1809,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Closed');
-    expect((await activePairStore.getAll()).length).toBe(0);
+    expect(arbitrager.status).to.equal('Closed');
+    expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
-  test('Not close filled orders with exitNetProfitRatio', async () => {
+  it('Not close filled orders with exitNetProfitRatio', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1849,15 +1845,15 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // Not closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(2);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(2);
   });
 
-  test('Not close filled orders with exitNetProfitRatio and commission', async () => {
+  it('Not close filled orders with exitNetProfitRatio and commission', async () => {
     const quotes = [
       toQuote('Quoine', QuoteSide.Ask, 700, 4),
       toQuote('Quoine', QuoteSide.Bid, 600, 4),
@@ -1887,11 +1883,11 @@ describe('Arbitrager', () => {
     positionService.isStarted = true;
     await arbitrager.start();
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(1);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(1);
     // Not closing
     await quoteAggregator.emitParallel('quoteUpdated', quotes);
-    expect(arbitrager.status).toBe('Filled');
-    expect((await activePairStore.getAll()).length).toBe(2);
+    expect(arbitrager.status).to.equal('Filled');
+    expect((await activePairStore.getAll()).length).to.equal(2);
   });
 });

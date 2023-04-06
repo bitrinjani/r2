@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import SpreadAnalyzer from '../SpreadAnalyzer';
-import { Broker, QuoteSide, ConfigStore } from '../types';
+import { QuoteSide, ConfigStore } from '../types';
 import * as _ from 'lodash';
-import Quote from '../types';
 import { options } from '@bitr/logger';
 import { toQuote } from '../util';
+import { expect } from 'chai';
 options.enabled = false;
 
 const config = require('./config_test.json');
@@ -26,7 +26,7 @@ const positionMap = {
 };
 
 describe('Spread Analyzer', () => {
-  test('analyze', async () => {
+  it('analyze', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 3, 1),
       toQuote('Coincheck', QuoteSide.Bid, 2, 2),
@@ -34,19 +34,19 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Bid, 2.5, 4)
     ];
     const target = new SpreadAnalyzer(configStore);
-    const result = await target.analyze(quotes, positionMap);
-    expect(result.ask.broker).toBe('Coincheck');
-    expect(result.ask.price).toBe(3);
-    expect(result.ask.volume).toBe(1);
-    expect(result.bid.broker).toBe('Quoine');
-    expect(result.bid.price).toBe(2.5);
-    expect(result.bid.volume).toBe(4);
-    expect(result.invertedSpread).toBe(-0.5);
-    expect(result.targetVolume).toBe(0.5);
-    expect(result.targetProfit).toBeCloseTo(0);
+    const result = await target.analyze(quotes, positionMap as any);
+    expect(result.ask.broker).to.equal('Coincheck');
+    expect(result.ask.price).to.equal(3);
+    expect(result.ask.volume).to.equal(1);
+    expect(result.bid.broker).to.equal('Quoine');
+    expect(result.bid.price).to.equal(2.5);
+    expect(result.bid.volume).to.equal(4);
+    expect(result.invertedSpread).to.equal(-0.5);
+    expect(result.targetVolume).to.equal(0.5);
+    expect(result.targetProfit).to.be.closeTo(0, 0.1);
   });
 
-  test('analyze positive profit', async () => {
+  it('analyze positive profit', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 300000, 1),
       toQuote('Coincheck', QuoteSide.Bid, 200000, 2),
@@ -54,19 +54,19 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
     const target = new SpreadAnalyzer(configStore);
-    const result = await target.analyze(quotes, positionMap);
-    expect(result.ask.broker).toBe('Coincheck');
-    expect(result.ask.price).toBe(300000);
-    expect(result.ask.volume).toBe(1);
-    expect(result.bid.broker).toBe('Quoine');
-    expect(result.bid.price).toBe(360000);
-    expect(result.bid.volume).toBe(4);
-    expect(result.invertedSpread).toBe(60000);
-    expect(result.targetVolume).toBe(0.5);
-    expect(result.targetProfit).toBe(30000);
+    const result = await target.analyze(quotes, positionMap as any);
+    expect(result.ask.broker).to.equal('Coincheck');
+    expect(result.ask.price).to.equal(300000);
+    expect(result.ask.volume).to.equal(1);
+    expect(result.bid.broker).to.equal('Quoine');
+    expect(result.bid.price).to.equal(360000);
+    expect(result.bid.volume).to.equal(4);
+    expect(result.invertedSpread).to.equal(60000);
+    expect(result.targetVolume).to.equal(0.5);
+    expect(result.targetProfit).to.equal(30000);
   });
 
-  test('analyze positive profit with too small quotes', async () => {
+  it('analyze positive profit with too small quotes', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 300000, 1),
       toQuote('Coincheck', QuoteSide.Bid, 200000, 2),
@@ -75,19 +75,19 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
     const target = new SpreadAnalyzer(configStore);
-    const result = await target.analyze(quotes, positionMap);
-    expect(result.ask.broker).toBe('Coincheck');
-    expect(result.ask.price).toBe(300000);
-    expect(result.ask.volume).toBe(1);
-    expect(result.bid.broker).toBe('Quoine');
-    expect(result.bid.price).toBe(360000);
-    expect(result.bid.volume).toBe(4);
-    expect(result.invertedSpread).toBe(60000);
-    expect(result.targetVolume).toBe(0.5);
-    expect(result.targetProfit).toBe(30000);
+    const result = await target.analyze(quotes, positionMap as any);
+    expect(result.ask.broker).to.equal('Coincheck');
+    expect(result.ask.price).to.equal(300000);
+    expect(result.ask.volume).to.equal(1);
+    expect(result.bid.broker).to.equal('Quoine');
+    expect(result.bid.price).to.equal(360000);
+    expect(result.bid.volume).to.equal(4);
+    expect(result.invertedSpread).to.equal(60000);
+    expect(result.targetVolume).to.equal(0.5);
+    expect(result.targetProfit).to.equal(30000);
   });
 
-  test('analyze positive profit with commission', async () => {
+  it('analyze positive profit with commission', async () => {
     config.brokers[2].commissionPercent = 0.05;
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 300000, 1),
@@ -96,19 +96,19 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
     const target = new SpreadAnalyzer(configStore);
-    const result = await target.analyze(quotes, positionMap);
-    expect(result.ask.broker).toBe('Coincheck');
-    expect(result.ask.price).toBe(300000);
-    expect(result.ask.volume).toBe(1);
-    expect(result.bid.broker).toBe('Quoine');
-    expect(result.bid.price).toBe(360000);
-    expect(result.bid.volume).toBe(4);
-    expect(result.invertedSpread).toBe(60000);
-    expect(result.targetVolume).toBe(0.5);
-    expect(result.targetProfit).toBe(29910);
+    const result = await target.analyze(quotes, positionMap as any);
+    expect(result.ask.broker).to.equal('Coincheck');
+    expect(result.ask.price).to.equal(300000);
+    expect(result.ask.volume).to.equal(1);
+    expect(result.bid.broker).to.equal('Quoine');
+    expect(result.bid.price).to.equal(360000);
+    expect(result.bid.volume).to.equal(4);
+    expect(result.invertedSpread).to.equal(60000);
+    expect(result.targetVolume).to.equal(0.5);
+    expect(result.targetProfit).to.equal(29910);
   });
 
-  test('analyze with no position map', async () => {
+  it('analyze with no position map', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 300000, 1),
       toQuote('Coincheck', QuoteSide.Bid, 200000, 2),
@@ -119,58 +119,58 @@ describe('Spread Analyzer', () => {
     try {
       const result = await target.analyze(quotes, {});
     } catch (ex) {
-      expect(ex.message).toBe('Position map is empty.');
+      expect(ex.message).to.equal('Position map is empty.');
       return;
     }
     throw new Error();
   });
 
-  test('analyze with no best bid', async () => {
+  it('analyze with no best bid', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 3, 1),
       toQuote('Quoine', QuoteSide.Ask, 3.5, 3)
     ];
     const target = new SpreadAnalyzer(configStore);
     try {
-      const result = await target.analyze(quotes, positionMap);
+      const result = await target.analyze(quotes, positionMap as any);
     } catch (ex) {
-      expect(ex.message).toBe('No best bid was found.');
+      expect(ex.message).to.equal('No best bid was found.');
       return;
     }
     throw new Error();
   });
 
-  test('analyze with no best ask', async () => {
+  it('analyze with no best ask', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Bid, 3, 1),
       toQuote('Quoine', QuoteSide.Bid, 3.5, 3)
     ];
     const target = new SpreadAnalyzer(configStore);
     try {
-      const result = await target.analyze(quotes, positionMap);
+      const result = await target.analyze(quotes, positionMap as any);
     } catch (ex) {
-      expect(ex.message).toBe('No best ask was found.');
+      expect(ex.message).to.equal('No best ask was found.');
       return;
     }
     throw new Error();
   });
 
-  test('invalid closingPairs', async () => {
+  it('invalid closingPairs', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Bid, 3, 1),
       toQuote('Quoine', QuoteSide.Bid, 3.5, 3)
     ];
     const target = new SpreadAnalyzer(configStore);
     try {
-      const result = await target.analyze(quotes, positionMap, [{size: 0.001}, {size: 0.002}]);
+      const result = await target.analyze(quotes, positionMap as any, [{size: 0.001}, {size: 0.002}] as any);
     } catch (ex) {
-      expect(ex.message).toBe('Invalid closing pair.');
+      expect(ex.message).to.equal('Invalid closing pair.');
       return;
     }
     throw new Error();
   });
 
-  test('getSpreadStat', async () => {
+  it('getSpreadStat', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 3, 1),
       toQuote('Coincheck', QuoteSide.Bid, 2, 2),
@@ -179,39 +179,39 @@ describe('Spread Analyzer', () => {
     ];
     const target = new SpreadAnalyzer(configStore);
     const spreadStat = await target.getSpreadStat(quotes);
-    const bestCase = spreadStat.bestCase;
-    expect(bestCase.ask.broker).toBe('Coincheck');
-    expect(bestCase.ask.price).toBe(3);
-    expect(bestCase.ask.volume).toBe(1);
-    expect(bestCase.bid.broker).toBe('Quoine');
-    expect(bestCase.bid.price).toBe(2.5);
-    expect(bestCase.bid.volume).toBe(4);
-    expect(bestCase.invertedSpread).toBe(-0.5);
-    expect(bestCase.targetVolume).toBe(0.5);
-    expect(bestCase.targetProfit).toBeCloseTo(0);
-    const worstCase = spreadStat.worstCase;
-    expect(worstCase.ask.broker).toBe('Quoine');
-    expect(worstCase.ask.price).toBe(3.5);
-    expect(worstCase.ask.volume).toBe(3);
-    expect(worstCase.bid.broker).toBe('Coincheck');
-    expect(worstCase.bid.price).toBe(2);
-    expect(worstCase.bid.volume).toBe(2);
-    expect(worstCase.invertedSpread).toBe(-1.5);
-    expect(worstCase.targetVolume).toBe(0.5);
-    expect(worstCase.targetProfit).toBeCloseTo(-1);
+    const bestCase = spreadStat!.bestCase;
+    expect(bestCase.ask.broker).to.equal('Coincheck');
+    expect(bestCase.ask.price).to.equal(3);
+    expect(bestCase.ask.volume).to.equal(1);
+    expect(bestCase.bid.broker).to.equal('Quoine');
+    expect(bestCase.bid.price).to.equal(2.5);
+    expect(bestCase.bid.volume).to.equal(4);
+    expect(bestCase.invertedSpread).to.equal(-0.5);
+    expect(bestCase.targetVolume).to.equal(0.5);
+    expect(bestCase.targetProfit).to.be.closeTo(0, 0.1);
+    const worstCase = spreadStat!.worstCase;
+    expect(worstCase.ask.broker).to.equal('Quoine');
+    expect(worstCase.ask.price).to.equal(3.5);
+    expect(worstCase.ask.volume).to.equal(3);
+    expect(worstCase.bid.broker).to.equal('Coincheck');
+    expect(worstCase.bid.price).to.equal(2);
+    expect(worstCase.bid.volume).to.equal(2);
+    expect(worstCase.invertedSpread).to.equal(-1.5);
+    expect(worstCase.targetVolume).to.equal(0.5);
+    expect(worstCase.targetProfit).to.be.closeTo(-1, 0.1);
   });
 
-  test('getSpreadStat no bid', async () => {
+  it('getSpreadStat no bid', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 3, 1),
       toQuote('Quoine', QuoteSide.Ask, 3.5, 3),
     ];
     const target = new SpreadAnalyzer(configStore);
     const spreadStat = await target.getSpreadStat(quotes);
-    expect(spreadStat).toBeUndefined();
+    expect(spreadStat).to.equal(undefined);
   });
 
-  test('getSpreadStat no bid in one broker', async () => {
+  it('getSpreadStat no bid in one broker', async () => {
     const quotes = [
       toQuote('Coincheck', QuoteSide.Ask, 3, 1),      
       toQuote('Coincheck', QuoteSide.Bid, 2, 2),
@@ -219,10 +219,10 @@ describe('Spread Analyzer', () => {
     ];
     const target = new SpreadAnalyzer(configStore);
     const spreadStat = await target.getSpreadStat(quotes);
-    expect(spreadStat).not.toBeUndefined();
+    expect(spreadStat).not.to.equal(undefined);
   });
 
-  test('analyze with maxTargetVolumePercent definition', async () => {
+  it('analyze with maxTargetVolumePercent definition', async () => {
     config.minSize = 0.5;
     config.maxTargetVolumePercent = 25.0;
     config.brokers[2].commissionPercent = 0.0;
@@ -233,15 +233,15 @@ describe('Spread Analyzer', () => {
       toQuote('Quoine', QuoteSide.Bid, 360000, 4)
     ];
     const target = new SpreadAnalyzer(configStore);
-    const result = await target.analyze(quotes, positionMap);
-    expect(result.ask.broker).toBe('Quoine');
-    expect(result.ask.price).toBe(350000);
-    expect(result.ask.volume).toBe(3);
-    expect(result.bid.broker).toBe('Quoine');
-    expect(result.bid.price).toBe(360000);
-    expect(result.bid.volume).toBe(4);
-    expect(result.invertedSpread).toBe(10000);
-    expect(result.targetVolume).toBe(0.5);
-    expect(result.targetProfit).toBe(5000);
+    const result = await target.analyze(quotes, positionMap as any);
+    expect(result.ask.broker).to.equal('Quoine');
+    expect(result.ask.price).to.equal(350000);
+    expect(result.ask.volume).to.equal(3);
+    expect(result.bid.broker).to.equal('Quoine');
+    expect(result.bid.price).to.equal(360000);
+    expect(result.bid.volume).to.equal(4);
+    expect(result.invertedSpread).to.equal(10000);
+    expect(result.targetVolume).to.equal(0.5);
+    expect(result.targetProfit).to.equal(5000);
   });
 });

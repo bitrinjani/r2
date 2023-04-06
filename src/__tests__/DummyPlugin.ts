@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const _ = require('lodash') as typeof import("lodash");
 const ss = require('simple-statistics');
 const { getLogger } = require('@bitr/logger');
 

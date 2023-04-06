@@ -3,29 +3,30 @@ import BrokerApi from '../../Quoine/BrokerApi';
 import nocksetup from './nocksetup';
 import * as nock from 'nock';
 import { options } from '@bitr/logger';
+import { expect } from 'chai';
 options.enabled = false;
 
-describe('Quoine.CashStrategy', () => {
-  beforeAll(() => {
+describe('Quoine.CashStrategy', function(){
+  this.beforeAll(() => {
     nocksetup();
   });
 
-  afterAll(() => {
+  this.afterAll(() => {
     nock.restore();
   });
 
-  test('getBtcBalance', async () => {
+  it('getBtcBalance', async () => {
     const strategy = new CashStrategy(new BrokerApi('key', 'secret'));
     const balance = await strategy.getBtcPosition();
-    expect(balance).toBe(0.04925688);
+    expect(balance).to.equal(0.04925688);
   });
 
-  test('getBtcBalance unable to find', async () => {
+  it('getBtcBalance unable to find', async () => {
     const strategy = new CashStrategy(new BrokerApi('key', 'secret'));
     try {
       const balance = await strategy.getBtcPosition();
     } catch (ex) {
-      expect(ex.message).toContain('Unable to find');
+      expect(ex.message).to.contain('Unable to find');
       return;
     }
     throw new Error();

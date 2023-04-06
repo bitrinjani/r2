@@ -1,9 +1,13 @@
-import { getConfigRoot } from '../configUtil';
+import { expect, spy } from 'chai';
+import * as config from '../configUtil';
 
-getConfigRoot = jest.fn().mockImplementation(() => {
+// @ts-ignore 2540
+config.getConfigRoot = spy(() => {
   throw new Error();
 });
 
-test('intl catch', () => {
-  expect(() => require('../intl')).not.toThrow();
+describe("intl", function(){
+  it('intl catch', () => {
+    expect(() => require('../intl')).not.to.throw();
+  });
 });

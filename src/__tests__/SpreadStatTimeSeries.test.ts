@@ -1,9 +1,11 @@
+import { expect, spy } from 'chai';
 import { getSpreadStatTimeSeries } from '../SpreadStatTimeSeries';
 
 describe('SpreadStatTimeSeries', () => {
-  test('get', () => {
-    const dbMock = { getTimeSeries: jest.fn() };
-    getSpreadStatTimeSeries(dbMock);
-    expect(dbMock.getTimeSeries.mock.calls.length).toBe(1);
+  it('get', () => {
+    let dbMockCount = 0;
+    const dbMock = { getTimeSeries: spy(() => ++dbMockCount) };
+    getSpreadStatTimeSeries(dbMock as any);
+    expect(dbMockCount).to.equal(1);
   });
 });
