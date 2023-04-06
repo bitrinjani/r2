@@ -1,6 +1,7 @@
 node_modules
 dist
 .DS_Store
+,env
 .env.local
 .env.development.local
 .env.test.local
@@ -14,4 +15,4 @@ coverage
 .vscode
 .idea
 .python-version
-datastore/
+datastore
