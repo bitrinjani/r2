@@ -18,10 +18,10 @@ export class ChronoDB {
       isClosed: () => store.status === 'closing' || store.status === 'closed',
       close: store.close.bind(store),
       createReadStream: (options) => {
-        return new EntryStream(options) as unknown as Readable;
+        return new EntryStream(store, options) as unknown as Readable;
       },
       createKeyStream: (options) => {
-        return new KeyStream(options) as unknown as Readable;
+        return new KeyStream(store, options) as unknown as Readable;
       },
     };
   }
