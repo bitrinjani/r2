@@ -126,7 +126,6 @@ jobs:
     needs:
       - lint
       - test
-      - docs
     steps:
       - uses: technote-space/workflow-conclusion-action@v3
       - name: Check failure
