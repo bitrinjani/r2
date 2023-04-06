@@ -11,8 +11,9 @@ async function main() {
   } catch (ex) {
     log.error(`Analytics Service failed. ${ex.message}`);
     log.debug(ex.stack);
-    analyticsService.stop();
+    analyticsService.stop().catch(log.error.bind(log));
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

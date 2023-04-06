@@ -4,6 +4,7 @@ import container from './container.config';
 
 process.title = 'r2app';
 const app = new AppRoot(container);
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 app.start();
 
 function exit(code: number = 0) {
