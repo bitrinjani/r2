@@ -9,8 +9,8 @@ lineApi.post('').reply(200, 'ok');
 lineApi.post('').reply(500, 'ng');
 lineApi.post('').replyWithError('mock error');
 
-describe('LineIntegration', () => {
-  test('line', () => {
+describe('LineIntegration', function(){
+  it('line', () => {
     const config = {
       enabled: true,
       token: 'TOKEN',
@@ -21,7 +21,7 @@ describe('LineIntegration', () => {
     line.handler('with keyword: profit');
   });
 
-  test('line with no keyword', () => {
+  it('line with no keyword', () => {
     const config = {
       enabled: true,
       token: 'TOKEN',
@@ -31,7 +31,7 @@ describe('LineIntegration', () => {
     line.handler('with keyword: profit');
   });
 
-  test('line error 500 response', () => {
+  it('line error 500 response', () => {
     const config = {
       enabled: true,
       token: 'TOKEN',
@@ -41,7 +41,7 @@ describe('LineIntegration', () => {
     line.handler('with keyword: profit');
   });
 
-  test('line exception response', async () => {
+  it('line exception response', async () => {
     const config = {
       enabled: true,
       token: 'TOKEN',
@@ -52,7 +52,7 @@ describe('LineIntegration', () => {
     await delay(0);
   });
 
-  afterAll(() => {
+  this.afterAll(() => {
     nock.restore();
   });
 });

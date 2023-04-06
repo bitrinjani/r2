@@ -10,7 +10,7 @@
     "build": "rimraf dist/ && tsc",
     "onlystart": "node ./dist",
     "start": "npm run build && npm run onlystart",
-    "test": "mocha",
+    "test": "mocha -- -r ts-node/register -r ./src/__tests__/importSpy.ts ./src/__tests__/**/*.test.ts",
     "lint": "tsc && eslint .",
     "cleanup": "rimraf dist/",
     "clearPairs": "ts-node ./tools/clearPairs.ts",
@@ -57,10 +57,13 @@
     "zeromq": "^5.3.1"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.4",
+    "@types/chai-spies": "^1.0.3",
     "@types/express": "^4.16.2",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/lodash": "^4.14.192",
     "@types/luxon": "^3.2.0",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.11",
     "@types/node-fetch": "^2.6.3",
     "@types/split2": "^3.2.1",
@@ -68,6 +71,8 @@
     "@types/uuid": "^9.0.1",
     "@types/ws": "^8.5.4",
     "@types/zeromq": "^5.2.2",
+    "chai": "^4.3.7",
+    "chai-spies": "^1.0.0",
     "coveralls": "^3.1.1",
     "cpy-cli": "^4.2.0",
     "mocha": "^10.2.0",
@@ -78,13 +83,17 @@
   },
   "keywords": [],
   "author": "bitrinjani",
-  "contributors": [{
-    "name": "nh-chitose"
-  },{
-    "name": "mtripg6666tdr"
-  },{
-    "name": "win2k-yuki"
-  }],
+  "contributors": [
+    {
+      "name": "nh-chitose"
+    },
+    {
+      "name": "mtripg6666tdr"
+    },
+    {
+      "name": "win2k-yuki"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nh-chitose/r2-re.git"

@@ -8,8 +8,8 @@ const slackApi = nock(slackUrl);
 slackApi.post('/xxxxxx').reply(200, 'ok');
 slackApi.post('/xxxxxx').replyWithError('mock error');
 
-describe('SlackIntegration', () => {
-  test('slack', () => {
+describe('SlackIntegration', function(){
+  it('slack', () => {
     const config = {
       enabled: true,
       url: 'https://hooks.slack.com/services/xxxxxx',
@@ -22,7 +22,7 @@ describe('SlackIntegration', () => {
     slack.handler('with keyword: profit');
   });
 
-  test('slack exception handling', async () => {
+  it('slack exception handling', async () => {
     const config = {
       enabled: true,
       url: 'https://hooks.slack.com/services/xxxxxx',
@@ -36,7 +36,7 @@ describe('SlackIntegration', () => {
     await util.delay(0);
   });
 
-  test('slack with no keyword', () => {
+  it('slack with no keyword', () => {
     const config = {
       enabled: true,
       url: 'https://hooks.slack.com/services/xxxxxx',
@@ -48,7 +48,7 @@ describe('SlackIntegration', () => {
     slack.handler('with keyword: profit');
   });
 
-  afterAll(() => {
+  this.afterAll(() => {
     nock.restore();
   });
 });

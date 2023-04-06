@@ -1,27 +1,35 @@
-
-jest.mock('fs', () => ({
-  existsSync: jest.fn(() => false),
-  readFileSync: jest.fn(() => '{"language": "test"}')
-}));
-
 import * as fs from 'fs';
-import * as util from '../util';
 import { getConfigRoot } from '../configUtil';
+import { expect, spy } from 'chai';
 
-test('getConfigRoot not found config.json', () => {
+let existsSyncCount = 0;
+const originalExistsSync = fs.existsSync;
+const originalReadFileSync = fs.readFileSync;
+// @ts-expect-error
+fs.existsSync = spy(() => {
+  existsSyncCount++;
+  return false;
+});
+// @ts-expect-error
+fs.readFileSync = spy(() => '{"language": "test"}');
+
+it('getConfigRoot not found config.json', () => {
   const config = getConfigRoot();
-  expect(fs.existsSync.mock.calls.length).toBe(1);
-  expect(config.language).toBe('test');
+  expect(existsSyncCount).to.equal(1);
+  expect(config.language).to.equal('test');
 });
 
-test('getConfigRoot with process.env mock', () => {
+it('getConfigRoot with process.env mock', () => {
   process.env.NODE_ENV = 'testmock';
   try {
     const config = getConfigRoot();
-    expect(config.language).toBe('test');
+    expect(config.language).to.equal('test');
   } finally {
     process.env.NODE_ENV = 'test';
   }
 });
 
-afterAll(() => jest.unmock('fs'));
+// @ts-expect-error
+fs.existsSync = originalExistsSync;
+// @ts-expect-error
+fs.readFileSync = originalReadFileSync;

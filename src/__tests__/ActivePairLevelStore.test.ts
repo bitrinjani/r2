@@ -1,25 +1,25 @@
-import OrderImpl from '../OrderImpl';
 import { OrderStatus, OrderSide, CashMarginType, OrderType, Broker, OrderPair } from '../types';
 import { getActivePairStore } from '../ActivePairLevelStore';
-import { ChronoDB } from '@bitr/chronodb';
+import { ChronoDB } from '../chronodb';
 import { createOrder } from './helper';
 import * as OrderUtil from '../OrderUtil';
+import { expect } from 'chai';
 
-describe('ActivePairLevelStore', () => {
+describe('ActivePairLevelStore', function(){
   let store;
   let chronoDB;
-  beforeAll(async () => {
+  this.beforeAll(async () => {
     chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
     store = getActivePairStore(chronoDB);
     await store.delAll();
   });
 
-  afterAll(async () => {
+  this.afterAll(async () => {
     await store.delAll();
     await chronoDB.close();
   });
 
-  test('put, get, getAll', async () => {
+  it('put, get, getAll', async () => {
     const buyLeg = createOrder('Dummy1' as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
     buyLeg.filledSize = 0.1;
     buyLeg.status = OrderStatus.Filled;
@@ -29,13 +29,13 @@ describe('ActivePairLevelStore', () => {
     const pair: OrderPair = [buyLeg, sellLeg];
     const key = await store.put(pair);
     const result = await store.get(key);
-    expect(result.length).toBe(2);
-    expect(() => OrderUtil.toShortString(result[0])).not.toThrow();
-    const activePairKeyValues = await store.getAll();
-    expect(activePairKeyValues[activePairKeyValues.length - 1].value[1].broker).toBe('Dummy2');
+    expect(result.length).to.equal(2);
+    expect(() => OrderUtil.toShortString(result[0])).not.to.throw();
+    const activePairKeyValues = await store.getAll(); 
+    expect(activePairKeyValues[activePairKeyValues.length - 1].value[1].broker).to.equal('Dummy2');
   });
 
-  test('del', async () => {
+  it('del', async () => {
     const buyLeg = createOrder('Dummy1' as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
     buyLeg.filledSize = 0.1;
     buyLeg.status = OrderStatus.Filled;
@@ -45,21 +45,21 @@ describe('ActivePairLevelStore', () => {
     const pair: OrderPair = [buyLeg, sellLeg];
     const key = await store.put(pair);
     const result = await store.get(key);
-    expect(result.length).toBe(2);
-    expect(() => OrderUtil.toShortString(result[0])).not.toThrow();
+    expect(result.length).to.equal(2);
+    expect(() => OrderUtil.toShortString(result[0])).not.to.throw();
     await store.del(key);
     try {
-      const result2 = await store.get(key);
+      await store.get(key);
     } catch (ex) {
-      expect(ex.message).toContain('Key not found');
+      expect(ex.message).to.contain('Key not found');
       return;
     }
     throw Error();
   });
 
-  test('delAll', async () => {
+  it('delAll', async () => {
     await store.delAll();
     const activePairs = await store.getAll();
-    expect(activePairs.length).toBe(0);
+    expect(activePairs.length).to.equal(0);
   });
 });

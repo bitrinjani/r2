@@ -1,15 +1,17 @@
+import { expect, spy } from 'chai';
 import OrderService from '../OrderService';
-import { HistoricalOrderStore, OrderSide, CashMarginType, OrderType, OrderStatus } from '../types';
+import { OrderSide, CashMarginType, OrderType, OrderStatus } from '../types';
 import { delay } from '../util';
 
 describe('OrderService', () => {
-  const store = { put: jest.fn() };
+  const store = { put: spy() };
 
-  test('create, emitOrderUpdated, finalize', async () => {
+  it('create, emitOrderUpdated, finalize', async () => {
     const os = new OrderService(store as any);
-    const orderCreated = jest.fn();
-    const orderUpdated = jest.fn();
-    const orderFinalized = jest.fn();
+    const orderCreated = spy(d => {}); // noop
+    const orderUpdatedArgs = [] as any[][];
+    const orderUpdated = spy((...args) => orderUpdatedArgs.push(args));
+    const orderFinalized = spy();
     os.on('orderCreated', o => {
       orderCreated(o);
       console.log(o);
@@ -27,16 +29,16 @@ describe('OrderService', () => {
       leverageLevel: 1
     });
     await delay(0);
-    expect(order.status).toBe(OrderStatus.PendingNew);
-    expect(orderCreated).toBeCalled();
+    expect(order.status).to.equal(OrderStatus.PendingNew);
+    expect(orderCreated).to.be.called();
 
     order.status = OrderStatus.Filled;
     os.emitOrderUpdated(order);
     await delay(0);
-    expect(orderUpdated.mock.calls[0][0].status).toBe(OrderStatus.Filled);
+    expect(orderUpdatedArgs[0][0].status).to.equal(OrderStatus.Filled);
 
     os.finalizeOrder(order);
     await delay(0);
-    expect(orderFinalized).toBeCalled();
+    expect(orderFinalized).to.be.called();
   });
 });

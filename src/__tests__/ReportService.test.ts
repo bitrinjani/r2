@@ -4,69 +4,69 @@ import * as mkdirp from 'mkdirp';
 import { toQuote, cwd } from '../util';
 import { QuoteSide } from '../types';
 import SpreadAnalyzer from '../SpreadAnalyzer';
-import { socket } from 'zeromq';
 import { reportServiceRepUrl } from '../constants';
 import { SnapshotRequester } from '../messages';
 import QuoteAggregator from '../QuoteAggregator';
 import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
+import { expect, spy } from 'chai';
 
 function createQuoteAggregatorMock() {
-  const aee: QuoteAggregator = new AwaitableEventEmitter();
-  aee.start = jest.fn();
-  aee.stop = jest.fn();
+  const aee: QuoteAggregator = new AwaitableEventEmitter() as QuoteAggregator;
+  aee.start = spy(() => Promise.resolve());
+  aee.stop = spy(() => Promise.resolve());
   return aee as QuoteAggregator;
 }
 
-describe('ReportService', () => {
-  afterAll(() => {
+describe('ReportService', function(){
+  this.afterAll(() => {
     // delete sandbox
     rimraf.sync(cwd());
   });
 
-  test('start/stop', async () => {
+  it('start/stop', async () => {
     const quoteAggregator = createQuoteAggregatorMock();
-    const spreadAnalyzer = { getSpreadStat: jest.fn() };
-    const timeSeries = { put: jest.fn() };
+    const spreadAnalyzer = { getSpreadStat: spy() };
+    const timeSeries = { put: spy() };
     const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    rimraf.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer as any, timeSeries as any, { config } as any);
+    rimraf.sync(rs["reportDir"]);
     await rs.start();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(1);
     await rs.stop();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(0);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(0);
   });
 
-  test('start/stop with existing dir', async () => {
+  it('start/stop with existing dir', async () => {
     const quoteAggregator = createQuoteAggregatorMock();
-    const spreadAnalyzer = { getSpreadStat: jest.fn() };
-    const timeSeries = { put: jest.fn() };
+    const spreadAnalyzer = { getSpreadStat: spy() };
+    const timeSeries = { put: spy() };
     const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    mkdirp.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer as any, timeSeries as any, { config } as any);
+    mkdirp.mkdirpManualSync(rs["reportDir"]);
     await rs.start();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(1);
     await rs.stop();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(0);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(0);
   });
 
-  test('fire event', async () => {
+  it('fire event', async () => {
     const quoteAggregator = createQuoteAggregatorMock();
-    const spreadAnalyzer = { getSpreadStat: jest.fn() };
-    const timeSeries = { put: jest.fn() };
+    const spreadAnalyzer = { getSpreadStat: spy() };
+    const timeSeries = { put: spy() };
     const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    mkdirp.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer as any, timeSeries as any, { config } as any);
+    mkdirp.mkdirpManualSync(rs["reportDir"]);
     await rs.start();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(1);
     await quoteAggregator.emitParallel('quoteUpdated', []);
     await rs.stop();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(0);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(0);
   });
 
-  test('fire event 2', async () => {
+  it('fire event 2', async () => {
     const quoteAggregator = createQuoteAggregatorMock();
     const spreadAnalyzer = new SpreadAnalyzer({
       config: {
@@ -75,13 +75,13 @@ describe('ReportService', () => {
         brokers: [{ broker: 'Coincheck', commissionPercent: 0 }, { broker: 'Quoine', commissionPercent: 0 }]
       }
     } as any);
-    const timeSeries = { put: jest.fn() };
+    const timeSeries = { put: spy() };
     const config = {};
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    mkdirp.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries as any, { config } as any);
+    mkdirp.mkdirpManualSync(rs["reportDir"]);
     await rs.start();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(1);
     await quoteAggregator.emitParallel('quoteUpdated', [
       toQuote('Coincheck', QuoteSide.Ask, 3, 1),
       toQuote('Coincheck', QuoteSide.Bid, 2, 2),
@@ -89,13 +89,13 @@ describe('ReportService', () => {
       toQuote('Quoine', QuoteSide.Bid, 2.5, 4)
     ]);
     await rs.stop();
-    expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(0);
+    expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(0);
   });
 
-  test('start/stop with analytics', async () => {
+  it('start/stop with analytics', async () => {
     const quoteAggregator = createQuoteAggregatorMock();
-    const spreadAnalyzer = { getSpreadStat: jest.fn() };
-    const timeSeries = { put: jest.fn(), query: jest.fn() };
+    const spreadAnalyzer = { getSpreadStat: spy() };
+    const timeSeries = { put: spy(), query: spy() };
     const config = {
       analytics: {
         enabled: true,
@@ -104,20 +104,20 @@ describe('ReportService', () => {
       }
     };
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    rimraf.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer as any, timeSeries as any, { config } as any);
+    rimraf.sync(rs["reportDir"]);
     try {
       await rs.start();
-      expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
+      expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(1);
       await rs.stop();
-      expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(0);
+      expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(0);
     } catch (ex) {
       if (process.env.CI && ex.message === 'Address already in use') return;
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     }
   });
 
-  test('fire event with analytics', async () => {
+  it('fire event with analytics', async () => {
     const config = {
       minSize: 0.005,
       maxSize: 100,
@@ -129,14 +129,14 @@ describe('ReportService', () => {
       brokers: [{ broker: 'Coincheck', commissionPercent: 0 }, { broker: 'Quoine', commissionPercent: 0 }]
     };
     const quoteAggregator = createQuoteAggregatorMock();
-    const spreadAnalyzer = new SpreadAnalyzer({ config });
-    const timeSeries = { put: jest.fn(), query: jest.fn() };
+    const spreadAnalyzer = new SpreadAnalyzer({ config } as any);
+    const timeSeries = { put: spy(), query: spy() };
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    mkdirp.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries as any, { config } as any);
+    mkdirp.mkdirpManualSync(rs["reportDir"]);
     try {
       await rs.start();
-      expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(1);
+      expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(1);
       await quoteAggregator.emitParallel('quoteUpdated', [
         toQuote('Coincheck', QuoteSide.Ask, 3, 1),
         toQuote('Coincheck', QuoteSide.Bid, 2, 2),
@@ -144,14 +144,14 @@ describe('ReportService', () => {
         toQuote('Quoine', QuoteSide.Bid, 2.5, 4)
       ]);
       await rs.stop();
-      expect(quoteAggregator.listenerCount('quoteUpdated')).toBe(0);
+      expect(quoteAggregator.listenerCount('quoteUpdated')).to.equal(0);
     } catch (ex) {
       if (process.env.CI && ex.message === 'Address already in use') return;
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     }
   });
 
-  test('respond snapshot request', async () => {
+  it('respond snapshot request', async () => {
     const config = {
       minSize: 0.005,
       maxSize: 100,
@@ -163,28 +163,28 @@ describe('ReportService', () => {
       brokers: [{ broker: 'Coincheck', commissionPercent: 0 }, { broker: 'Quoine', commissionPercent: 0 }]
     };
     const quoteAggregator = createQuoteAggregatorMock();
-    const spreadAnalyzer = new SpreadAnalyzer({ config });
-    const timeSeries = { put: jest.fn(), query: () => [{ value: 'dummy' }] };
+    const spreadAnalyzer = new SpreadAnalyzer({ config } as any);
+    const timeSeries = { put: spy(), query: () => [{ value: 'dummy' }] };
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    mkdirp.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries as any, { config } as any);
+    mkdirp.mkdirpManualSync(rs["reportDir"]);
     let client;
     try {
       await rs.start();
       client = new SnapshotRequester(reportServiceRepUrl);
       const reply = await client.request({ type: 'spreadStatSnapshot' });
-      expect(reply.success).toBe(true);
-      expect(reply.data).toEqual(['dummy']);
+      expect(reply.success).to.equal(true);
+      expect(reply.data).to.equal(['dummy']);
       await rs.stop();
     } catch (ex) {
       if (process.env.CI && ex.message === 'Address already in use') return;
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } finally {
       if (client) client.dispose();
     }
   });
 
-  test('invalid request', async () => {
+  it('invalid request', async () => {
     const config = {
       minSize: 0.005,
       maxSize: 100,
@@ -196,21 +196,21 @@ describe('ReportService', () => {
       brokers: [{ broker: 'Coincheck', commissionPercent: 0 }, { broker: 'Quoine', commissionPercent: 0 }]
     };
     const quoteAggregator = createQuoteAggregatorMock();
-    const spreadAnalyzer = new SpreadAnalyzer({ config });
-    const timeSeries = { put: jest.fn(), query: () => [] };
+    const spreadAnalyzer = new SpreadAnalyzer({ config } as any);
+    const timeSeries = { put: spy(), query: () => [] };
 
-    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries, { config });
-    mkdirp.sync(rs.reportDir);
+    const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries as any, { config } as any);
+    mkdirp.mkdirpManualSync(rs["reportDir"]);
     let client;
     try {
       await rs.start();
       client = new SnapshotRequester(reportServiceRepUrl);
       const reply = await client.request('invalid');
-      expect(reply.success).toBe(false);
+      expect(reply.success).to.equal(false);
       await rs.stop();
     } catch (ex) {
       if (process.env.CI && ex.message === 'Address already in use') return;
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } finally {
       if (client) client.dispose();
     }

@@ -1,3 +1,4 @@
+import { spy } from 'chai';
 import WebGateway from '../WebGateway';
 import { delay } from '../util';
 import { EventEmitter } from 'events';
@@ -11,11 +12,11 @@ describe('WebGateway', () => {
     positionService = new EventEmitter();
     opportunitySearcher = new EventEmitter();
     activePairStore = new EventEmitter();
-    activePairStore.getAll = jest.fn().mockImplementation(() => []);
+    activePairStore.getAll = spy(() => []);
     orderService = new EventEmitter();
   });
 
-  test('start, stop - not enabled', async () => {
+  it('start, stop - not enabled', async () => {
     const config = { webGateway: { enabled: false } };
     const configStore = new EventEmitter() as any;
     configStore.config = config;
@@ -25,6 +26,7 @@ describe('WebGateway', () => {
       positionService,
       opportunitySearcher,
       activePairStore,
+      // @ts-expect-error
       orderService
     );
     await wg.start();
@@ -33,7 +35,7 @@ describe('WebGateway', () => {
     await delay(10);
   });
 
-  test('start, stop - enabled', async () => {
+  it('start, stop - enabled', async () => {
     const config = { webGateway: { enabled: true }, brokers: [{ key: 'key', secret: 'secret' }] };
     const configStore = new EventEmitter() as any;
     configStore.config = config;
@@ -43,6 +45,7 @@ describe('WebGateway', () => {
       positionService,
       opportunitySearcher,
       activePairStore,
+      // @ts-expect-error
       orderService
     );
     try {
@@ -54,7 +57,7 @@ describe('WebGateway', () => {
     }
   });
 
-  test('emit events', async () => {
+  it('emit events', async () => {
     const config = { webGateway: { enabled: true }, brokers: [{ key: 'key', secret: 'secret' }] };
     const configStore = new EventEmitter() as any;
     configStore.config = config;
@@ -64,6 +67,7 @@ describe('WebGateway', () => {
       positionService,
       opportunitySearcher,
       activePairStore,
+      // @ts-expect-error
       orderService
     );
     let ws;
@@ -90,7 +94,7 @@ describe('WebGateway', () => {
     }
   });
 
-  test('emit events - no ws client', async () => {
+  it('emit events - no ws client', async () => {
     const config = { webGateway: { enabled: true }, brokers: [{ key: 'key', secret: 'secret' }] };
     const configStore = new EventEmitter() as any;
     configStore.config = config;
@@ -100,6 +104,7 @@ describe('WebGateway', () => {
       positionService,
       opportunitySearcher,
       activePairStore,
+      // @ts-expect-error
       orderService
     );
     try {

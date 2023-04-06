@@ -2,12 +2,11 @@
 import * as nock from 'nock';
 import * as _ from 'lodash';
 import BrokerAdapterImpl from '../../Coincheck/BrokerAdapterImpl';
-import { OrderStatus, Broker, CashMarginType, OrderSide, OrderType, ConfigRoot, BrokerConfigType } from '../../types';
+import { OrderStatus, CashMarginType, OrderSide, OrderType, ConfigRoot, BrokerConfigType } from '../../types';
 import nocksetup from './nocksetup';
-import OrderImpl from '../../OrderImpl';
-import { NewOrderRequest } from '../../Coincheck/types';
 import { options } from '@bitr/logger';
 import { createOrder } from '../helper';
+import { expect } from 'chai';
 options.enabled = false;
 
 nocksetup();
@@ -19,8 +18,8 @@ const brokerConfig = {
   cashMarginType: CashMarginType.MarginOpen
 } as BrokerConfigType;
 
-describe('Coincheck BrokerAdapter', () => {
-  test('send with invalid cashMarginType', async () => {
+describe('Coincheck BrokerAdapter', function(){
+  it('send with invalid cashMarginType', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = createOrder(
       'Coincheck',
@@ -29,18 +28,19 @@ describe('Coincheck BrokerAdapter', () => {
       300000,
       'Invalid' as CashMarginType,
       OrderType.Limit,
+      // @ts-expect-error
       undefined
     );
     try {
       await target.send(order);
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } catch (ex) {
       return;
     }
-    expect(true).toBe(false);
+    expect(true).to.equal(false);
   });
 
-  test('send leverage buy limit', async () => {
+  it('send leverage buy limit', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = createOrder(
       'Coincheck',
@@ -49,34 +49,35 @@ describe('Coincheck BrokerAdapter', () => {
       300000,
       CashMarginType.MarginOpen,
       OrderType.Limit,
+      // @ts-expect-error
       undefined
     );
     await target.send(order);
-    expect(order.status).toBe(OrderStatus.New);
-    expect(order.brokerOrderId).toBe('340622252');
+    expect(order.status).to.equal(OrderStatus.New);
+    expect(order.brokerOrderId).to.equal('340622252');
   });
 
-  test('getBtcPosition with invalid cashMarginType', async () => {
+  it('getBtcPosition with invalid cashMarginType', async () => {
     const config = {
       brokers: [{ broker: 'Coincheck', key: '', secret: '', cashMarginType: 'Invalid' as CashMarginType }]
     } as ConfigRoot;
     const target = new BrokerAdapterImpl(brokerConfig);
     try {
       await target.getBtcPosition();
-      expect(true).toBe(false);
+      expect(true).to.equal(false);
     } catch (ex) {
       return;
     }
-    expect(true).toBe(false);
+    expect(true).to.equal(false);
   });
 
-  test('getBtcPosition leverage', async () => {
+  it('getBtcPosition leverage', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const result = await target.getBtcPosition();
-    expect(result).toBe(-0.14007);
+    expect(result).to.equal(-0.14007);
   });
 
-  test('refresh', async () => {
+  it('refresh', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTC/JPY',
@@ -95,11 +96,11 @@ describe('Coincheck BrokerAdapter', () => {
       brokerOrderId: '361173028',
       lastUpdated: '2017-10-28T01:20:39.416Z'
     };
-    await target.refresh(order);
-    expect(order.status).toBe(OrderStatus.Filled);
+    await target.refresh(order as any);
+    expect(order.status).to.equal(OrderStatus.Filled);
   });
 
-  test('refresh partial fill', async () => {
+  it('refresh partial fill', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTC/JPY',
@@ -118,11 +119,11 @@ describe('Coincheck BrokerAdapter', () => {
       brokerOrderId: '361173028',
       lastUpdated: '2017-10-28T01:20:39.416Z'
     };
-    await target.refresh(order);
-    expect(order.status).toBe(OrderStatus.PartiallyFilled);
+    await target.refresh(order as any);
+    expect(order.status).to.equal(OrderStatus.PartiallyFilled);
   });
 
-  test('refresh partial fill', async () => {
+  it('refresh partial fill', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = {
       symbol: 'BTC/JPY',
@@ -142,50 +143,50 @@ describe('Coincheck BrokerAdapter', () => {
       lastUpdated: '2017-10-28T01:20:39.416Z'
     };
     try {
-      await target.refresh(order);
+      await target.refresh(order as any);
     } catch (ex) {
       return;
     }
-    expect(false).toBe(true);
+    expect(false).to.equal(true);
   });
 
-  test('fetchQuotes', async () => {
+  it('fetchQuotes', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const result = await target.fetchQuotes();
-    expect(result.length).toBe(200);
-    result.forEach(q => expect(q.broker).toBe('Coincheck'));
+    expect(result.length).to.equal(200);
+    result.forEach(q => expect(q.broker).to.equal('Coincheck'));
   });
 
-  test('send wrong broker order', async () => {
+  it('send wrong broker order', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = { broker: 'Bitflyer' };
     try {
-      await target.send(order);
+      await target.send(order as any);
     } catch (ex) {
       return;
     }
-    expect(false).toBe(true);
+    expect(false).to.equal(true);
   });
 
-  test('cancel', async () => {
+  it('cancel', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = { brokerOrderId: '340809935' };
-    await target.cancel(order);
-    expect(order.status).toBe(OrderStatus.Canceled);
+    await target.cancel(order as any);
+    expect((order as any).status).to.equal(OrderStatus.Canceled);
   });
 
-  test('cancel failed', async () => {
+  it('cancel failed', async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = { brokerOrderId: '340809935' };
     try {
-      await target.cancel(order);
+      await target.cancel(order as any);
     } catch (ex) {
       return;
     }
-    expect(false).toBe(true);
+    expect(false).to.equal(true);
   });
-});
 
-afterAll(() => {
-  nock.restore();
+  this.afterAll(() => {
+    nock.restore();
+  });
 });

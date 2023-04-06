@@ -1,11 +1,12 @@
 import 'reflect-metadata';
 import QuoteAggregator from '../QuoteAggregator';
-import { Broker, QuoteSide } from '../types';
+import { QuoteSide } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
 import BrokerAdapterRouter from '../BrokerAdapterRouter';
 import { options } from '@bitr/logger';
 import { DateTime } from 'luxon';
+import { expect, spy } from 'chai';
 options.enabled = false;
 
 const config = {
@@ -33,7 +34,7 @@ const config = {
 const configStore = { config };
 
 describe('Quote Aggregator', () => {
-  test('folding', async () => {
+  it('folding', async () => {
     configStore.config.iterationInterval = 10;
     const bitflyerBa = {
       broker: 'Bitflyer',
@@ -56,33 +57,35 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, coincheckBa, quoineBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
-    const mustBeCalled = jest.fn();
+    const baRouter = new (BrokerAdapterRouter  as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter as any);
+    let mustBeCalledCount = 0;
+    const mustBeCalled = spy(() => ++mustBeCalledCount);
     aggregator.on('quoteUpdated', async quotes => {
       try {
-        expect(quotes.length).toBe(3);
-        expect(quotes[0].broker).toBe('Bitflyer');
-        expect(quotes[0].side).toBe('Ask');
-        expect(quotes[0].price).toBe(500000);
-        expect(quotes[0].volume).toBe(0.1);
+        expect(quotes.length).to.equal(3);
+        expect(quotes[0].broker).to.equal('Bitflyer');
+        expect(quotes[0].side).to.equal('Ask');
+        expect(quotes[0].price).to.equal(500000);
+        expect(quotes[0].volume).to.equal(0.1);
         mustBeCalled();
       } catch (ex) {
         console.log(ex);
-        expect(ex.message).toBe('');
+        expect(ex.message).to.equal('');
       }
     });
     await aggregator.start();
     await delay(0);
     await aggregator.stop();
-    expect(mustBeCalled.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(mustBeCalledCount).to.be.greaterThanOrEqual(1);
   });
 
-  test('folding with noTradePeriods', async () => {
+  it('folding with noTradePeriods', async () => {
     configStore.config.iterationInterval = 10;
     const current = DateTime.local();
     const start = current.minus({ minutes: 5 });
     const end = current.plus({ minutes: 5 });
+    // @ts-expect-error
     configStore.config.brokers[0].noTradePeriods = [
       [start.toLocaleString(DateTime.TIME_24_SIMPLE), end.toLocaleString(DateTime.TIME_24_SIMPLE)]
     ];
@@ -107,24 +110,26 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, coincheckBa, quoineBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
-    const mustBeCalled = jest.fn();
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter);
+    let mustBeCalledCount = 0;
+    const mustBeCalled = spy(() => ++mustBeCalledCount);
     aggregator.on('quoteUpdated', async quotes => {
-      expect(quotes.length).toBe(1);
+      expect(quotes.length).to.equal(1);
       mustBeCalled();
     });
     await aggregator.start();
     await delay(0);
     await aggregator.stop();
-    expect(mustBeCalled.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(mustBeCalledCount).to.be.greaterThanOrEqual(1);
   });
 
-  test('folding with noTradePeriods -> no matching period', async () => {
+  it('folding with noTradePeriods -> no matching period', async () => {
     configStore.config.iterationInterval = 10;
     const current = DateTime.local();
     const start = current.plus({ minutes: 5 });
     const end = current.plus({ minutes: 15 });
+    // @ts-expect-error
     configStore.config.brokers[0].noTradePeriods = [
       [start.toLocaleString(DateTime.TIME_24_SIMPLE), end.toLocaleString(DateTime.TIME_24_SIMPLE)]
     ];
@@ -149,21 +154,23 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, coincheckBa, quoineBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
-    const mustBeCalled = jest.fn();
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter as any);
+    let mustBeCalledCount = 0;
+    const mustBeCalled = spy(() => ++mustBeCalledCount);
     aggregator.on('quoteUpdated', async quotes => {
-      expect(quotes.length).toBe(3);
+      expect(quotes.length).to.equal(3);
       mustBeCalled();
     });
     await aggregator.start();
     await delay(0);
     await aggregator.stop();
-    expect(mustBeCalled.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(mustBeCalledCount).to.be.greaterThanOrEqual(1);
   });
 
-  test('folding with noTradePeriods -> invalid period', async () => {
+  it('folding with noTradePeriods -> invalid period', async () => {
     configStore.config.iterationInterval = 10;
+    // @ts-expect-error
     configStore.config.brokers[0].noTradePeriods = [['00_00', '01_00']];
     const bitflyerBa = {
       broker: 'Bitflyer',
@@ -186,20 +193,21 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, coincheckBa, quoineBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
-    const mustBeCalled = jest.fn();
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter as any);
+    let mustBeCalledCount = 0;
+    const mustBeCalled = spy(() => ++mustBeCalledCount);
     aggregator.on('quoteUpdated', async quotes => {
-      expect(quotes.length).toBe(3);
+      expect(quotes.length).to.equal(3);
       mustBeCalled();
     });
     await aggregator.start();
     await delay(0);
     await aggregator.stop();
-    expect(mustBeCalled.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(mustBeCalledCount).to.be.greaterThanOrEqual(1);
   });
 
-  test('folding when a broker is disabled', async () => {
+  it('folding when a broker is disabled', async () => {
     configStore.config.iterationInterval = 11;
     config.brokers[0].enabled = false;
     const bitflyerBa = {
@@ -223,20 +231,21 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, coincheckBa, quoineBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
-    const mustBeCalled = jest.fn();
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter as any);
+    let mustBeCalledCount = 0;
+    const mustBeCalled = spy(() => ++mustBeCalledCount);
     aggregator.on('quoteUpdated', async quotes => {
-      expect(quotes.length).toBe(1);
+      expect(quotes.length).to.equal(1);
       mustBeCalled();
     });
     await aggregator.start();
     await delay(0);
     await aggregator.stop();
-    expect(mustBeCalled.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(mustBeCalledCount).to.be.greaterThanOrEqual(1);
   });
 
-  test('onQuoteUpdated', async () => {
+  it('onQuoteUpdated', async () => {
     configStore.config.iterationInterval = 12;
     const bitflyerBa = {
       broker: 'Bitflyer',
@@ -255,17 +264,18 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
-    const fn = jest.fn();
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter as any);
+    let fnCalledCount = 0;
+    const fn = spy(async () => void ++fnCalledCount);
     aggregator.on('quoteUpdated', fn);
     await aggregator.start();
     await delay(0);
-    expect(fn.mock.calls.length).toBeGreaterThan(0);
+    expect(fnCalledCount).to.be.greaterThan(0);
     await aggregator.stop();
   });
 
-  test('onQuoteUpdated without event handler', async () => {
+  it('onQuoteUpdated without event handler', async () => {
     configStore.config.iterationInterval = 12;
     const bitflyerBa = {
       broker: 'Bitflyer',
@@ -284,14 +294,14 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter);
     await aggregator.start();
     await delay(0);
     await aggregator.stop();
   });
 
-  test('when already running', async () => {
+  it('when already running', async () => {
     configStore.config.iterationInterval = 12;
     const bitflyerBa = {
       broker: 'Bitflyer',
@@ -299,22 +309,22 @@ describe('Quote Aggregator', () => {
     };
     const quoineBa = {
       broker: 'Quoine',
-      fetchQuotes: jest.fn()
+      fetchQuotes: spy()
     };
     const coincheckBa = {
       broker: 'Coincheck',
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
-    aggregator.isRunning = true;
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter);
+    aggregator["isRunning"] = true;
     await aggregator.start();
     await aggregator.stop();
-    expect(quoineBa.fetchQuotes).not.toBeCalled();
+    expect(quoineBa.fetchQuotes).not.to.be.called();
   });
 
-  test('fetchQuotes throws', async () => {
+  it('fetchQuotes throws', async () => {
     configStore.config.iterationInterval = 12;
     const bitflyerBa = {
       broker: 'Bitflyer',
@@ -331,15 +341,15 @@ describe('Quote Aggregator', () => {
       fetchQuotes: () => Promise.resolve([])
     };
     const baList = [bitflyerBa, quoineBa, coincheckBa];
-    const baRouter = new BrokerAdapterRouter(baList);
-    const aggregator: QuoteAggregator = new QuoteAggregator(configStore, baRouter);
+    const baRouter = new (BrokerAdapterRouter as any)(baList);
+    const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter);
     await aggregator.start();
     await aggregator.stop();
-    expect(aggregator.quotes.length).toBe(0);
+    expect(aggregator["quotes"].length).to.equal(0);
   });
 });
 
-test('stop without start', () => {
-  const aggregator = new QuoteAggregator(configStore, []);
+it('stop without start', () => {
+  const aggregator = new QuoteAggregator(configStore as any, [] as any);
   aggregator.stop();
 });

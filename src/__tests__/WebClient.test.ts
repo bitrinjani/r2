@@ -4,6 +4,7 @@ import WebClient from '../WebClient';
 import { RequestInit } from 'node-fetch';
 import * as nock from 'nock';
 import { options } from '@bitr/logger';
+import { expect } from 'chai';
 options.enabled = false;
 
 const baseUrl = 'http://local';
@@ -19,8 +20,8 @@ interface MockResponse {
   field2: string;
 }
 
-describe('WebClient', () => {
-  test('HTTP Code 200', () => {
+describe('WebClient', function(){
+  it('HTTP Code 200', () => {
     const path = '/v2/a';
     const init: RequestInit = {
       headers: {
@@ -28,10 +29,10 @@ describe('WebClient', () => {
       }
     };
     const rc = new WebClient(baseUrl);
-    return rc.fetch<MockResponse>(path, init).then(x => expect(x.field2).toBe('value2'));
+    return rc.fetch<MockResponse>(path, init).then(x => expect(x.field2).to.equal('value2'));
   });
 
-  test('HTTP Code 400', () => {
+  it('HTTP Code 400', () => {
     const path = '/v2/b';
     const init: RequestInit = {
       headers: {
@@ -40,10 +41,10 @@ describe('WebClient', () => {
     };
     const rc = new WebClient(baseUrl);
     const expected = 'HTTP request failed. Response from http://local/v2/b. Status Code: 400 (Bad Request) Content: bad request';
-    return rc.fetch<MockResponse>(path, init).catch(x => expect(x.message).toBe(expected));
+    return rc.fetch<MockResponse>(path, init).catch(x => expect(x.message).to.equal(expected));
   });
 
-  afterAll(() => {
+  this.afterAll(() => {
     nock.restore();
   });
 });
