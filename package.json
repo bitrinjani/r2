@@ -61,6 +61,7 @@
     "@types/jsonwebtoken": "^9.0.1",
     "@types/lodash": "^4.14.192",
     "@types/luxon": "^3.2.0",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.11",
     "@types/node-fetch": "^2.6.3",
     "@types/split2": "^3.2.1",
@@ -78,13 +79,17 @@
   },
   "keywords": [],
   "author": "bitrinjani",
-  "contributors": [{
-    "name": "nh-chitose"
-  },{
-    "name": "mtripg6666tdr"
-  },{
-    "name": "win2k-yuki"
-  }],
+  "contributors": [
+    {
+      "name": "nh-chitose"
+    },
+    {
+      "name": "mtripg6666tdr"
+    },
+    {
+      "name": "win2k-yuki"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nh-chitose/r2-re.git"
