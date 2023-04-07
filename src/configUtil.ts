@@ -1,19 +1,24 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { ConfigRoot, Broker, BrokerConfig } from './types';
-import { readJsonFileSync } from './util';
+
 import * as _ from 'lodash';
 
 const defaultValues = {
   symbol: 'BTC/JPY'
 };
 
+function readJson(filepath: string): any {
+  const content = fs.readFileSync(filepath, 'utf-8');
+  return JSON.parse(content);
+}
+
 export function getConfigRoot(): ConfigRoot {
   let configPath = getConfigPath();
   if (!fs.existsSync(configPath)) {
     configPath = path.join(process.cwd(), path.basename(configPath));
   }
-  const config = new ConfigRoot(readJsonFileSync(configPath));
+  const config = new ConfigRoot(readJson(configPath));
   return _.defaultsDeep({}, config, defaultValues);
 }
 

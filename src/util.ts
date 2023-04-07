@@ -66,15 +66,6 @@ export function revive<T, K>(t: Function, o: K): T {
   return Object.assign(newObject, o) as T;
 }
 
-function removeBom(s: string): string {
-  return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s;
-}
-
-export function readJsonFileSync(filepath: string): any {
-  const content = fs.readFileSync(filepath, 'utf-8');
-  return JSON.parse(removeBom(content));
-}
-
 export function toExecution(order: Order): Partial<Execution> {
   return {
     broker: order.broker,
