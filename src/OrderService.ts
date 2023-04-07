@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { injectable, inject } from 'inversify';
-import OrderImpl, { OrderInit } from './OrderImpl';
+import OrderImpl, { OrderInit } from './orderImpl';
 import symbols from './symbols';
 import { HistoricalOrderStore } from './types';
 import _ = require('lodash');

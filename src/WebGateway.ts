@@ -9,15 +9,15 @@ import {
   ConfigRoot,
   LimitCheckResult
 } from './types';
-import QuoteAggregator from './QuoteAggregator';
+import QuoteAggregator from './quoteAggregator';
 import { getLogger } from '@bitr/logger';
 import * as WebSocket from 'ws';
 import { wssPort } from './constants';
 import * as _ from 'lodash';
-import PositionService from './PositionService';
-import OppotunitySearcher from './OpportunitySearcher';
-import OrderService from './OrderService';
-import OrderImpl from './OrderImpl';
+import PositionService from './positionService';
+import OppotunitySearcher from './oppportunitySearcher';
+import OrderService from './orderService';
+import OrderImpl from './orderImpl';
 import * as express from 'express';
 import * as http from 'http';
 import { autobind } from 'core-decorators';

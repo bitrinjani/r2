@@ -3,7 +3,7 @@ import { ConfigStore, BrokerConfig, QuoteSide, Broker, Quote } from './types';
 import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import symbols from './symbols';
-import BrokerAdapterRouter from './BrokerAdapterRouter';
+import BrokerAdapterRouter from './brokerAdapterRouter';
 import { DateTime, Interval } from 'luxon';
 import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
 

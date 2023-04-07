@@ -1,4 +1,4 @@
-import AppRoot from './AppRoot';
+import AppRoot from './appRoot';
 import { exec } from 'child_process';
 import container from './container.config';
 

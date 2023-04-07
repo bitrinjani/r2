@@ -2,14 +2,14 @@
 import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
 import { ConfigStore, Quote } from './types';
-import t from './intl';
+import t from './i18n';
 import { hr, delay } from './util';
 import symbols from './symbols';
 import { fatalErrors } from './constants';
-import QuoteAggregator from './QuoteAggregator';
-import PositionService from './PositionService';
-import OpportunitySearcher from './OpportunitySearcher';
-import PairTrader from './PairTrader';
+import QuoteAggregator from './quoteAggregator';
+import PositionService from './positionService';
+import OpportunitySearcher from './oppportunitySearcher';
+import PairTrader from './pairTrader';
 
 @injectable()
 export default class Arbitrager {

@@ -1,7 +1,7 @@
 import { getLogger } from '@bitr/logger';
 import { injectable, inject } from 'inversify';
 import * as _ from 'lodash';
-import OrderImpl from './OrderImpl';
+import OrderImpl from './orderImpl';
 import {
   ConfigStore,
   SpreadAnalysisResult,
@@ -12,15 +12,15 @@ import {
   Quote,
   OrderPair
 } from './types';
-import t from './intl';
+import t from './i18n';
 import { delay, formatQuote } from './util';
 import symbols from './symbols';
-import SingleLegHandler from './SingleLegHandler';
+import SingleLegHandler from './singleLegHandler';
 import { findBrokerConfig } from './configUtil';
-import BrokerAdapterRouter from './BrokerAdapterRouter';
+import BrokerAdapterRouter from './brokerAdapterRouter';
 import { EventEmitter } from 'events';
 import { calcProfit } from './pnl';
-import * as OrderUtil from './OrderUtil';
+import * as OrderUtil from './orderUtil';
 
 @injectable()
 export default class PairTrader extends EventEmitter {

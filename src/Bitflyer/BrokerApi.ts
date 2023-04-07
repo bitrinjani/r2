@@ -1,5 +1,5 @@
 import { hmac, nonce, safeQueryStringStringify } from '../util';
-import WebClient from '../WebClient';
+import WebClient from '../webClient';
 import {
   SendChildOrderRequest,
   SendChildOrderResponse,

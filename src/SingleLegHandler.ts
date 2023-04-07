@@ -1,14 +1,14 @@
 import { OnSingleLegConfig, ReverseOption, ProceedOption, OrderSide, OrderType, OrderPair, ConfigStore } from './types';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
-import OrderImpl from './OrderImpl';
+import OrderImpl from './orderImpl';
 import * as _ from 'lodash';
 import { getLogger } from '@bitr/logger';
-import t from './intl';
+import t from './i18n';
 import { delay, splitSymbol } from './util';
-import BrokerAdapterRouter from './BrokerAdapterRouter';
+import BrokerAdapterRouter from './brokerAdapterRouter';
 import { injectable, inject } from 'inversify';
 import symbols from './symbols';
-import * as OrderUtil from './OrderUtil';
+import * as OrderUtil from './orderUtil';
 
 @injectable()
 export default class SingleLegHandler {

@@ -3,9 +3,9 @@ import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
 import { injectable, multiInject, inject } from 'inversify';
 import symbols from './symbols';
-import BrokerStabilityTracker from './BrokerStabilityTracker';
-import OrderService from './OrderService';
-import OrderImpl from './OrderImpl';
+import BrokerStabilityTracker from './brokerStabilityTracker';
+import OrderService from './orderService';
+import OrderImpl from './orderImpl';
 
 @injectable()
 export default class BrokerAdapterRouter {

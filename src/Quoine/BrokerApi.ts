@@ -1,5 +1,5 @@
 import { nonce, safeQueryStringStringify } from '../util';
-import WebClient from '../WebClient';
+import WebClient from '../webClient';
 import {
   SendOrderResponse,
   SendOrderRequest,

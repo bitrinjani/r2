@@ -1,5 +1,5 @@
 import { SpreadStat } from './types';
-import { ChronoDB, TimeSeries } from './chronodb';
+import { ChronoDB, TimeSeries } from './chrono';
 import { eRound } from './util';
 import { EOL } from 'os';
 

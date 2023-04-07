@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { hmac, nonce, safeQueryStringStringify } from '../util';
-import WebClient from '../WebClient';
+import WebClient from '../webClient';
 import {
   AccountsBalanceResponse,
   LeveragePositionsRequest,

@@ -1,6 +1,6 @@
-import OrderImpl from './OrderImpl';
+import OrderImpl from './orderImpl';
 import { splitSymbol } from './util';
-import t from './intl';
+import t from './i18n';
 import { format } from 'util';
 import * as _ from 'lodash';
 

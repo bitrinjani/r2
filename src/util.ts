@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import * as crypto from 'crypto';
-import * as fs from 'fs';
 import * as querystring from 'querystring';
 import { Execution, Order, Broker, QuoteSide, Quote } from './types';
 
@@ -52,18 +51,9 @@ export const nonce: () => string = (function() {
   };
 })();
 
-export function timestampToDate(n: number): Date {
-  return new Date(n * 1000);
-}
-
 export function safeQueryStringStringify(o: any) {
   const noUndefinedFields = _.pickBy(o, _.negate(_.isUndefined));
   return querystring.stringify(noUndefinedFields);
-}
-
-export function revive<T, K>(t: Function, o: K): T {
-  const newObject = Object.create(t.prototype);
-  return Object.assign(newObject, o) as T;
 }
 
 export function toExecution(order: Order): Partial<Execution> {
@@ -78,10 +68,6 @@ export function toExecution(order: Order): Partial<Execution> {
 
 export function toQuote(broker: Broker, side: QuoteSide, price: number, volume: number) {
   return { broker, side, price, volume };
-}
-
-export function cwd() {
-  return process.env.NODE_ENV === 'test' ? `${process.cwd()}/src/__tests__/sandbox` : process.cwd();
 }
 
 export function splitSymbol(symbol: string): { baseCcy: string; quoteCcy: string } {

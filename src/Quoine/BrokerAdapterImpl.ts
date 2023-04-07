@@ -13,10 +13,14 @@
 import BrokerApi from './BrokerApi';
 import * as _ from 'lodash';
 import { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from './types';
-import { timestampToDate, toExecution, toQuote } from '../util';
+import { toExecution, toQuote } from '../util';
 import Decimal from 'decimal.js';
 import CashStrategy from './CashStrategy';
 import NetOutStrategy from './NetOutStrategy';
+
+function timestampToDate(n: number): Date {
+  return new Date(n * 1000);
+}
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;

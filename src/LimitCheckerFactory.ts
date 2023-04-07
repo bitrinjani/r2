@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify';
 import symbols from './symbols';
 import { ConfigStore, SpreadAnalysisResult, LimitChecker, OrderPair } from './types';
-import PositionService from './PositionService';
-import MainLimitChecker from './MainLimitChecker';
+import PositionService from './positionService';
+import MainLimitChecker from './mainLimitChecker';
 
 @injectable()
 export default class LimitCheckerFactory {

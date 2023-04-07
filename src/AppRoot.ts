@@ -1,16 +1,16 @@
 ﻿import { getLogger } from '@bitr/logger';
-import t from './intl';
+import t from './i18n';
 import 'reflect-metadata';
 import symbols from './symbols';
 import { BrokerAdapter, ConfigStore } from './types';
 import { Container } from 'inversify';
 import { closeChronoDB } from './chrono';
-import QuoteAggregator from './QuoteAggregator';
-import PositionService from './PositionService';
-import Arbitrager from './Arbitrager';
-import ReportService from './ReportService';
-import BrokerStabilityTracker from './BrokerStabilityTracker';
-import WebGateway from './WebGateway';
+import QuoteAggregator from './quoteAggregator';
+import PositionService from './positionService';
+import Arbitrager from './arbitrager';
+import ReportService from './reportService';
+import BrokerStabilityTracker from './brokerStabilityTracker';
+import WebGateway from './webGateway';
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);

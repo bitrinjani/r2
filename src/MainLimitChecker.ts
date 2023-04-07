@@ -7,8 +7,8 @@ import {
 } from './types';
 import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
-import t from './intl';
-import PositionService from './PositionService';
+import t from './i18n';
+import PositionService from './positionService';
 import { calcProfit } from './pnl';
 
 export default class MainLimitChecker implements LimitChecker {

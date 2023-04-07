@@ -1,21 +1,26 @@
-import SpreadAnalyzer from './SpreadAnalyzer';
+import SpreadAnalyzer from './spreadAnalyzer';
 import { injectable, inject } from 'inversify';
 import symbols from './symbols';
 import { SpreadStatTimeSeries, Quote, ConfigStore } from './types';
-import QuoteAggregator from './QuoteAggregator';
-import { spreadStatToCsv, spreadStatCsvHeader } from './SpreadStatTimeSeries';
+import QuoteAggregator from './quoteAggregator';
+import { spreadStatToCsv, spreadStatCsvHeader } from './spreadStatTimeSeries';
 import * as fs from 'fs';
 import mkdirp from 'mkdirp';
 import { promisify } from 'util';
 import { fork, ChildProcess } from 'child_process';
 import { reportServicePubUrl, reportServiceRepUrl } from './constants';
 import { getLogger } from '@bitr/logger';
-import { cwd } from './util';
 import { Duration, DateTime } from 'luxon';
 import { SnapshotResponder } from './messages';
 import { ZmqPublisher } from './zmq';
 
 const writeFile = promisify(fs.writeFile);
+
+function cwd() {
+  return process.env.NODE_ENV === 'test' 
+    ? `${process.cwd()}/src/__tests__/sandbox` 
+    : process.cwd();
+}
 
 @injectable()
 export default class ReportService {

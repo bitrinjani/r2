@@ -1,4 +1,4 @@
-import OrderImpl from './OrderImpl';
+import OrderImpl from './orderImpl';
 import * as _ from 'lodash';
 import { findBrokerConfig } from './configUtil';
 import { OrderSide, ConfigRoot } from './types';

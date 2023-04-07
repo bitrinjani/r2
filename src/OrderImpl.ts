@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { OrderSide, CashMarginType, OrderType, TimeInForce, OrderStatus, Broker, Order, Execution } from './types';
-import { eRound, revive } from './util';
+import { eRound } from './util';
 
 export interface OrderInit {
   symbol: string;
@@ -12,6 +12,11 @@ export interface OrderInit {
   cashMarginType: CashMarginType;
   type: OrderType;
   leverageLevel: number;
+}
+
+function revive<T, K>(t: Function, o: K): T {
+  const newObject = Object.create(t.prototype);
+  return Object.assign(newObject, o) as T;
 }
 
 export default class OrderImpl implements Order {

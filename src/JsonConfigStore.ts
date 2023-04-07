@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { ConfigStore, ConfigRoot } from './types';
 import { getConfigRoot, getConfigPath } from './configUtil';
-import ConfigValidator from './ConfigValidator';
+import ConfigValidator from './configValidator';
 import { setTimeout } from 'timers';
 import { configStoreSocketUrl } from './constants';
 import * as _ from 'lodash';

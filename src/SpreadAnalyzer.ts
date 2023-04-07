@@ -12,12 +12,12 @@ import {
 } from './types';
 import { getLogger } from '@bitr/logger';
 import * as _ from 'lodash';
-import t from './intl';
+import t from './i18n';
 import symbols from './symbols';
 import Decimal from 'decimal.js';
 import { findBrokerConfig } from './configUtil';
 import { LOT_MIN_DECIMAL_PLACE } from './constants';
-import OrderImpl from './OrderImpl';
+import OrderImpl from './orderImpl';
 import { calcCommission } from './pnl';
 
 @injectable()

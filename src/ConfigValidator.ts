@@ -1,5 +1,5 @@
 ﻿import { ConfigRoot, BrokerConfig, CashMarginType } from './types';
-import t from './intl';
+import t from './i18n';
 import * as _ from 'lodash';
 import { injectable } from 'inversify';
 import { findBrokerConfig } from './configUtil';

@@ -5,9 +5,9 @@ import * as _ from 'lodash';
 import Decimal from 'decimal.js';
 import { hr, eRound, splitSymbol, padEnd, padStart } from './util';
 import symbols from './symbols';
-import BrokerAdapterRouter from './BrokerAdapterRouter';
-import BrokerStabilityTracker from './BrokerStabilityTracker';
-import t from './intl';
+import BrokerAdapterRouter from './brokerAdapterRouter';
+import BrokerStabilityTracker from './brokerStabilityTracker';
+import t from './i18n';
 import { EventEmitter } from 'events';
 
 @injectable()
