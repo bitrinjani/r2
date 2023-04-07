@@ -8,6 +8,6 @@ config.getConfigRoot = spy(() => {
 
 describe("intl", function(){
   it('intl catch', () => {
-    expect(() => require('../intl')).not.to.throw();
+    expect(() => require('../i18n')).not.to.throw();
   });
 });

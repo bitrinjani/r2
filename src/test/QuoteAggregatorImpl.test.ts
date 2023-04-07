@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import QuoteAggregator from '../QuoteAggregator';
+import QuoteAggregator from '../quoteAggregator';
 import { QuoteSide } from '../types';
 import * as _ from 'lodash';
 import { delay } from '../util';
-import BrokerAdapterRouter from '../BrokerAdapterRouter';
+import BrokerAdapterRouter from '../brokerAdapterRouter';
 import { options } from '@bitr/logger';
 import { DateTime } from 'luxon';
 import { expect, spy } from 'chai';

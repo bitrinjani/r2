@@ -1,6 +1,6 @@
-import SingleLegHandler from '../SingleLegHandler';
+import SingleLegHandler from '../singleLegHandler';
 import { OnSingleLegConfig, OrderSide, CashMarginType, OrderType, OrderStatus } from '../types';
-import OrderImpl from '../OrderImpl';
+import OrderImpl from '../orderImpl';
 import { options } from '@bitr/logger';
 import { createOrder } from './helper';
 import { expect, spy } from 'chai';

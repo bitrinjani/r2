@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import MainLimitChecker from '../MainLimitChecker';
+import MainLimitChecker from '../mainLimitChecker';
 import { options } from '@bitr/logger';
 options.enabled = false;
 

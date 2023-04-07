@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import PositionService from '../PositionService';
+import PositionService from '../positionService';
 import * as _ from 'lodash';
 import { delay } from '../util';
 import { options } from '@bitr/logger';
-import BrokerStabilityTracker from '../BrokerStabilityTracker';
+import BrokerStabilityTracker from '../brokerStabilityTracker';
 import { expect } from 'chai';
 options.enabled = false;
 

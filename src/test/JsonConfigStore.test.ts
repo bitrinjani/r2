@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import JsonConfigStore from '../JsonConfigStore';
+import JsonConfigStore from '../jsonConfigStore';
 import { ConfigRoot } from '../types';
 import { options } from '@bitr/logger';
 import { delay } from '../util';

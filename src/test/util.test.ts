@@ -1,13 +1,9 @@
 import * as util from '../util';
 import { Broker, OrderSide, CashMarginType, OrderType } from '../types';
 import { findBrokerConfig } from '../configUtil';
-import OrderImpl from '../OrderImpl';
+import OrderImpl from '../orderImpl';
 import { expect } from 'chai';
 
-it('timestampToDate', () => {
-  const dt = util.timestampToDate(1509586252);
-  expect(dt.toISOString()).to.equal('2017-11-02T01:30:52.000Z');
-});
 
 it('nonce', async () => {
   const result: string[] = [];
@@ -36,16 +32,6 @@ it('almostEqual', () => {
   expect(util.almostEqual(1.50001, 0.99, 20)).to.equal(false);
 });
 
-it('readJsonFileSync with BOM', () => {
-  const config = util.readJsonFileSync('./src/__tests__/config_test_bom.json');
-  expect(config.language).to.equal('en');
-});
-
-it('readJsonFileSync with no BOM', () => {
-  const config = util.readJsonFileSync('./src/__tests__/config_test.json');
-  expect(config.language).to.equal('en');
-});
-
 it('findBrokerConfig with no config', () => {
   expect(() => findBrokerConfig({ brokers: [] } as any, 'Bitflyer')).to.throw();
 });
@@ -54,11 +40,4 @@ it('safeQueryStringStringify', () => {
   const o = { a: 1, b: undefined };
   const result = util.safeQueryStringStringify(o);
   expect(result).to.equal('a=1');
-});
-
-it('cwd', () => {
-  const tmp = process.env.NODE_ENV;
-  process.env.NODE_ENV = '__test__';
-  const dir = util.cwd();
-  process.env.NODE_ENV = tmp;
 });

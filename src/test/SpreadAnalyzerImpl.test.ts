@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import SpreadAnalyzer from '../SpreadAnalyzer';
+import SpreadAnalyzer from '../spreadAnalyzer';
 import { QuoteSide, ConfigStore } from '../types';
 import * as _ from 'lodash';
 import { options } from '@bitr/logger';

@@ -15,7 +15,7 @@ import * as WebSocket from 'ws';
 import { wssPort } from './constants';
 import * as _ from 'lodash';
 import PositionService from './positionService';
-import OppotunitySearcher from './oppportunitySearcher';
+import OppotunitySearcher from './opportunitySearcher';
 import OrderService from './orderService';
 import OrderImpl from './orderImpl';
 import * as express from 'express';

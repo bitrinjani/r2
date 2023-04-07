@@ -8,7 +8,7 @@ import symbols from './symbols';
 import { fatalErrors } from './constants';
 import QuoteAggregator from './quoteAggregator';
 import PositionService from './positionService';
-import OpportunitySearcher from './oppportunitySearcher';
+import OpportunitySearcher from './opportunitySearcher';
 import PairTrader from './pairTrader';
 
 @injectable()

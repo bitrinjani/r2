@@ -7,17 +7,17 @@ import {
   OrderSide,
   Order,
   Execution} from '../types';
-import Arbitrager from '../Arbitrager';
-import OppotunitySearcher from '../OpportunitySearcher';
-import PairTrader from '../PairTrader';
-import LimitCheckerFactory from '../LimitCheckerFactory';
-import SpreadAnalyzer from '../SpreadAnalyzer';
+import Arbitrager from '../arbitrager';
+import OppotunitySearcher from '../opportunitySearcher';
+import PairTrader from '../pairTrader';
+import LimitCheckerFactory from '../limitCheckerFactory';
+import SpreadAnalyzer from '../spreadAnalyzer';
 import { toQuote } from '../util';
 import { options } from '@bitr/logger';
-import { getActivePairStore } from '../ActivePairLevelStore';
-import { ChronoDB } from '../chronodb';
-import QuoteAggregator from '../QuoteAggregator';
-import SingleLegHandler from '../SingleLegHandler';
+import { getActivePairStore } from '../activePairLevelStore';
+import { ChronoDB } from '../chrono';
+import QuoteAggregator from '../quoteAggregator';
+import SingleLegHandler from '../singleLegHandler';
 import AwaitableEventEmitter from '@bitr/awaitable-event-emitter/dist/AwaitableEventEmitter';
 import { expect, spy } from 'chai';
 options.enabled = false;

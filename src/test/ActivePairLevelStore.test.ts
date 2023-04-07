@@ -1,8 +1,8 @@
 import { OrderStatus, OrderSide, CashMarginType, OrderType, Broker, OrderPair } from '../types';
-import { getActivePairStore } from '../ActivePairLevelStore';
-import { ChronoDB } from '../chronodb';
+import { getActivePairStore } from '../activePairLevelStore';
+import { ChronoDB } from '../chrono';
 import { createOrder } from './helper';
-import * as OrderUtil from '../OrderUtil';
+import * as OrderUtil from '../orderUtil';
 import { expect } from 'chai';
 
 describe('ActivePairLevelStore', function(){

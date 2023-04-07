@@ -1,5 +1,5 @@
 import { expect, spy } from 'chai';
-import OrderService from '../OrderService';
+import OrderService from '../orderService';
 import { OrderSide, CashMarginType, OrderType, OrderStatus } from '../types';
 import { delay } from '../util';
 

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import BrokerStabilityTracker from '../BrokerStabilityTracker';
+import BrokerStabilityTracker from '../brokerStabilityTracker';
 import { delay } from '../util';
 
 describe('BrokerStabilityTracker', () => {

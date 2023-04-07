@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import { CashMarginType, OrderType, OrderSide } from '../types';
-import BrokerAdapterRouter from '../BrokerAdapterRouter';
+import BrokerAdapterRouter from '../brokerAdapterRouter';
 import { options } from '@bitr/logger';
 import { createOrder } from './helper';
-import BrokerStabilityTracker from '../BrokerStabilityTracker';
+import BrokerStabilityTracker from '../brokerStabilityTracker';
 import { expect, spy } from 'chai';
 options.enabled = false;
 

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import OrderImpl from '../OrderImpl';
+import OrderImpl from '../orderImpl';
 import { Broker, OrderSide, OrderType, CashMarginType, Execution } from '../types';
 import { toExecution } from '../util';
 import { createOrder } from './helper';

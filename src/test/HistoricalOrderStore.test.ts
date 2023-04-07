@@ -1,5 +1,5 @@
 import { getHistoricalOrderStore } from '../HistoricalOrderStore';
-import { ChronoDB } from '../chronodb';
+import { ChronoDB } from '../chrono';
 import { createOrder } from './helper';
 import { OrderSide, CashMarginType, OrderType, HistoricalOrderStore } from '../types';
 import { expect } from 'chai';

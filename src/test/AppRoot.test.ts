@@ -1,4 +1,4 @@
-import AppRoot from '../AppRoot';
+import AppRoot from '../appRoot';
 import { options } from '@bitr/logger';
 import symbols from '../symbols';
 import { expect, spy } from 'chai';

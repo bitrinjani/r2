@@ -1,5 +1,5 @@
 import { Broker, OrderSide, CashMarginType, OrderType } from '../types';
-import OrderImpl from '../OrderImpl';
+import OrderImpl from '../orderImpl';
 
 export function createOrder(
   broker: Broker,

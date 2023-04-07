@@ -1,12 +1,12 @@
-import ReportService from '../ReportService';
+import ReportService from '../reportService';
 import * as rimraf from 'rimraf';
 import * as mkdirp from 'mkdirp';
-import { toQuote, cwd } from '../util';
+import { toQuote } from '../util';
 import { QuoteSide } from '../types';
-import SpreadAnalyzer from '../SpreadAnalyzer';
+import SpreadAnalyzer from '../spreadAnalyzer';
 import { reportServiceRepUrl } from '../constants';
 import { SnapshotRequester } from '../messages';
-import QuoteAggregator from '../QuoteAggregator';
+import QuoteAggregator from '../quoteAggregator';
 import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
 import { expect, spy } from 'chai';
 
@@ -18,10 +18,6 @@ function createQuoteAggregatorMock() {
 }
 
 describe('ReportService', function(){
-  this.afterAll(() => {
-    // delete sandbox
-    rimraf.sync(cwd());
-  });
 
   it('start/stop', async () => {
     const quoteAggregator = createQuoteAggregatorMock();

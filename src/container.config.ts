@@ -11,7 +11,7 @@ import ConfigValidator from './configValidator';
 import LimitCheckerFactory from './limitCheckerFactory';
 import { getActivePairStore } from './activePairLevelStore';
 import { getChronoDB } from './chrono';
-import OppotunitySearcher from './oppportunitySearcher';
+import OppotunitySearcher from './opportunitySearcher';
 import PairTrader from './pairTrader';
 import SingleLegHandler from './singleLegHandler';
 import { EventEmitter } from 'events';
