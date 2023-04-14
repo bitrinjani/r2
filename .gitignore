@@ -19,3 +19,4 @@ config.json
 datastore/
 reports/
 sandbox/
+.history
