@@ -17,7 +17,9 @@ import { ZmqPublisher } from './zmq';
 const writeFile = promisify(fs.writeFile);
 
 function cwd() {
-  return process.env.NODE_ENV === 'test' ? `${process.cwd()}/src/__tests__/sandbox` : process.cwd();
+  return process.env.NODE_ENV === 'test'
+    ? `${process.cwd()}/src/__tests__/sandbox`
+    : process.cwd();
 }
 
 @injectable()
@@ -35,8 +37,7 @@ export default class ReportService {
   constructor(
     private readonly quoteAggregator: QuoteAggregator,
     private readonly spreadAnalyzer: SpreadAnalyzer,
-    @inject(symbols.SpreadStatTimeSeries)
-    private readonly spreadStatTimeSeries: SpreadStatTimeSeries,
+    @inject(symbols.SpreadStatTimeSeries) private readonly spreadStatTimeSeries: SpreadStatTimeSeries,
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore
   ) {}
 
@@ -86,9 +87,7 @@ export default class ReportService {
     const stat = await this.spreadAnalyzer.getSpreadStat(quotes);
     if (stat) {
       await this.spreadStatTimeSeries.put(stat);
-      await promisify(this.spreadStatWriteStream.write).bind(this.spreadStatWriteStream)(
-        spreadStatToCsv(stat)
-      );
+      await promisify(this.spreadStatWriteStream.write).bind(this.spreadStatWriteStream)(spreadStatToCsv(stat));
       const { analytics } = this.configStore.config;
       if (analytics && analytics.enabled && this.analyticsProcess.connected) {
         this.streamPublisher.publish('spreadStat', stat);
