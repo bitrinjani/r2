@@ -1,7 +1,8 @@
+# R2 Bitcoin Arbitrager
+
 [日本語はこちら](http://qiita.com/bitrinjani/items/3ed756da9baf7d171306)
 
 [![Coverage Status](https://coveralls.io/repos/github/bitrinjani/r2/badge.svg?branch=master&i=5)](https://coveralls.io/github/bitrinjani/r2?branch=master)
-# R2 Bitcoin Arbitrager
 
 R2 Bitcoin Arbitrager is an automatic arbitrage trading application targeting Bitcoin exchanges.
 
@@ -21,15 +22,20 @@ Console mode is for CUI-only environment like Linux boxes with no GUI.
 
 1. Install [Node.js](https://nodejs.org) 8.5 or newer.
 2. Clone this repository.
+
   ```bash
-  git clone https://github.com/bitrinjani/r2.git
+    git clone https://github.com/bitrinjani/r2.git
   ```
+
 3. Run `npm install`. (or `yarn`)
+
 ```bash
 cd r2
 npm install
 ```
+
 4. Rename `config_default.json` in the folder to `config.json`
+
 5. Replace `key` and `secret` fields with your API keys (tokens) and secrets. Set `enabled` to `false` for exchanges you do not use.
 6. To run R2 in Web UI mode, set `webGateway.enabled` to true. By default, R2 starts in Console mode. 
 7. Start the application by `npm start` or `yarn start`.
@@ -44,10 +50,13 @@ or
 
 1. Install [Docker](https://docs.docker.com/engine/installation/)
 2. Clone this repository.
+
   ```bash
   git clone https://github.com/bitrinjani/r2.git
   ```
+
 3. Run `docker build` and `docker run`.
+
   ```
   cd r2
   docker build -t r2:latest .
@@ -55,7 +64,9 @@ or
   ```
 
 ### Prerequisites
+
 R2 works on any OS that supports Node.js, such as:
+
 - Windows
 - Mac OS
 - Linux
@@ -63,6 +74,7 @@ R2 works on any OS that supports Node.js, such as:
 Web UI works on the latest version of Google Chrome.
 
 #### Supported Exchanges
+
 R2 supports the following exchanges.
 
 |Exchange|Cash|Margin|
@@ -70,12 +82,13 @@ R2 supports the following exchanges.
 |bitFlyer|✔️|✔️*|
 |Quoine|✔️|✔️|
 |Coincheck|✔️|✔️|
-|bitbank.cc|️️️✔️|| 
-|BTCBox|✔️|| 
+|bitbank.cc|️️️✔️||
+|BTCBox|✔️||
 
 *bitFlyer margin trading (BTC-FX/JPY) is available as a [broker plugin](https://github.com/bitrinjani/bitflyer-fx).
 
 ## How it works
+
 1. Every 3 seconds, R2 downloads quotes from exchanges.
 1. Filters out quotes that are not usable for arbitrage. For example, if `maxShortPosition` config is 0 and the current position is 0 for a broker, the ask quotes for the broker will be filtered out.
 1. Calculates the best ask and the best bid from the filtered quotes and checks if the expected profit is larger than the configured minimum value, `minTargetProfitPercent`. If there is no arbitrage opportunity, R2 waits for the next iteration.
@@ -86,6 +99,7 @@ R2 supports the following exchanges.
 After the spread has became smaller than the configured value, `exitNetProfitRatio`, R2 tries to close the pair.
 
 ## Architecture Overview
+
 - Pluggable architecture: User can add new exchanges/brokers as an npm package like [bitflyer-fx plugin](https://github.com/bitrinjani/bitflyer-fx)
 - Concurrency: All API calls to exchanges are concurrently sent/handled.
 - ️Dynamic configuration: User can dynamically update the configuration based on spread statistics by a simple js script, like setting `minTargetProfitPercent` to μ + σ every few seconds.
@@ -97,6 +111,7 @@ After the spread has became smaller than the configured value, `exitNetProfitRat
 All configurations are stored in `config.json`.
 
 ### Global Config
+
 |Name|Values|Description|
 |----|------|-----------|
 |language|"ja" or "en"|UI language. Japanese or English.|
@@ -125,7 +140,7 @@ All configurations are stored in `config.json`.
 
 Default config:
 
-```
+```sh
   "webGateway": {
     "enabled": false,
     "host": "127.0.0.1",
@@ -180,6 +195,7 @@ The onSingleLeg config specifies what action should be taken when only one leg i
 ````
 
 - action: Action to be taken when only one leg is opened.
+
     - Cancel: Cancel the unfilled order.
     - Reverse: After canceling the unfilled order, R2 sends a limit order to the opposite side of the filled order. The limit price depends on limitMovePercent config. 
     - Proceed: After canceling the unfilled order, R2 sends another order to the same side of the unfilled order. The limit price depends on limitMovePercent config.
@@ -189,6 +205,7 @@ The onSingleLeg config specifies what action should be taken when only one leg i
     - ttl: Time to Live of the limit order created by the action。
 
 ### Broker config
+
 |Name|Values|Description|
 |----|------|-----------|
 |broker|Bitflyer, Quoine or Coincheck|Broker name|
@@ -223,9 +240,11 @@ Coincheck's NetOut is artificially handled by R2 because the exchange doesn't su
 Please note this implementation doesn't close multiple positions by one order.
 
 ### noTradePeriods config
+
 The noTradePeriods config specifies the periods when the quotes from the exchange must be ignored. The config is useful for scheduled maintenance periods, e.g. 4:00-4:15 in bitFlyer.
 
 - Example: Exclude bitFlyer from trading activities between 4:00 am to 4:15 am.
+
 ```json
     {
       "broker": "Bitflyer",
@@ -235,6 +254,7 @@ The noTradePeriods config specifies the periods when the quotes from the exchang
 ```
 
 - Example: Excludes multiple periods
+
 ```json
     {
       "broker": "Bitflyer",
@@ -271,6 +291,7 @@ R2 can send notification messages to Slack and LINE when it detects the configur
 ```
 
 #### Slack notification
+
 |Name|Values|Description|
 |----|------|-----------|
 |enabled|true or false|Enable notification|
@@ -280,6 +301,7 @@ R2 can send notification messages to Slack and LINE when it detects the configur
 |keywords|string[]|Keyword list|
 
 #### LINE notification
+
 |Name|Values|Description|
 |----|------|-----------|
 |enabled|true or false|Enable notification|
@@ -287,6 +309,7 @@ R2 can send notification messages to Slack and LINE when it detects the configur
 |keywords|string[]|Keyword list|
 
 ### Log files
+
 All log files are saved under `logs` directory.
 
 |File name|Description|
@@ -301,9 +324,10 @@ Several utility scripts are available to close positions, show balances and clea
 See [TOOLS.md](https://github.com/bitrinjani/r2/blob/master/docs/TOOLS.md)
 
 ## Running the tests
+
 `test` script runs [ts-jest](https://github.com/kulshekhar/ts-jest).
 
-```
+```sh
 npm test
 ```
 
@@ -316,4 +340,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 USE THE SOFTWARE AT YOUR OWN RISK. YOU ARE RESPONSIBLE FOR YOUR OWN MONEY. THE AUTHOR HAS NO RESPONSIBILITY FOR YOUR TRADING RESULTS.
 
 ## Inspirations
+
 [Blackbird](https://github.com/butor/blackbird), which targets US exchanges. 

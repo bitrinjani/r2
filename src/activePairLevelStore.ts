@@ -1,7 +1,10 @@
-import { ActivePairStore, OrderPair } from './types';
-import { reviveOrder } from './orderImpl';
-import { ChronoDB, TimeSeries } from './chrono';
-import { EventEmitter } from 'events';
+import type { ChronoDB, TimeSeries } from "./chrono";
+import type { ActivePairStore, OrderPair } from "./types";
+
+import { EventEmitter } from "events";
+
+import { reviveOrder } from "./orderImpl";
+
 
 class EmittableActivePairStore extends EventEmitter implements ActivePairStore {
   timeSeries: TimeSeries<OrderPair>;
@@ -9,7 +12,7 @@ class EmittableActivePairStore extends EventEmitter implements ActivePairStore {
   constructor(chronoDB: ChronoDB) {
     super();
     this.timeSeries = chronoDB.getTimeSeries<OrderPair>(
-      'ActivePair',
+      "ActivePair",
       orderPair => orderPair.map(o => reviveOrder(o)) as OrderPair
     );
   }
@@ -18,22 +21,22 @@ class EmittableActivePairStore extends EventEmitter implements ActivePairStore {
     return this.timeSeries.get(key);
   }
 
-  getAll(): Promise<{ key: string; value: OrderPair }[]> {
+  getAll(): Promise<{ key: string, value: OrderPair }[]> {
     return this.timeSeries.getAll();
   }
 
   put(value: OrderPair): Promise<string> {
-    this.emit('change');
+    this.emit("change");
     return this.timeSeries.put(value);
   }
 
   del(key: string): Promise<void> {
-    this.emit('change');
+    this.emit("change");
     return this.timeSeries.del(key);
   }
 
   delAll(): Promise<{}> {
-    this.emit('change');
+    this.emit("change");
     return this.timeSeries.delAll();
   }
 }

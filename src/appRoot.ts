@@ -1,25 +1,28 @@
-﻿import { getLogger } from '@bitr/logger';
-import t from './i18n';
-import 'reflect-metadata';
-import symbols from './symbols';
-import { BrokerAdapter, ConfigStore } from './types';
-import { Container } from 'inversify';
-import { closeChronoDB } from './chrono';
-import QuoteAggregator from './quoteAggregator';
-import PositionService from './positionService';
-import Arbitrager from './arbitrager';
-import ReportService from './reportService';
-import BrokerStabilityTracker from './brokerStabilityTracker';
-import WebGateway from './webGateway';
+import { getLogger } from "@bitr/logger";
+
+import t from "./i18n";
+import "reflect-metadata";
+import PositionService from "./positionService";
+import QuoteAggregator from "./quoteAggregator";
+import ReportService from "./reportService";
+import symbols from "./symbols";
+
+import type { BrokerAdapter, ConfigStore } from "./types";
+import type { Container } from "inversify";
+
+import { closeChronoDB } from "./chrono";
+import Arbitrager from "./arbitrager";
+import BrokerStabilityTracker from "./brokerStabilityTracker";
+import WebGateway from "./webGateway";
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
-  private services: { start: () => Promise<void>; stop: () => Promise<void> }[];
+  private services: { start: () => Promise<void>, stop: () => Promise<void> }[];
 
   constructor(private readonly ioc: Container) {}
 
   async start(): Promise<void> {
-    try {
+    try{
       this.log.info(t`StartingTheService`);
       await this.bindBrokers();
       this.services = [
@@ -28,27 +31,27 @@ export default class AppRoot {
         this.ioc.get(Arbitrager),
         this.ioc.get(ReportService),
         this.ioc.get(BrokerStabilityTracker),
-        this.ioc.get(WebGateway)
+        this.ioc.get(WebGateway),
       ];
-      for (const service of this.services) {
+      for(const service of this.services){
         await service.start();
       }
       this.log.info(t`SuccessfullyStartedTheService`);
-    } catch (ex) {
+    } catch(ex){
       this.log.error(ex.message);
       this.log.debug(ex.stack);
     }
   }
 
   async stop(): Promise<void> {
-    try {
+    try{
       this.log.info(t`StoppingTheService`);
-      for (const service of this.services.slice().reverse()) {
+      for(const service of this.services.slice().reverse()){
         await service.stop();
       }
       await closeChronoDB();
       this.log.info(t`SuccessfullyStoppedTheService`);
-    } catch (ex) {
+    } catch(ex){
       this.log.error(ex.message);
       this.log.debug(ex.stack);
     }
@@ -61,8 +64,8 @@ export default class AppRoot {
       const brokerName = brokerConfig.broker;
       const brokerModule = brokerConfig.npmPath
         ? await this.tryImport(brokerConfig.npmPath)
-        : (await this.tryImport(`./${brokerName}`)) || (await this.tryImport(`@bitr/${brokerName}`));
-      if (brokerModule === undefined) {
+        : await this.tryImport(`./${brokerName}`) || await this.tryImport(`@bitr/${brokerName}`);
+      if(brokerModule === undefined){
         throw new Error(`Unable to find ${brokerName} package.`);
       }
       const brokerAdapter = brokerModule.create(brokerConfig);
@@ -72,13 +75,13 @@ export default class AppRoot {
   }
 
   private async tryImport(path: string): Promise<any> {
-    try {
+    try{
       const module = await import(path);
-      if (module.create === undefined) {
+      if(module.create === undefined){
         return undefined;
       }
       return module;
-    } catch (ex) {
+    } catch(ex){
       return undefined;
     }
   }

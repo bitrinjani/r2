@@ -1,14 +1,18 @@
-import { Broker, ConfigStore } from './types';
-import { inject, injectable } from 'inversify';
-import symbols from './symbols';
-import * as _ from 'lodash';
+import type { Broker } from "./types";
+
+
+import { inject, injectable } from "inversify";
+import * as _ from "lodash";
+
+import symbols from "./symbols";
+import { ConfigStore } from "./types";
 
 const MAX = 10;
 const MIN = 1;
 
 @injectable()
 export default class BrokerStabilityTracker {
-  private stabilityMap: Map<Broker, number>;
+  private readonly stabilityMap: Map<Broker, number>;
   private timer;
 
   constructor(@inject(symbols.ConfigStore) private readonly configStore: ConfigStore) {
@@ -17,20 +21,20 @@ export default class BrokerStabilityTracker {
   }
 
   async start() {
-    if (this.configStore.config.stabilityTracker) {
+    if(this.configStore.config.stabilityTracker){
       const interval = this.configStore.config.stabilityTracker.recoveryInterval || 60 * 1000;
       this.timer = setInterval(() => this.recover(), interval);
     }
   }
 
   async stop() {
-    if (this.timer) {
+    if(this.timer){
       clearInterval(this.timer);
     }
   }
 
   decrement(broker: Broker) {
-    if (this.stabilityMap.has(broker)) {
+    if(this.stabilityMap.has(broker)){
       const counter = this.stability(broker);
       const newValue = counter - 1;
       this.stabilityMap.set(broker, _.clamp(newValue, MIN, MAX));
@@ -38,12 +42,12 @@ export default class BrokerStabilityTracker {
   }
 
   isStable(broker: Broker): boolean {
-    if (!this.stabilityMap.has(broker)) {
+    if(!this.stabilityMap.has(broker)){
       return false;
     }
     const counter = this.stability(broker);
     let threshold = 0;
-    if (this.configStore.config.stabilityTracker) {
+    if(this.configStore.config.stabilityTracker){
       threshold = this.configStore.config.stabilityTracker.threshold || 0;
     }
     return counter >= threshold;
@@ -61,7 +65,7 @@ export default class BrokerStabilityTracker {
 
   private recover() {
     const brokers = this.configStore.config.brokers.map(b => b.broker);
-    for (const broker of brokers) {
+    for(const broker of brokers){
       this.increment(broker);
     }
   }

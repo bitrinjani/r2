@@ -1,6 +1,8 @@
 // tslint:disable:variable-name
-import { Castable, cast, element } from '@bitr/castable';
-import { Order } from '../types';
+import type { Order } from "../types";
+
+import { Castable, cast, element } from "@bitr/castable";
+
 
 export class AccountsBalanceResponse extends Castable {
   @cast success: boolean;
@@ -108,13 +110,13 @@ export class LeverageBalanceResponse extends Castable {
 
 export class Pagination extends Castable {
   @cast limit: number;
-  @cast order: 'desc' | 'asc';
+  @cast order: "desc" | "asc";
   @cast starting_after: string;
   @cast ending_before: string;
 }
 
 export interface LeveragePositionsRequest extends Partial<Pagination> {
-  status?: 'open' | 'closed';
+  status?: "open" | "closed";
 }
 
 export class NewOrder extends Castable {
@@ -244,6 +246,6 @@ export class TransactionsResponse extends Castable {
 }
 
 export interface CashMarginTypeStrategy {
-  send(order: Order): Promise<void>;
-  getBtcPosition(): Promise<number>;
+  send: (order: Order) => Promise<void>;
+  getBtcPosition: () => Promise<number>;
 }

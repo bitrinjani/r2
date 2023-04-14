@@ -1,5 +1,8 @@
-import fetch, { RequestInit as FetchRequestInit } from 'node-fetch';
-import { SlackConfig } from '../types';
+import type { SlackConfig } from "../types";
+import type { RequestInit as FetchRequestInit } from "node-fetch";
+
+import fetch from "node-fetch";
+
 
 export default class SlackIntegration {
   static fetchTimeout = 5000;
@@ -10,22 +13,22 @@ export default class SlackIntegration {
 
   handler(message: string): void {
     const keywords = this.config.keywords;
-    if (!(keywords instanceof Array)) {
+    if(!(keywords instanceof Array)){
       return;
     }
-    if (!keywords.some(x => message.includes(x))) {
+    if(!keywords.some(x => message.includes(x))){
       return;
     }
     const payload = {
       text: message,
       channel: this.config.channel,
-      username: this.config.username
+      username: this.config.username,
     };
     const init: FetchRequestInit = {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(payload),
-      headers: { 'Content-Type': 'application/json' },
-      timeout: SlackIntegration.fetchTimeout
+      headers: { "Content-Type": "application/json" },
+      timeout: SlackIntegration.fetchTimeout,
     };
     fetch(this.config.url, init).catch(ex => console.log(ex));
   }

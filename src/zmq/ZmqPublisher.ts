@@ -1,5 +1,6 @@
-import { socket } from 'zeromq';
-import { EventEmitter } from 'events';
+import type { EventEmitter } from "events";
+
+import { socket } from "zeromq";
 
 interface PubSocket extends EventEmitter {
   bindSync: (url: string) => void;
@@ -9,10 +10,10 @@ interface PubSocket extends EventEmitter {
 }
 
 export default class ZmqPublisher {
-  private socket: PubSocket;
+  private readonly socket: PubSocket;
   
   constructor(private readonly url: string) {
-    this.socket = socket('pub');
+    this.socket = socket("pub");
     this.socket.bindSync(this.url);
   }
 

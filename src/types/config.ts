@@ -1,5 +1,6 @@
-import { Castable, cast, element } from '@bitr/castable';
-import { CashMarginType } from './index';
+import { Castable, cast, element } from "@bitr/castable";
+
+import { CashMarginType } from "./index";
 
 export interface BrokerConfigType {
   broker: string;
@@ -52,8 +53,8 @@ export class LoggingConfig extends Castable {
 }
 
 export class OnSingleLegConfig extends Castable {
-  @cast action: 'Cancel' | 'Reverse' | 'Proceed';
-  @cast actionOnExit: 'Cancel' | 'Reverse' | 'Proceed';
+  @cast action: "Cancel" | "Reverse" | "Proceed";
+  @cast actionOnExit: "Cancel" | "Reverse" | "Proceed";
   @cast options: CancelOption | ReverseOption | ProceedOption;
 }
 

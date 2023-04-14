@@ -1,17 +1,19 @@
-import { v1 as uuid } from 'uuid';
-import * as _ from 'lodash';
-import { LevelUp, QueryOptions } from './types';
-import * as through2 from 'through2';
+import type { LevelUp, QueryOptions } from "./types";
 
-const firstUuid = '00000000-0000-0000-0000-000000000000';
-const lastUuid = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
-const firstTimestamp = '0000000000000';
-const lastTimestamp = '9999999999999';
+import * as _ from "lodash";
+import * as through2 from "through2";
+import { v1 as uuid } from "uuid";
+
+
+const firstUuid = "00000000-0000-0000-0000-000000000000";
+const lastUuid = "ffffffff-ffff-ffff-ffff-ffffffffffff";
+const firstTimestamp = "0000000000000";
+const lastTimestamp = "9999999999999";
 
 export class TimeSeries<T> {
   private readonly queryAll = {
     gt: `${this.name}/${firstTimestamp}/${firstUuid}`,
-    lt: `${this.name}/${lastTimestamp}/${lastUuid}`
+    lt: `${this.name}/${lastTimestamp}/${lastUuid}`,
   };
 
   constructor(
@@ -25,37 +27,37 @@ export class TimeSeries<T> {
     return this.reviver ? this.reviver(value) : value;
   }
 
-  getAll(): Promise<{ key: string; value: T }[]> {
-    const kvArray: { key: string; value: T }[] = [];
+  getAll(): Promise<{ key: string, value: T }[]> {
+    const kvArray: { key: string, value: T }[] = [];
     return new Promise((resolve, reject) =>
       this.store
         .createReadStream(this.queryAll)
-        .on('data', kv =>
+        .on("data", kv =>
           kvArray.push({
             key: kv.key,
-            value: this.reviver ? this.reviver(kv.value) : kv.value
+            value: this.reviver ? this.reviver(kv.value) : kv.value,
           })
         )
-        .on('end', () => resolve(kvArray))
-        .on('error', reject)
+        .on("end", () => resolve(kvArray))
+        .on("error", reject)
     );
   }
 
-  query(options: QueryOptions): Promise<{ key: string; value: T }[]> {
-    const kvArray: { key: string; value: T }[] = [];
+  query(options: QueryOptions): Promise<{ key: string, value: T }[]> {
+    const kvArray: { key: string, value: T }[] = [];
     const gt = `${this.name}/${this.dateToTimestamp(options.start)}/${firstUuid}`;
     const lt = `${this.name}/${this.dateToTimestamp(options.end)}/${lastUuid}`;
     return new Promise((resolve, reject) =>
       this.store
         .createReadStream({ gt, lt })
-        .on('data', kv =>
+        .on("data", kv =>
           kvArray.push({
             key: kv.key,
-            value: this.reviver ? this.reviver(kv.value) : kv.value
+            value: this.reviver ? this.reviver(kv.value) : kv.value,
           })
         )
-        .on('end', () => resolve(kvArray))
-        .on('error', reject)
+        .on("end", () => resolve(kvArray))
+        .on("error", reject)
     );
   }
 
@@ -68,7 +70,7 @@ export class TimeSeries<T> {
       through2.obj(function(kv: any) {
         this.push({
           key: kv.key,
-          value: that.reviver ? that.reviver(kv.value) : kv.value
+          value: that.reviver ? that.reviver(kv.value) : kv.value,
         });
       })
     );
@@ -88,9 +90,9 @@ export class TimeSeries<T> {
     return new Promise((resolve, reject) =>
       this.store
         .createKeyStream(this.queryAll)
-        .on('data', key => this.store.del(key))
-        .on('end', () => resolve({}))
-        .on('error', reject)
+        .on("data", key => this.store.del(key))
+        .on("end", () => resolve({}))
+        .on("error", reject)
     );
   }
 
@@ -99,6 +101,6 @@ export class TimeSeries<T> {
   }
 
   private dateToTimestamp(date: Date): string {
-    return _.padStart(String(date.valueOf()), 13, '0');
+    return _.padStart(String(date.valueOf()), 13, "0");
   }
 }

@@ -1,6 +1,8 @@
-import { socket } from 'zeromq';
-import { EventEmitter } from 'events';
-import { parseBuffer } from './util';
+import type { EventEmitter } from "events";
+
+import { socket } from "zeromq";
+
+import { parseBuffer } from "./util";
 
 interface SubSocket extends EventEmitter {
   connect: (url: string) => void;
@@ -11,17 +13,17 @@ interface SubSocket extends EventEmitter {
 }
 
 export default class ZmqSubscriber {
-  private socket: SubSocket;
+  private readonly socket: SubSocket;
 
   constructor(private readonly url: string) {
-    this.socket = socket('sub');
+    this.socket = socket("sub");
     this.socket.connect(this.url);
   }
 
   subscribe<T>(topic: string, handler: (message: T | undefined) => void) {
     this.socket.subscribe(topic);
-    this.socket.on('message', (topicBuffer: Buffer, messageBuffer: Buffer) => {
-      if (topicBuffer.toString() !== topic) {
+    this.socket.on("message", (topicBuffer: Buffer, messageBuffer: Buffer) => {
+      if(topicBuffer.toString() !== topic){
         return;
       }
       const message = parseBuffer<T>(messageBuffer);

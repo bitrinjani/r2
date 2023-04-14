@@ -1,20 +1,23 @@
-import { OnSingleLegConfig, ReverseOption, ProceedOption, OrderSide, OrderType, OrderPair, ConfigStore } from './types';
-import { LOT_MIN_DECIMAL_PLACE } from './constants';
-import OrderImpl from './orderImpl';
-import * as _ from 'lodash';
-import { getLogger } from '@bitr/logger';
-import t from './i18n';
-import { delay, splitSymbol } from './util';
-import BrokerAdapterRouter from './brokerAdapterRouter';
-import { injectable, inject } from 'inversify';
-import symbols from './symbols';
-import * as OrderUtil from './orderUtil';
+import type { OnSingleLegConfig, ReverseOption, ProceedOption, OrderPair } from "./types";
+
+import { getLogger } from "@bitr/logger";
+import { injectable, inject } from "inversify";
+import * as _ from "lodash";
+
+import BrokerAdapterRouter from "./brokerAdapterRouter";
+import { LOT_MIN_DECIMAL_PLACE } from "./constants";
+import t from "./i18n";
+import OrderImpl from "./orderImpl";
+import * as OrderUtil from "./orderUtil";
+import symbols from "./symbols";
+import { OrderSide, OrderType, ConfigStore } from "./types";
+import { delay, splitSymbol } from "./util";
 
 @injectable()
 export default class SingleLegHandler {
   private readonly log = getLogger(this.constructor.name);
   private readonly onSingleLegConfig: OnSingleLegConfig;
-  private symbol: string;
+  private readonly symbol: string;
 
   constructor(
     private readonly brokerAdapterRouter: BrokerAdapterRouter,
@@ -25,21 +28,21 @@ export default class SingleLegHandler {
   }
 
   async handle(orders: OrderPair, closable: boolean): Promise<OrderImpl[]> {
-    if (this.onSingleLegConfig === undefined) {
+    if(this.onSingleLegConfig === undefined){
       return [];
     }
     const action = closable ? this.onSingleLegConfig.actionOnExit : this.onSingleLegConfig.action;
-    if (action === undefined || action === 'Cancel') {
+    if(action === undefined || action === "Cancel"){
       return [];
     }
     const { options } = this.onSingleLegConfig;
-    switch (action) {
-      case 'Reverse':
-        return await this.reverseLeg(orders, options as ReverseOption);
-      case 'Proceed':
-        return await this.proceedLeg(orders, options as ProceedOption);
+    switch(action){
+      case "Reverse":
+        return this.reverseLeg(orders, options as ReverseOption);
+      case "Proceed":
+        return this.proceedLeg(orders, options as ProceedOption);
       default:
-        throw new Error('Invalid action.');
+        throw new Error("Invalid action.");
     }
   }
 
@@ -59,7 +62,7 @@ export default class SingleLegHandler {
       price,
       cashMarginType: largeLeg.cashMarginType,
       type: OrderType.Limit,
-      leverageLevel: largeLeg.leverageLevel
+      leverageLevel: largeLeg.leverageLevel,
     });
     await this.sendOrderWithTtl(reversalOrder, options.ttl);
     return [reversalOrder];
@@ -81,25 +84,25 @@ export default class SingleLegHandler {
       price,
       cashMarginType: smallLeg.cashMarginType,
       type: OrderType.Limit,
-      leverageLevel: smallLeg.leverageLevel
+      leverageLevel: smallLeg.leverageLevel,
     });
     await this.sendOrderWithTtl(proceedOrder, options.ttl);
     return [proceedOrder];
   }
 
   private async sendOrderWithTtl(order: OrderImpl, ttl: number) {
-    try {
+    try{
       this.log.info(t`SendingOrderTtl`, ttl);
       await this.brokerAdapterRouter.send(order);
       await delay(ttl);
       await this.brokerAdapterRouter.refresh(order);
-      if (order.filled) {
+      if(order.filled){
         this.log.info(`${OrderUtil.toExecSummary(order)}`);
-      } else {
+      }else{
         this.log.info(t`NotFilledTtl`, ttl);
         await this.brokerAdapterRouter.cancel(order);
       }
-    } catch (ex) {
+    } catch(ex){
       this.log.warn(ex.message);
     }
   }

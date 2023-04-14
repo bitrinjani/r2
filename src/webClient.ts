@@ -1,9 +1,11 @@
-import fetch, { RequestInit as FetchRequestInit } from 'node-fetch';
-import { getLogger } from '@bitr/logger';
+import type { RequestInit as FetchRequestInit } from "node-fetch";
+
+import { getLogger } from "@bitr/logger";
+import fetch from "node-fetch";
 
 export default class WebClient {
   static fetchTimeout = 5000;
-  private readonly log = getLogger('WebClient');
+  private readonly log = getLogger("WebClient");
 
   constructor(public readonly baseUrl: string) {}
 
@@ -18,15 +20,15 @@ export default class WebClient {
     let logText = `Response from ${res.url}. ` + `Status Code: ${res.status} (${res.statusText}) `;
     this.log.debug(logText);
     const content = await res.text();
-    if (!res.ok) {
+    if(!res.ok){
       logText += `Content: ${content}`;
       throw new Error(`HTTP request failed. ${logText}`);
     }
-    if (!content) {
+    if(!content){
       return {} as T;
     }
     const t = JSON.parse(content) as T;
-    if (verbose) {
+    if(verbose){
       this.log.debug(`Response content from ${res.url}: ${JSON.stringify(t)}`);
     }
     return t;

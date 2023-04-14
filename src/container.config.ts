@@ -1,27 +1,30 @@
-import { Container, decorate, injectable } from 'inversify';
-import symbols from './symbols';
-import Arbitrager from './arbitrager';
-import { ConfigStore, ActivePairStore, SpreadStatTimeSeries, HistoricalOrderStore } from './types';
-import JsonConfigStore from './jsonConfigStore';
-import QuoteAggregator from './quoteAggregator';
-import PositionService from './positionService';
-import BrokerAdapterRouter from './brokerAdapterRouter';
-import SpreadAnalyzer from './spreadAnalyzer';
-import ConfigValidator from './configValidator';
-import LimitCheckerFactory from './limitCheckerFactory';
-import { getActivePairStore } from './activePairLevelStore';
-import { getChronoDB } from './chrono';
-import OppotunitySearcher from './opportunitySearcher';
-import PairTrader from './pairTrader';
-import SingleLegHandler from './singleLegHandler';
-import { EventEmitter } from 'events';
-import { getSpreadStatTimeSeries } from './spreadStatTimeSeries';
-import ReportService from './reportService';
-import BrokerStabilityTracker from './brokerStabilityTracker';
-import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
-import WebGateway from './webGateway';
-import { getHistoricalOrderStore } from './historicalOrderStore';
-import OrderService from './orderService';
+import type { ConfigStore, ActivePairStore, SpreadStatTimeSeries, HistoricalOrderStore } from "./types";
+
+import { EventEmitter } from "events";
+
+import { AwaitableEventEmitter } from "@bitr/awaitable-event-emitter";
+import { Container, decorate, injectable } from "inversify";
+
+import { getActivePairStore } from "./activePairLevelStore";
+import Arbitrager from "./arbitrager";
+import BrokerAdapterRouter from "./brokerAdapterRouter";
+import BrokerStabilityTracker from "./brokerStabilityTracker";
+import { getChronoDB } from "./chrono";
+import ConfigValidator from "./configValidator";
+import { getHistoricalOrderStore } from "./historicalOrderStore";
+import JsonConfigStore from "./jsonConfigStore";
+import LimitCheckerFactory from "./limitCheckerFactory";
+import OppotunitySearcher from "./opportunitySearcher";
+import OrderService from "./orderService";
+import PairTrader from "./pairTrader";
+import PositionService from "./positionService";
+import QuoteAggregator from "./quoteAggregator";
+import ReportService from "./reportService";
+import SingleLegHandler from "./singleLegHandler";
+import SpreadAnalyzer from "./spreadAnalyzer";
+import { getSpreadStatTimeSeries } from "./spreadStatTimeSeries";
+import symbols from "./symbols";
+import WebGateway from "./webGateway";
 
 decorate(injectable(), EventEmitter);
 decorate(injectable(), AwaitableEventEmitter);

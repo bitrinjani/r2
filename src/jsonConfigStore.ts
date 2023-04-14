@@ -1,15 +1,20 @@
-import { injectable } from 'inversify';
-import { ConfigStore, ConfigRoot } from './types';
-import { getConfigRoot, getConfigPath } from './configUtil';
-import ConfigValidator from './configValidator';
-import { setTimeout } from 'timers';
-import { configStoreSocketUrl } from './constants';
-import * as _ from 'lodash';
-import * as fs from 'fs';
-import { promisify } from 'util';
-import { getLogger } from '@bitr/logger';
-import { ConfigRequest, ConfigResponse, ConfigResponder } from './messages';
-import { EventEmitter } from 'events';
+import type { ConfigRequest, ConfigResponse } from "./messages";
+import type { ConfigStore, ConfigRoot } from "./types";
+
+import { EventEmitter } from "events";
+import * as fs from "fs";
+import { setTimeout } from "timers";
+import { promisify } from "util";
+
+import { getLogger } from "@bitr/logger";
+import { injectable } from "inversify";
+import * as _ from "lodash";
+
+import { getConfigRoot, getConfigPath } from "./configUtil";
+import ConfigValidator from "./configValidator";
+import { configStoreSocketUrl } from "./constants";
+import { ConfigResponder } from "./messages";
+
 
 const writeFile = promisify(fs.writeFile);
 
@@ -29,7 +34,7 @@ export default class JsonConfigStore extends EventEmitter implements ConfigStore
   }
 
   get config(): ConfigRoot {
-    if (this.cache) {
+    if(this.cache){
       return this.cache;
     }
     const config = getConfigRoot();
@@ -49,30 +54,30 @@ export default class JsonConfigStore extends EventEmitter implements ConfigStore
   }
 
   private async requestHandler(request: ConfigRequest | undefined, respond: (response: ConfigResponse) => void) {
-    if (request === undefined) {
-      this.log.debug('Invalid message received.');
-      respond({ success: false, reason: 'invalid message' });
+    if(request === undefined){
+      this.log.debug("Invalid message received.");
+      respond({ success: false, reason: "invalid message" });
       return;
     }
-    switch (request.type) {
-      case 'set':
-        try {
+    switch(request.type){
+      case "set":
+        try{
           const newConfig = request.data;
           await this.set(_.merge({}, getConfigRoot(), newConfig));
           respond({ success: true });
           this.log.debug(`Config updated with ${JSON.stringify(newConfig)}`);
-        } catch (ex) {
-          respond({ success: false, reason: 'invalid config' });
+        } catch(ex){
+          respond({ success: false, reason: "invalid config" });
           this.log.warn(`Failed to update config. Error: ${ex.message}`);
           this.log.debug(ex.stack);
         }
         break;
-      case 'get':
+      case "get":
         respond({ success: true, data: getConfigRoot() });
         break;
       default:
         this.log.warn(`ConfigStore received an invalid message. Message: ${request}`);
-        respond({ success: false, reason: 'invalid message type' });
+        respond({ success: false, reason: "invalid message type" });
         break;
     }
   }
@@ -80,7 +85,7 @@ export default class JsonConfigStore extends EventEmitter implements ConfigStore
   private updateCache(config: ConfigRoot) {
     this.cache = config;
     clearTimeout(this.timer);
-    this.timer = setTimeout(() => (this.cache = undefined), this.TTL);
-    this.emit('configUpdated', config);
+    this.timer = setTimeout(() => this.cache = undefined, this.TTL);
+    this.emit("configUpdated", config);
   }
 } /* istanbul ignore next */

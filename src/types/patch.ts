@@ -1,4 +1,4 @@
-import { Socket } from 'zeromq';
+import type { Socket } from "zeromq";
 
 // patch for @types/zeromq
 export interface ZmqSocket extends Socket {

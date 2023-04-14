@@ -1,22 +1,27 @@
-﻿import {
+import type { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from "./types";
+import type {
   BrokerAdapter,
-  OrderStatus,
-  OrderType,
-  OrderSide,
-  CashMarginType,
-  QuoteSide,
   Order,
   Execution,
   Quote,
   BrokerConfigType
-} from '../types';
-import BrokerApi from './BrokerApi';
-import * as _ from 'lodash';
-import { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from './types';
-import { toExecution, toQuote } from '../util';
-import Decimal from 'decimal.js';
-import CashStrategy from './CashStrategy';
-import NetOutStrategy from './NetOutStrategy';
+} from "../types";
+
+
+import Decimal from "decimal.js";
+import * as _ from "lodash";
+
+import BrokerApi from "./BrokerApi";
+import CashStrategy from "./CashStrategy";
+import NetOutStrategy from "./NetOutStrategy";
+import {
+  OrderStatus,
+  OrderType,
+  OrderSide,
+  CashMarginType,
+  QuoteSide
+} from "../types";
+import { toExecution, toQuote } from "../util";
 
 function timestampToDate(n: number): Date {
   return new Date(n * 1000);
@@ -24,19 +29,19 @@ function timestampToDate(n: number): Date {
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
-  readonly broker = 'Quoine';
+  readonly broker = "Quoine";
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
       [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
-      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)]
+      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)],
     ]);
   }
 
   async send(order: Order): Promise<void> {
-    if (order.broker !== this.broker) {
+    if(order.broker !== this.broker){
       throw new Error();
     }
     const request = this.mapOrderToSendOrderRequest(order);
@@ -60,10 +65,10 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
 
   async getBtcPosition(): Promise<number> {
     const strategy = this.strategyMap.get(this.config.cashMarginType);
-    if (strategy === undefined) {
+    if(strategy === undefined){
       throw new Error(`Unable to find a strategy for ${this.config.cashMarginType}.`);
     }
-    return await strategy.getBtcPosition();
+    return strategy.getBtcPosition();
   }
 
   async fetchQuotes(): Promise<Quote[]> {
@@ -73,42 +78,42 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
 
   private mapOrderToSendOrderRequest(order: Order): SendOrderRequest {
     let productId: string;
-    switch (order.symbol) {
-      case 'BTC/JPY':
-        productId = '5';
+    switch(order.symbol){
+      case "BTC/JPY":
+        productId = "5";
         break;
       default:
-        throw new Error('Not implemented.');
+        throw new Error("Not implemented.");
     }
 
     let orderType: string;
-    let price: number = 0;
-    switch (order.type) {
+    let price = 0;
+    switch(order.type){
       case OrderType.Limit:
-        orderType = 'limit';
+        orderType = "limit";
         price = order.price;
         break;
       case OrderType.Market:
-        orderType = 'market';
+        orderType = "market";
         price = 0;
         break;
       default:
-        throw new Error('Not implemented.');
+        throw new Error("Not implemented.");
     }
 
     let orderDirection: string | undefined;
     let leverageLevel: number | undefined;
-    switch (order.cashMarginType) {
+    switch(order.cashMarginType){
       case CashMarginType.Cash:
         orderDirection = undefined;
         leverageLevel = undefined;
         break;
       case CashMarginType.NetOut:
-        orderDirection = 'netout';
+        orderDirection = "netout";
         leverageLevel = order.leverageLevel;
         break;
       default:
-        throw new Error('Not implemented.');
+        throw new Error("Not implemented.");
     }
 
     return {
@@ -119,8 +124,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
         order_type: orderType,
         side: OrderSide[order.side].toLowerCase(),
         quantity: order.size,
-        leverage_level: leverageLevel
-      }
+        leverage_level: leverageLevel,
+      },
     };
   }
 
@@ -128,9 +133,9 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     order.brokerOrderId = ordersResponse.id.toString();
     order.filledSize = Number(ordersResponse.filled_quantity);
     order.creationTime = timestampToDate(ordersResponse.created_at);
-    if (new Decimal(order.filledSize).eq(order.size)) {
+    if(new Decimal(order.filledSize).eq(order.size)){
       order.status = OrderStatus.Filled;
-    } else if (order.filledSize > 0) {
+    }else if(order.filledSize > 0){
       order.status = OrderStatus.PartiallyFilled;
     }
     order.executions = _.map(ordersResponse.executions, x => {

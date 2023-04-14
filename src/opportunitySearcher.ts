@@ -1,27 +1,32 @@
-import { getLogger } from '@bitr/logger';
-import { injectable, inject } from 'inversify';
-import * as _ from 'lodash';
-import {
-  ConfigStore,
+import type OrderImpl from "./orderImpl";
+import type {
   SpreadAnalysisResult,
-  ActivePairStore,
   Quote,
   OrderPair,
-  OrderSide,
   PairWithSummary,
   PairSummary
-} from './types';
-import t from './i18n';
-import { padEnd, formatQuote } from './util';
-import symbols from './symbols';
-import PositionService from './positionService';
-import SpreadAnalyzer from './spreadAnalyzer';
-import LimitCheckerFactory from './limitCheckerFactory';
-import { EventEmitter } from 'events';
-import { calcProfit } from './pnl';
-import OrderImpl from './orderImpl';
-import { LOT_MIN_DECIMAL_PLACE } from './constants';
-import * as OrderUtil from './orderUtil';
+} from "./types";
+
+import { EventEmitter } from "events";
+
+import { getLogger } from "@bitr/logger";
+import { injectable, inject } from "inversify";
+import * as _ from "lodash";
+
+import { LOT_MIN_DECIMAL_PLACE } from "./constants";
+import t from "./i18n";
+import LimitCheckerFactory from "./limitCheckerFactory";
+import * as OrderUtil from "./orderUtil";
+import { calcProfit } from "./pnl";
+import PositionService from "./positionService";
+import SpreadAnalyzer from "./spreadAnalyzer";
+import symbols from "./symbols";
+import {
+  ConfigStore,
+  ActivePairStore,
+  OrderSide
+} from "./types";
+import { padEnd, formatQuote } from "./util";
 
 @injectable()
 export default class OppotunitySearcher extends EventEmitter {
@@ -38,15 +43,15 @@ export default class OppotunitySearcher extends EventEmitter {
   }
 
   set status(value: string) {
-    this.emit('status', value);
+    this.emit("status", value);
   }
 
   async search(
     quotes: Quote[]
-  ): Promise<{ found: false } | { found: true; spreadAnalysisResult: SpreadAnalysisResult; closable: boolean }> {
+  ): Promise<{ found: false } | { found: true, spreadAnalysisResult: SpreadAnalysisResult, closable: boolean }> {
     this.log.info(t`LookingForOpportunity`);
     const { closable, key: closablePairKey, exitAnalysisResult } = await this.findClosable(quotes);
-    if (closable) {
+    if(closable){
       this.log.info(t`FoundClosableOrders`);
       const spreadAnalysisResult = exitAnalysisResult as SpreadAnalysisResult;
       this.log.debug(`Deleting key ${closablePairKey}.`);
@@ -54,22 +59,22 @@ export default class OppotunitySearcher extends EventEmitter {
       return { found: true, spreadAnalysisResult, closable };
     }
 
-    try {
+    try{
       const spreadAnalysisResult = await this.spreadAnalyzer.analyze(quotes, this.positionService.positionMap);
       this.printSpreadAnalysisResult(spreadAnalysisResult);
-      this.emit('spreadAnalysisDone', spreadAnalysisResult);
+      this.emit("spreadAnalysisDone", spreadAnalysisResult);
       const limitCheckResult = this.limitCheckerFactory.create(spreadAnalysisResult).check();
-      if (!limitCheckResult.success) {
+      if(!limitCheckResult.success){
         this.status = limitCheckResult.reason;
         this.log.info(limitCheckResult.message);
-        this.emit('limitCheckDone', limitCheckResult);
+        this.emit("limitCheckDone", limitCheckResult);
         return { found: false };
       }
       this.log.info(t`FoundArbitrageOppotunity`);
-      this.emit('limitCheckDone', { ...limitCheckResult, message: t`FoundArbitrageOppotunity` });
+      this.emit("limitCheckDone", { ...limitCheckResult, message: t`FoundArbitrageOppotunity` });
       return { found: true, spreadAnalysisResult, closable };
-    } catch (ex) {
-      this.status = 'Spread analysis failed';
+    } catch(ex){
+      this.status = "Spread analysis failed";
       this.log.warn(t`FailedToGetASpreadAnalysisResult`, ex.message);
       this.log.debug(ex.stack);
       return { found: false };
@@ -78,38 +83,38 @@ export default class OppotunitySearcher extends EventEmitter {
 
   private async findClosable(
     quotes: Quote[]
-  ): Promise<{ closable: boolean; key?: string; exitAnalysisResult?: SpreadAnalysisResult }> {
+  ): Promise<{ closable: boolean, key?: string, exitAnalysisResult?: SpreadAnalysisResult }> {
     const { minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio } = this.configStore.config;
-    if ([minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio].every(_.isUndefined)) {
+    if([minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio].every(_.isUndefined)){
       return { closable: false };
     }
     const activePairsMap = await this.activePairStore.getAll();
-    if (activePairsMap.length > 0) {
+    if(activePairsMap.length > 0){
       this.log.info({ hidden: true }, t`OpenPairs`);
       const pairsWithSummary = await Promise.all(
         activePairsMap.map(async (kv): Promise<PairWithSummary> => {
           const { key, value: pair } = kv;
-          try {
+          try{
             const exitAnalysisResult = await this.spreadAnalyzer.analyze(
               quotes,
               this.positionService.positionMap,
               pair
             );
             return { key, pair, pairSummary: this.getPairSummary(pair, exitAnalysisResult), exitAnalysisResult };
-          } catch (ex) {
+          } catch(ex){
             this.log.debug(ex.message);
             return { key, pair, pairSummary: this.getPairSummary(pair) };
           }
         })
       );
-      this.emit('activePairRefresh', pairsWithSummary);
+      this.emit("activePairRefresh", pairsWithSummary);
       pairsWithSummary.forEach(x => this.log.info({ hidden: true }, this.formatPairSummary(x.pair, x.pairSummary)));
-      for (const pairWithSummary of pairsWithSummary.filter(x => x.exitAnalysisResult !== undefined)) {
+      for(const pairWithSummary of pairsWithSummary.filter(x => x.exitAnalysisResult !== undefined)){
         const limitChecker = this.limitCheckerFactory.create(
           pairWithSummary.exitAnalysisResult as SpreadAnalysisResult,
           pairWithSummary.pair
         );
-        if (limitChecker.check().success) {
+        if(limitChecker.check().success){
           return { closable: true, key: pairWithSummary.key, exitAnalysisResult: pairWithSummary.exitAnalysisResult };
         }
       }
@@ -126,7 +131,7 @@ export default class OppotunitySearcher extends EventEmitter {
     let currentExitCost;
     let currentExitCostRatio;
     let currentExitNetProfitRatio;
-    if (exitAnalysisResult) {
+    if(exitAnalysisResult){
       currentExitCost = -exitAnalysisResult.targetProfit;
       currentExitCostRatio = _.round(currentExitCost / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
       currentExitNetProfitRatio = _.round(
@@ -139,35 +144,35 @@ export default class OppotunitySearcher extends EventEmitter {
       entryProfitRatio,
       currentExitCost,
       currentExitCostRatio,
-      currentExitNetProfitRatio
+      currentExitNetProfitRatio,
     };
   }
 
   private formatPairSummary(pair: OrderPair, pairSummary: PairSummary) {
     const { entryProfit, entryProfitRatio, currentExitCost } = pairSummary;
     const entryProfitString = `Entry PL: ${_.round(entryProfit)} JPY (${entryProfitRatio}%)`;
-    if (currentExitCost) {
+    if(currentExitCost){
       const currentExitCostText = `Current exit cost: ${_.round(currentExitCost)} JPY`;
       return `[${[
         OrderUtil.toShortString(pair[0]),
         OrderUtil.toShortString(pair[1]),
         entryProfitString,
-        currentExitCostText
-      ].join(', ')}]`;
+        currentExitCostText,
+      ].join(", ")}]`;
     }
-    return `[${[OrderUtil.toShortString(pair[0]), OrderUtil.toShortString(pair[1]), entryProfitString].join(', ')}]`;
+    return `[${[OrderUtil.toShortString(pair[0]), OrderUtil.toShortString(pair[1]), entryProfitString].join(", ")}]`;
   }
 
   private printSpreadAnalysisResult(result: SpreadAnalysisResult) {
     const columnWidth = 17;
-    this.log.info({ hidden: true }, '%s: %s', padEnd(t`BestAsk`, columnWidth), formatQuote(result.ask));
-    this.log.info({ hidden: true }, '%s: %s', padEnd(t`BestBid`, columnWidth), formatQuote(result.bid));
-    this.log.info({ hidden: true }, '%s: %s', padEnd(t`Spread`, columnWidth), -result.invertedSpread);
-    this.log.info({ hidden: true }, '%s: %s', padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
-    this.log.info({ hidden: true }, '%s: %s', padEnd(t`TargetVolume`, columnWidth), result.targetVolume);
+    this.log.info({ hidden: true }, "%s: %s", padEnd(t`BestAsk`, columnWidth), formatQuote(result.ask));
+    this.log.info({ hidden: true }, "%s: %s", padEnd(t`BestBid`, columnWidth), formatQuote(result.bid));
+    this.log.info({ hidden: true }, "%s: %s", padEnd(t`Spread`, columnWidth), -result.invertedSpread);
+    this.log.info({ hidden: true }, "%s: %s", padEnd(t`AvailableVolume`, columnWidth), result.availableVolume);
+    this.log.info({ hidden: true }, "%s: %s", padEnd(t`TargetVolume`, columnWidth), result.targetVolume);
     this.log.info(
       { hidden: true },
-      '%s: %s (%s%%)',
+      "%s: %s (%s%%)",
       padEnd(t`ExpectedProfit`, columnWidth),
       result.targetProfit,
       result.profitPercentAgainstNotional

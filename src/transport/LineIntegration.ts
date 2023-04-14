@@ -1,10 +1,14 @@
-import fetch, { RequestInit as FetchRequestInit } from 'node-fetch';
-import { LineConfig } from '../types';
-import * as querystring from 'querystring';
+import type { LineConfig } from "../types";
+import type { RequestInit as FetchRequestInit } from "node-fetch";
+
+import * as querystring from "querystring";
+
+import fetch from "node-fetch";
+
 
 export default class LineIntegration {
   static fetchTimeout = 5000;
-  static apiUrl = 'https://notify-api.line.me/api/notify';
+  static apiUrl = "https://notify-api.line.me/api/notify";
 
   constructor(private readonly config: LineConfig) {
     this.config = config;
@@ -12,32 +16,32 @@ export default class LineIntegration {
 
   handler(message: string): void {
     const keywords = this.config.keywords;
-    if (!(keywords instanceof Array)) {
+    if(!(keywords instanceof Array)){
       return;
     }
-    if (!keywords.some(x => message.includes(x))) {
+    if(!keywords.some(x => message.includes(x))){
       return;
     }
     const payload = {
-      message
+      message,
     };
     const body = querystring.stringify(payload);
     const init: FetchRequestInit = {
       body,
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${this.config.token}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': body.length.toString()
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": body.length.toString(),
       },
-      timeout: LineIntegration.fetchTimeout
+      timeout: LineIntegration.fetchTimeout,
     };
     fetch(LineIntegration.apiUrl, init)
       .then(res => {
-        if (!res.ok) {
+        if(!res.ok){
           res
             .text()
-            .catch(e => typeof e === 'object' && 'message' in e ? e.message : Object.prototype.toString.call(e))
+            .catch(e => typeof e === "object" && "message" in e ? e.message : Object.prototype.toString.call(e))
             .then(s => console.log(`LINE notify failed. ${res.statusText}: ${s}`))
             .catch(() => { /* empty */});
         }

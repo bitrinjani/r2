@@ -1,7 +1,7 @@
 export function parseBuffer<T>(buffer: Buffer): T | undefined {
-  try {
+  try{
     return JSON.parse(buffer.toString());
-  } catch (ex) {
+  } catch(ex){
     return undefined;
   }
 }

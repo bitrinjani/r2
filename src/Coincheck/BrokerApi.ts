@@ -1,80 +1,84 @@
-import * as _ from 'lodash';
-import { hmac, nonce, safeQueryStringStringify } from '../util';
-import WebClient from '../webClient';
+import type {
+  LeveragePositionsRequest,
+  LeveragePosition,
+  NewOrderRequest,
+  Pagination,
+  Transaction } from "./types";
+
+import { setTimeout } from "timers";
+
+import * as _ from "lodash";
+
 import {
   AccountsBalanceResponse,
-  LeveragePositionsRequest,
   LeveragePositionsResponse,
-  LeveragePosition,
   OrderBooksResponse,
-  NewOrderRequest,
   NewOrderResponse,
   CancelOrderResponse,
   OpenOrdersResponse,
   TransactionsResponse,
-  Pagination,
-  Transaction,
   LeverageBalanceResponse
-} from './types';
-import { setTimeout } from 'timers';
+} from "./types";
+import { hmac, nonce, safeQueryStringStringify } from "../util";
+import WebClient from "../webClient";
 
 export default class BrokerApi {
-  private static CACHE_MS = 1000;
+  private static readonly CACHE_MS = 1000;
   private leveragePositionsCache?: LeveragePosition[];
-  private readonly baseUrl = 'https://coincheck.com';
+  private readonly baseUrl = "https://coincheck.com";
   private readonly webClient: WebClient = new WebClient(this.baseUrl);
 
   constructor(private readonly key: string, private readonly secret: string) {}
 
   async getAccountsBalance(): Promise<AccountsBalanceResponse> {
-    const path = '/api/accounts/balance';
+    const path = "/api/accounts/balance";
     return new AccountsBalanceResponse(await this.get<AccountsBalanceResponse>(path));
   }
 
   async getLeverageBalance(): Promise<LeverageBalanceResponse> {
-    const path = '/api/accounts/leverage_balance';
+    const path = "/api/accounts/leverage_balance";
     return new LeverageBalanceResponse(await this.get<LeverageBalanceResponse>(path));
   }
 
   async getOpenOrders(): Promise<OpenOrdersResponse> {
-    const path = '/api/exchange/orders/opens';
+    const path = "/api/exchange/orders/opens";
     return new OpenOrdersResponse(await this.get<OpenOrdersResponse>(path));
   }
 
   async getLeveragePositions(request?: LeveragePositionsRequest): Promise<LeveragePositionsResponse> {
-    const path = '/api/exchange/leverage/positions';
+    const path = "/api/exchange/leverage/positions";
     return new LeveragePositionsResponse(
       await this.get<LeveragePositionsResponse, LeveragePositionsRequest>(path, request)
     );
   }
 
   async getAllOpenLeveragePositions(limit: number = 20): Promise<LeveragePosition[]> {
-    if (this.leveragePositionsCache) {
+    if(this.leveragePositionsCache){
       return _.cloneDeep(this.leveragePositionsCache);
     }
     let result: LeveragePosition[] = [];
-    const request: LeveragePositionsRequest = { limit, status: 'open', order: 'desc' };
+    const request: LeveragePositionsRequest = { limit, status: "open", order: "desc" };
     let reply = await this.getLeveragePositions(request);
-    while (reply.data !== undefined && reply.data.length > 0) {
+    while(reply.data !== undefined && reply.data.length > 0){
       result = _.concat(result, reply.data);
-      if (reply.data.length < limit) {
+      if(reply.data.length < limit){
         break;
       }
       const last = _.last(reply.data) as LeveragePosition;
       reply = await this.getLeveragePositions({ ...request, starting_after: last.id });
     }
     this.leveragePositionsCache = result;
-    setTimeout(() => (this.leveragePositionsCache = undefined), BrokerApi.CACHE_MS);
+    setTimeout(() => this.leveragePositionsCache = undefined, BrokerApi.CACHE_MS);
     return result;
   }
 
   async getOrderBooks(): Promise<OrderBooksResponse> {
-    const path = '/api/order_books';
+    const path = "/api/order_books";
     return new OrderBooksResponse(await this.webClient.fetch<OrderBooksResponse>(path, undefined, false));
   }
 
   async newOrder(request: NewOrderRequest): Promise<NewOrderResponse> {
-    const path = '/api/exchange/orders';
+    const path = "/api/exchange/orders";
     return new NewOrderResponse(await this.post<NewOrderResponse, NewOrderRequest>(path, request));
   }
 
@@ -84,18 +88,18 @@ export default class BrokerApi {
   }
 
   async getTransactions(pagination: Partial<Pagination>): Promise<TransactionsResponse> {
-    const path = '/api/exchange/orders/transactions_pagination';
+    const path = "/api/exchange/orders/transactions_pagination";
     return new TransactionsResponse(await this.get<TransactionsResponse, Partial<Pagination>>(path, pagination));
   }
 
   async getTransactionsWithStartDate(from: Date): Promise<Transaction[]> {
     let transactions: Transaction[] = [];
-    const pagination = { order: 'desc', limit: 20 } as Partial<Pagination>;
+    const pagination = { order: "desc", limit: 20 } as Partial<Pagination>;
     let res: TransactionsResponse = await this.getTransactions(pagination);
-    while (res.data.length > 0) {
+    while(res.data.length > 0){
       const last = _.last(res.data) as Transaction;
       transactions = _.concat(transactions, res.data.filter(x => from < x.created_at));
-      if (from > last.created_at || res.pagination.limit > res.data.length) {
+      if(from > last.created_at || res.pagination.limit > res.data.length){
         break;
       }
       const lastId = last.id;
@@ -104,33 +108,33 @@ export default class BrokerApi {
     return transactions;
   }
 
-  private call<R>(path: string, method: string, body: string = ''): Promise<R> {
+  private call<R>(path: string, method: string, body: string = ""): Promise<R> {
     const n = nonce();
     const url = this.baseUrl + path;
     const message = n + url + body;
     const sign = hmac(this.secret, message);
     const headers = {
-      'ACCESS-KEY': this.key,
-      'ACCESS-NONCE': n,
-      'ACCESS-SIGNATURE': sign
+      "ACCESS-KEY": this.key,
+      "ACCESS-NONCE": n,
+      "ACCESS-SIGNATURE": sign,
     };
-    if (method === 'POST') {
-      headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    if(method === "POST"){
+      headers["Content-Type"] = "application/x-www-form-urlencoded";
     }
     const init = { method, headers, body };
     return this.webClient.fetch<R>(path, init);
   }
 
   private post<R, T>(path: string, requestBody: T): Promise<R> {
-    const method = 'POST';
+    const method = "POST";
     const body = safeQueryStringStringify(requestBody);
     return this.call<R>(path, method, body);
   }
 
   private get<R, T = never>(path: string, requestParam?: T): Promise<R> {
-    const method = 'GET';
+    const method = "GET";
     let pathWithParam = path;
-    if (requestParam) {
+    if(requestParam){
       const param = safeQueryStringStringify(requestParam);
       pathWithParam += `?${param}`;
     }
@@ -138,7 +142,7 @@ export default class BrokerApi {
   }
 
   private delete<R>(path: string): Promise<R> {
-    const method = 'DELETE';
+    const method = "DELETE";
     return this.call<R>(path, method);
   }
 }

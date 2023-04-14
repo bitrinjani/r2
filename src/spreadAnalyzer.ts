@@ -1,24 +1,29 @@
-﻿import { injectable, inject } from 'inversify';
-import {
-  ConfigStore,
-  QuoteSide,
+import type OrderImpl from "./orderImpl";
+import type {
   SpreadAnalysisResult,
   BrokerMap,
-  OrderSide,
   Quote,
   BrokerPosition,
   OrderPair,
   SpreadStat
-} from './types';
-import { getLogger } from '@bitr/logger';
-import * as _ from 'lodash';
-import t from './i18n';
-import symbols from './symbols';
-import Decimal from 'decimal.js';
-import { findBrokerConfig } from './configUtil';
-import { LOT_MIN_DECIMAL_PLACE } from './constants';
-import OrderImpl from './orderImpl';
-import { calcCommission } from './pnl';
+} from "./types";
+
+
+import { getLogger } from "@bitr/logger";
+import Decimal from "decimal.js";
+import { injectable, inject } from "inversify";
+import * as _ from "lodash";
+
+import { findBrokerConfig } from "./configUtil";
+import { LOT_MIN_DECIMAL_PLACE } from "./constants";
+import t from "./i18n";
+import { calcCommission } from "./pnl";
+import symbols from "./symbols";
+import {
+  ConfigStore,
+  QuoteSide,
+  OrderSide
+} from "./types";
 
 @injectable()
 export default class SpreadAnalyzer {
@@ -31,40 +36,40 @@ export default class SpreadAnalyzer {
     positionMap: BrokerMap<BrokerPosition>,
     closingPair?: OrderPair
   ): Promise<SpreadAnalysisResult> {
-    if (closingPair && closingPair[0].size !== closingPair[1].size) {
-      throw new Error('Invalid closing pair.');
+    if(closingPair && closingPair[0].size !== closingPair[1].size){
+      throw new Error("Invalid closing pair.");
     }
 
     const { config } = this.configStore;
-    if (_.isEmpty(positionMap)) {
-      throw new Error('Position map is empty.');
+    if(_.isEmpty(positionMap)){
+      throw new Error("Position map is empty.");
     }
     let filteredQuotes = _(quotes)
       .filter(q => this.isAllowedByCurrentPosition(q, positionMap[q.broker]))
       .filter(q => new Decimal(q.volume).gte(
-        (closingPair ? closingPair[0].size : config.minSize) *
-          _.floor(config.maxTargetVolumePercent !== undefined
+        (closingPair ? closingPair[0].size : config.minSize)
+          * _.floor(config.maxTargetVolumePercent !== undefined
             ? 100 / config.maxTargetVolumePercent
             : 1)))
-      .orderBy(['price'])
+      .orderBy(["price"])
       .value();
-    if (closingPair) {
+    if(closingPair){
       const isOppositeSide = (o: OrderImpl, q: Quote) =>
         q.side === (o.side === OrderSide.Buy ? QuoteSide.Bid : QuoteSide.Ask);
       const isSameBroker = (o: OrderImpl, q: Quote) => o.broker === q.broker;
       filteredQuotes = _(filteredQuotes)
         .filter(
           q =>
-            (isSameBroker(closingPair[0], q) && isOppositeSide(closingPair[0], q)) ||
-            (isSameBroker(closingPair[1], q) && isOppositeSide(closingPair[1], q))
+            (isSameBroker(closingPair[0], q) && isOppositeSide(closingPair[0], q))
+            || (isSameBroker(closingPair[1], q) && isOppositeSide(closingPair[1], q))
         )
         .filter(q => new Decimal(q.volume).gte(closingPair[0].size))
         .value();
     }
     const { ask, bid } = this.getBest(filteredQuotes);
-    if (bid === undefined) {
+    if(bid === undefined){
       throw new Error(t`NoBestBidWasFound`);
-    } else if (ask === undefined) {
+    }else if(ask === undefined){
       throw new Error(t`NoBestAskWasFound`);
     }
 
@@ -74,7 +79,7 @@ export default class SpreadAnalyzer {
     const allowedLongSize = positionMap[ask.broker].allowedLongSize;
     let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]) as number;
     targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
-    if (closingPair) {
+    if(closingPair){
       targetVolume = closingPair[0].size;
     }
     const commission = this.calculateTotalCommission([bid, ask], targetVolume);
@@ -88,7 +93,7 @@ export default class SpreadAnalyzer {
       availableVolume,
       targetVolume,
       targetProfit,
-      profitPercentAgainstNotional
+      profitPercentAgainstNotional,
     };
     this.log.debug(`Analysis done. Result: ${JSON.stringify(spreadAnalysisResult)}`);
     return spreadAnalysisResult;
@@ -98,11 +103,11 @@ export default class SpreadAnalyzer {
     const { config } = this.configStore;
     const filteredQuotes = _(quotes)
       .filter(q => new Decimal(q.volume).gte(config.minSize))
-      .orderBy(['price'])
+      .orderBy(["price"])
       .value();
     const asks = _(filteredQuotes).filter(q => q.side === QuoteSide.Ask);
     const bids = _(filteredQuotes).filter(q => q.side === QuoteSide.Bid);
-    if (asks.isEmpty() || bids.isEmpty()) {
+    if(asks.isEmpty() || bids.isEmpty()){
       return undefined;
     }
     const byBroker = _(filteredQuotes)
@@ -114,19 +119,19 @@ export default class SpreadAnalyzer {
       })
       .value();
     const flattened = _(byBroker)
-      .map((v, k) => [v.ask, v.bid])  
-      .flatten()      
+      .map((v, k) => [v.ask, v.bid])
+      .flatten()
       .filter(q => q !== undefined)
       .value() as Quote[];
-    const { ask: bestAsk, bid: bestBid } = this.getBest(flattened) as { ask: Quote; bid: Quote };
-    const { ask: worstAsk, bid: worstBid } = this.getWorst(flattened) as { ask: Quote; bid: Quote };
+    const { ask: bestAsk, bid: bestBid } = this.getBest(flattened) as { ask: Quote, bid: Quote };
+    const { ask: worstAsk, bid: worstBid } = this.getWorst(flattened) as { ask: Quote, bid: Quote };
     const bestCase = this.getEstimate(bestAsk, bestBid);
     const worstCase = this.getEstimate(worstAsk, worstBid);
     return {
       timestamp: Date.now(),
       byBroker,
       bestCase,
-      worstCase
+      worstCase,
     };
   }
 
@@ -146,12 +151,12 @@ export default class SpreadAnalyzer {
       availableVolume,
       targetVolume,
       targetProfit,
-      profitPercentAgainstNotional
+      profitPercentAgainstNotional,
     };
   }
 
   private getBest(quotes: Quote[]) {
-    const ordered = _.orderBy(quotes, ['price']);
+    const ordered = _.orderBy(quotes, ["price"]);
     const ask = _(ordered)
       .filter(q => q.side === QuoteSide.Ask)
       .first();
@@ -162,7 +167,7 @@ export default class SpreadAnalyzer {
   }
 
   private getWorst(quotes: Quote[]) {
-    const ordered = _.orderBy(quotes, ['price']);
+    const ordered = _.orderBy(quotes, ["price"]);
     const ask = _(ordered)
       .filter(q => q.side === QuoteSide.Ask)
       .last();

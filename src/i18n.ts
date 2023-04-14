@@ -1,27 +1,28 @@
-import * as i18next from 'i18next';
-import { en, ja } from './stringResources';
-import { getConfigRoot } from './configUtil';
+import * as i18next from "i18next";
 
-let lng = 'en';
+import { getConfigRoot } from "./configUtil";
+import { en, ja } from "./stringResources";
 
-try {
+let lng = "en";
+
+try{
   lng = getConfigRoot().language;
-} catch (ex) {
+} catch(ex){
   console.log(ex.message);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 i18next.init({
   lng,
-  fallbackLng: 'en',
+  fallbackLng: "en",
   resources: {
     en: {
-      translation: en
+      translation: en,
     },
     ja: {
-      translation: ja
-    }
-  }
+      translation: ja,
+    },
+  },
 });
 
 export default function translateTaggedTemplate(strings: TemplateStringsArray, ...keys: string[]): string {

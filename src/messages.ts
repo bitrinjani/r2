@@ -1,5 +1,6 @@
-import { ConfigRoot, SpreadStat } from './types';
-import { ZmqResponder, ZmqRequester } from './zmq';
+import type { ConfigRoot, SpreadStat } from "./types";
+
+import { ZmqResponder, ZmqRequester } from "./zmq";
 
 export interface GenericRequest<T> {
   type: string;
@@ -12,12 +13,12 @@ export interface GenericResponse<T> {
   data?: T;
 }
 
-export interface ConfigRequest extends GenericRequest<any> {}
-export interface ConfigResponse extends GenericResponse<ConfigRoot> {}
+export type ConfigRequest = GenericRequest<any>;
+export type ConfigResponse = GenericResponse<ConfigRoot>;
 export class ConfigRequester extends ZmqRequester<ConfigRequest, ConfigResponse> {}
 export class ConfigResponder extends ZmqResponder<ConfigRequest, ConfigResponse> {}
 
-export interface SnapshotRequest extends GenericRequest<never> {}
-export interface SnapshotResponse extends GenericResponse<SpreadStat[]> {}
+export type SnapshotRequest = GenericRequest<never>;
+export type SnapshotResponse = GenericResponse<SpreadStat[]>;
 export class SnapshotRequester extends ZmqRequester<SnapshotRequest, SnapshotResponse> {}
 export class SnapshotResponder extends ZmqResponder<SnapshotRequest, SnapshotResponse> {}

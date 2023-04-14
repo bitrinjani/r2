@@ -1,6 +1,8 @@
-import { socket } from 'zeromq';
-import { parseBuffer } from './util';
-import { EventEmitter } from 'events';
+import type { EventEmitter } from "events";
+
+import { socket } from "zeromq";
+
+import { parseBuffer } from "./util";
 
 interface RepSocket extends EventEmitter {
   bindSync: (url: string) => void;
@@ -10,14 +12,14 @@ interface RepSocket extends EventEmitter {
 }
 
 export default class ZmqResponder<Request, Response> {
-  private responder: RepSocket;
+  private readonly responder: RepSocket;
 
   constructor(
     private readonly url: string,
     private readonly handler: (request: Request | undefined, respond: (response: Response) => void) => void
   ) {
-    this.responder = socket('rep');
-    this.responder.on('message', (message: Buffer) => this.parser(message));
+    this.responder = socket("rep");
+    this.responder.on("message", (message: Buffer) => this.parser(message));
     this.responder.bindSync(this.url);
   }
 

@@ -1,33 +1,38 @@
-﻿import {
+import type { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from "./types";
+import type {
   BrokerAdapter,
+  Order,
+  Execution,
+  Quote,
+  BrokerConfigType
+} from "../types";
+
+
+import { getLogger } from "@bitr/logger";
+import * as _ from "lodash";
+
+import BrokerApi from "./BrokerApi";
+import {
   OrderStatus,
   OrderType,
   TimeInForce,
   OrderSide,
   CashMarginType,
-  QuoteSide,
-  Order,
-  Execution,
-  Quote,
-  BrokerConfigType
-} from '../types';
-import { getLogger } from '@bitr/logger';
-import * as _ from 'lodash';
-import BrokerApi from './BrokerApi';
-import { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from './types';
-import { eRound, toExecution } from '../util';
+  QuoteSide
+} from "../types";
+import { eRound, toExecution } from "../util";
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
-  private readonly log = getLogger('Bitflyer.BrokerAdapter');
-  readonly broker = 'Bitflyer';
+  private readonly log = getLogger("Bitflyer.BrokerAdapter");
+  readonly broker = "Bitflyer";
 
   constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
   }
 
   async send(order: Order): Promise<void> {
-    if (order.broker !== this.broker) {
+    if(order.broker !== this.broker){
       throw new Error();
     }
     const param = this.mapOrderToSendChildOrderRequest(order);
@@ -43,7 +48,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     const request: ChildOrdersParam = { child_order_acceptance_id: orderId };
     const reply = await this.brokerApi.getChildOrders(request);
     const childOrder = reply[0];
-    if (childOrder === undefined) {
+    if(childOrder === undefined){
       const message = `Unable to find ${orderId}. GetOrderState failed.`;
       this.log.warn(message);
       return;
@@ -63,13 +68,13 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   async cancel(order: Order): Promise<void> {
-    let productCode = '';
-    switch (order.symbol) {
-      case 'BTC/JPY':
-        productCode = 'BTC_JPY';
+    let productCode = "";
+    switch(order.symbol){
+      case "BTC/JPY":
+        productCode = "BTC_JPY";
         break;
       default:
-        throw new Error('Not implemented.');
+        throw new Error("Not implemented.");
     }
     const request = { product_code: productCode, child_order_acceptance_id: order.brokerOrderId };
     await this.brokerApi.cancelChildOrder(request);
@@ -79,9 +84,9 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
 
   async getBtcPosition(): Promise<number> {
     const balanceResponse = await this.brokerApi.getBalance();
-    const btcBalance = _.find(balanceResponse, b => b.currency_code === 'BTC');
-    if (!btcBalance) {
-      throw new Error('Btc balance is not found.');
+    const btcBalance = _.find(balanceResponse, b => b.currency_code === "BTC");
+    if(!btcBalance){
+      throw new Error("Btc balance is not found.");
     }
     return btcBalance.amount;
   }
@@ -92,47 +97,47 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   private mapOrderToSendChildOrderRequest(order: Order): SendChildOrderRequest {
-    if (order.cashMarginType !== CashMarginType.Cash) {
-      throw new Error('Not implemented.');
+    if(order.cashMarginType !== CashMarginType.Cash){
+      throw new Error("Not implemented.");
     }
 
-    let productCode = '';
-    switch (order.symbol) {
-      case 'BTC/JPY':
-        productCode = 'BTC_JPY';
+    let productCode = "";
+    switch(order.symbol){
+      case "BTC/JPY":
+        productCode = "BTC_JPY";
         break;
       default:
-        throw new Error('Not implemented.');
+        throw new Error("Not implemented.");
     }
 
     let price = 0;
-    let childOrderType = '';
-    switch (order.type) {
+    let childOrderType = "";
+    switch(order.type){
       case OrderType.Limit:
-        childOrderType = 'LIMIT';
+        childOrderType = "LIMIT";
         price = order.price;
         break;
       case OrderType.Market:
-        childOrderType = 'MARKET';
+        childOrderType = "MARKET";
         price = 0;
         break;
       default:
-        throw new Error('Not implemented.');
+        throw new Error("Not implemented.");
     }
 
     let timeInForce;
-    switch (order.timeInForce) {
+    switch(order.timeInForce){
       case TimeInForce.None:
-        timeInForce = '';
+        timeInForce = "";
         break;
       case TimeInForce.Fok:
-        timeInForce = 'FOK';
+        timeInForce = "FOK";
         break;
       case TimeInForce.Ioc:
-        timeInForce = 'IOC';
+        timeInForce = "IOC";
         break;
       default:
-        throw new Error('Not implemented.');
+        throw new Error("Not implemented.");
     }
 
     return {
@@ -141,19 +146,19 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       child_order_type: childOrderType,
       side: OrderSide[order.side].toUpperCase(),
       size: order.size,
-      time_in_force: timeInForce
+      time_in_force: timeInForce,
     };
   }
 
   private setOrderFields(childOrder: ChildOrder, order: Order): void {
     order.filledSize = eRound(childOrder.executed_size);
-    if (childOrder.child_order_state === 'CANCELED') {
+    if(childOrder.child_order_state === "CANCELED"){
       order.status = OrderStatus.Canceled;
-    } else if (childOrder.child_order_state === 'EXPIRED') {
+    }else if(childOrder.child_order_state === "EXPIRED"){
       order.status = OrderStatus.Expired;
-    } else if (order.filledSize === order.size) {
+    }else if(order.filledSize === order.size){
       order.status = OrderStatus.Filled;
-    } else if (order.filledSize > 0) {
+    }else if(order.filledSize > 0){
       order.status = OrderStatus.PartiallyFilled;
     }
     order.lastUpdated = new Date();

@@ -1,27 +1,31 @@
-﻿import { getLogger } from '@bitr/logger';
-import { addMinutes } from 'date-fns';
-import * as _ from 'lodash';
-import BrokerApi from './BrokerApi';
-import {
+import type { OrderBooksResponse, CashMarginTypeStrategy } from "./types";
+import type {
   Order,
   Execution,
-  CashMarginType,
   BrokerAdapter,
-  QuoteSide,
-  OrderStatus,
   Quote,
   BrokerConfigType
-} from '../types';
-import { OrderBooksResponse, CashMarginTypeStrategy } from './types';
-import { eRound, almostEqual, toExecution, toQuote } from '../util';
-import CashStrategy from './CashStrategy';
-import MarginOpenStrategy from './MarginOpenStrategy';
-import NetOutStrategy from './NetOutStrategy';
+} from "../types";
+
+import { getLogger } from "@bitr/logger";
+import { addMinutes } from "date-fns";
+import * as _ from "lodash";
+
+import BrokerApi from "./BrokerApi";
+import CashStrategy from "./CashStrategy";
+import MarginOpenStrategy from "./MarginOpenStrategy";
+import NetOutStrategy from "./NetOutStrategy";
+import {
+  CashMarginType,
+  QuoteSide,
+  OrderStatus
+} from "../types";
+import { eRound, almostEqual, toExecution, toQuote } from "../util";
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
-  private readonly log = getLogger('Coincheck.BrokerAdapter');
-  readonly broker = 'Coincheck';
+  private readonly log = getLogger("Coincheck.BrokerAdapter");
+  readonly broker = "Coincheck";
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(private readonly config: BrokerConfigType) {
@@ -29,16 +33,16 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
       [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
       [CashMarginType.MarginOpen, new MarginOpenStrategy(this.brokerApi)],
-      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)]
+      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)],
     ]);
   }
 
   async getBtcPosition(): Promise<number> {
     const strategy = this.strategyMap.get(this.config.cashMarginType);
-    if (strategy === undefined) {
+    if(strategy === undefined){
       throw new Error(`Unable to find a strategy for ${this.config.cashMarginType}.`);
     }
-    return await strategy.getBtcPosition();
+    return strategy.getBtcPosition();
   }
 
   async fetchQuotes(): Promise<Quote[]> {
@@ -59,11 +63,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   async send(order: Order): Promise<void> {
-    if (order.broker !== this.broker) {
+    if(order.broker !== this.broker){
       throw new Error();
     }
     const strategy = this.strategyMap.get(order.cashMarginType);
-    if (strategy === undefined) {
+    if(strategy === undefined){
       throw new Error(`Unable to find a strategy for ${order.cashMarginType}.`);
     }
     await strategy.send(order);
@@ -72,7 +76,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   async cancel(order: Order): Promise<void> {
     const orderId = order.brokerOrderId;
     const reply = await this.brokerApi.cancelOrder(orderId);
-    if (!reply.success) {
+    if(!reply.success){
       throw new Error(`Cancel ${orderId} failed.`);
     }
     order.lastUpdated = new Date();
@@ -82,12 +86,12 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   async refresh(order: Order): Promise<void> {
     const reply = await this.brokerApi.getOpenOrders();
     const brokerOrder = _.find(reply.orders, o => o.id === order.brokerOrderId);
-    if (brokerOrder !== undefined) {
-      if (brokerOrder.pending_amount === undefined || brokerOrder.pending_amount === 0) {
-        throw new Error('Unexpected reply returned.');
+    if(brokerOrder !== undefined){
+      if(brokerOrder.pending_amount === undefined || brokerOrder.pending_amount === 0){
+        throw new Error("Unexpected reply returned.");
       }
       order.filledSize = eRound(order.size - brokerOrder.pending_amount);
-      if (order.filledSize > 0) {
+      if(order.filledSize > 0){
         order.status = OrderStatus.PartiallyFilled;
       }
       order.lastUpdated = new Date();
@@ -97,8 +101,8 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     const transactions = (await this.brokerApi.getTransactionsWithStartDate(from)).filter(
       x => x.order_id === order.brokerOrderId
     );
-    if (transactions.length === 0) {
-      this.log.warn('The order is not found in pending orders and historical orders.');
+    if(transactions.length === 0){
+      this.log.warn("The order is not found in pending orders and historical orders.");
       return;
     }
     order.executions = transactions.map(x => {

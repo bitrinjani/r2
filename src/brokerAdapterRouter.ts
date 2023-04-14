@@ -1,11 +1,15 @@
-﻿import { Broker, BrokerAdapter, BrokerMap, Order, Quote, ConfigStore } from './types';
-import { getLogger } from '@bitr/logger';
-import * as _ from 'lodash';
-import { injectable, multiInject, inject } from 'inversify';
-import symbols from './symbols';
-import BrokerStabilityTracker from './brokerStabilityTracker';
-import OrderService from './orderService';
-import OrderImpl from './orderImpl';
+import type OrderImpl from "./orderImpl";
+import type { Broker, BrokerAdapter, BrokerMap, Order, Quote } from "./types";
+
+
+import { getLogger } from "@bitr/logger";
+import { injectable, multiInject, inject } from "inversify";
+import * as _ from "lodash";
+
+import BrokerStabilityTracker from "./brokerStabilityTracker";
+import OrderService from "./orderService";
+import symbols from "./symbols";
+import { ConfigStore } from "./types";
 
 @injectable()
 export default class BrokerAdapterRouter {
@@ -13,7 +17,7 @@ export default class BrokerAdapterRouter {
   private readonly brokerAdapterMap: BrokerMap<BrokerAdapter>;
 
   constructor(
-    @multiInject(symbols.BrokerAdapter) brokerAdapters: BrokerAdapter[],
+  @multiInject(symbols.BrokerAdapter) brokerAdapters: BrokerAdapter[],
     private readonly brokerStabilityTracker: BrokerStabilityTracker,
     @inject(symbols.ConfigStore) private readonly configStore: ConfigStore,
     private readonly orderService: OrderService
@@ -23,10 +27,10 @@ export default class BrokerAdapterRouter {
 
   async send(order: Order): Promise<void> {
     this.log.debug(order.toString());
-    try {
+    try{
       await this.brokerAdapterMap[order.broker].send(order);
       this.orderService.emitOrderUpdated(order as OrderImpl);
-    } catch (ex) {
+    } catch(ex){
       this.brokerStabilityTracker.decrement(order.broker);
       throw ex;
     }
@@ -45,26 +49,26 @@ export default class BrokerAdapterRouter {
   }
 
   async getPositions(broker: Broker): Promise<Map<string, number>> {
-    try {
+    try{
       // for backword compatibility, use getBtcPosition if getPositions is not defined
-      if (!_.isFunction(this.brokerAdapterMap[broker].getPositions) && this.configStore.config.symbol === 'BTC/JPY') {
+      if(!_.isFunction(this.brokerAdapterMap[broker].getPositions) && this.configStore.config.symbol === "BTC/JPY"){
         const btcPosition = await this.brokerAdapterMap[broker].getBtcPosition();
-        return new Map<string, number>([['BTC', btcPosition]]);
+        return new Map<string, number>([["BTC", btcPosition]]);
       }
-      if (this.brokerAdapterMap[broker].getPositions !== undefined) {
+      if(this.brokerAdapterMap[broker].getPositions !== undefined){
         return await (this.brokerAdapterMap[broker].getPositions as () => Promise<Map<string, number>>)();
       }
-      throw new Error('Unable to find a method to get positions.');
-    } catch (ex) {
+      throw new Error("Unable to find a method to get positions.");
+    } catch(ex){
       this.brokerStabilityTracker.decrement(broker);
       throw ex;
     }
   }
 
   async fetchQuotes(broker: Broker): Promise<Quote[]> {
-    try {
+    try{
       return await this.brokerAdapterMap[broker].fetchQuotes();
-    } catch (ex) {
+    } catch(ex){
       this.brokerStabilityTracker.decrement(broker);
       this.log.error(ex.message);
       this.log.debug(ex.stack);

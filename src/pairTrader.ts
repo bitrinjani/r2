@@ -1,26 +1,31 @@
-import { getLogger } from '@bitr/logger';
-import { injectable, inject } from 'inversify';
-import * as _ from 'lodash';
-import OrderImpl from './orderImpl';
+import type {
+  SpreadAnalysisResult,
+  Quote,
+  OrderPair
+} from "./types";
+
+import { EventEmitter } from "events";
+
+import { getLogger } from "@bitr/logger";
+import { injectable, inject } from "inversify";
+import * as _ from "lodash";
+
+import BrokerAdapterRouter from "./brokerAdapterRouter";
+import { findBrokerConfig } from "./configUtil";
+import t from "./i18n";
+import OrderImpl from "./orderImpl";
+import * as OrderUtil from "./orderUtil";
+import { calcProfit } from "./pnl";
+import SingleLegHandler from "./singleLegHandler";
+import symbols from "./symbols";
 import {
   ConfigStore,
-  SpreadAnalysisResult,
   OrderType,
   QuoteSide,
   OrderSide,
-  ActivePairStore,
-  Quote,
-  OrderPair
-} from './types';
-import t from './i18n';
-import { delay, formatQuote } from './util';
-import symbols from './symbols';
-import SingleLegHandler from './singleLegHandler';
-import { findBrokerConfig } from './configUtil';
-import BrokerAdapterRouter from './brokerAdapterRouter';
-import { EventEmitter } from 'events';
-import { calcProfit } from './pnl';
-import * as OrderUtil from './orderUtil';
+  ActivePairStore
+} from "./types";
+import { delay, formatQuote } from "./util";
 
 @injectable()
 export default class PairTrader extends EventEmitter {
@@ -36,40 +41,40 @@ export default class PairTrader extends EventEmitter {
   }
 
   set status(value: string) {
-    this.emit('status', value);
+    this.emit("status", value);
   }
 
   async trade(spreadAnalysisResult: SpreadAnalysisResult, closable: boolean): Promise<void> {
     const { bid, ask, targetVolume } = spreadAnalysisResult;
     const sendTasks = [ask, bid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
     const orders = await Promise.all(sendTasks);
-    this.status = 'Sent';
+    this.status = "Sent";
     await this.checkOrderState(orders, closable);
   }
 
   private async checkOrderState(orders: OrderImpl[], closable: boolean): Promise<void> {
     const { config } = this.configStore;
-    for (const i of _.range(1, config.maxRetryCount + 1)) {
+    for(const i of _.range(1, config.maxRetryCount + 1)){
       await delay(config.orderStatusCheckInterval);
       this.log.info(t`OrderCheckAttempt`, i);
       this.log.info(t`CheckingIfBothLegsAreDoneOrNot`);
-      try {
+      try{
         const refreshTasks = orders.map(o => this.brokerAdapterRouter.refresh(o));
         await Promise.all(refreshTasks);
-      } catch (ex) {
+      } catch(ex){
         this.log.warn(ex.message);
         this.log.debug(ex.stack);
       }
 
       this.printOrderSummary(orders);
 
-      if (orders.every(o => o.filled)) {
+      if(orders.every(o => o.filled)){
         this.log.info(t`BothLegsAreSuccessfullyFilled`);
-        if (closable) {
-          this.status = 'Closed';
-        } else {
-          this.status = 'Filled';
-          if (orders[0].size === orders[1].size) {
+        if(closable){
+          this.status = "Closed";
+        }else{
+          this.status = "Filled";
+          if(orders[0].size === orders[1].size){
             this.log.debug(`Putting pair ${JSON.stringify(orders)}.`);
             await this.activePairStore.put(orders as OrderPair);
           }
@@ -78,17 +83,17 @@ export default class PairTrader extends EventEmitter {
         break;
       }
 
-      if (i === config.maxRetryCount) {
-        this.status = 'MaxRetryCount breached';
+      if(i === config.maxRetryCount){
+        this.status = "MaxRetryCount breached";
         this.log.warn(t`MaxRetryCountReachedCancellingThePendingOrders`);
         const cancelTasks = orders.filter(o => !o.filled).map(o => this.brokerAdapterRouter.cancel(o));
         await Promise.all(cancelTasks);
-        if (
-          orders.some(o => !o.filled) &&
-          _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0
-        ) {
+        if(
+          orders.some(o => !o.filled)
+          && _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0
+        ){
           const subOrders = await this.singleLegHandler.handle(orders as OrderPair, closable);
-          if (subOrders.length !== 0 && subOrders.every(o => o.filled)) {
+          if(subOrders.length !== 0 && subOrders.every(o => o.filled)){
             this.printProfit(_.concat(orders, subOrders));
           }
         }
@@ -103,12 +108,12 @@ export default class PairTrader extends EventEmitter {
     const { config } = this.configStore;
     const { cashMarginType, leverageLevel } = brokerConfig;
     const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
-    const orderPrice = 
-     (quote.side === QuoteSide.Ask && config.acceptablePriceRange !== undefined)
-     ? _.round(quote.price * (1 + config.acceptablePriceRange/100)) as number
-     : (quote.side === QuoteSide.Bid && config.acceptablePriceRange !== undefined)
-     ? _.round(quote.price * (1 - config.acceptablePriceRange/100)) as number
-     : quote.price;
+    const orderPrice
+     = quote.side === QuoteSide.Ask && config.acceptablePriceRange !== undefined
+       ? _.round(quote.price * (1 + config.acceptablePriceRange / 100))
+       : quote.side === QuoteSide.Bid && config.acceptablePriceRange !== undefined
+         ? _.round(quote.price * (1 - config.acceptablePriceRange / 100))
+         : quote.price;
     const order = new OrderImpl({
       symbol: this.configStore.config.symbol,
       broker: quote.broker,
@@ -117,7 +122,7 @@ export default class PairTrader extends EventEmitter {
       price: orderPrice,
       cashMarginType,
       type: orderType,
-      leverageLevel
+      leverageLevel,
     });
     await this.brokerAdapterRouter.send(order);
     return order;
@@ -125,9 +130,9 @@ export default class PairTrader extends EventEmitter {
 
   private printOrderSummary(orders: OrderImpl[]) {
     orders.forEach(o => {
-      if (o.filled) {
+      if(o.filled){
         this.log.info(OrderUtil.toExecSummary(o));
-      } else {
+      }else{
         this.log.warn(OrderUtil.toExecSummary(o));
       }
     });
@@ -136,7 +141,7 @@ export default class PairTrader extends EventEmitter {
   private printProfit(orders: OrderImpl[]): void {
     const { profit, commission } = calcProfit(orders, this.configStore.config);
     this.log.info(t`ProfitIs`, _.round(profit));
-    if (commission !== 0) {
+    if(commission !== 0){
       this.log.info(t`CommissionIs`, _.round(commission));
     }
   }
