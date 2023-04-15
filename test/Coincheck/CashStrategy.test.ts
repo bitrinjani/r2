@@ -5,7 +5,7 @@ import * as nock from "nock";
 import nocksetup from "./nocksetup";
 import BrokerApi from "../../src/Coincheck/BrokerApi";
 import CashStrategy from "../../src/Coincheck/CashStrategy";
-import { CashMarginType, OrderSide, OrderType, Broker, OrderStatus } from "../../src/types";
+import { CashMarginType, OrderSide, OrderType, OrderStatus } from "../../src/types";
 import { createOrder } from "../helper";
 
 options.enabled = false;

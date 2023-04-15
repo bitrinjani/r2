@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import { options } from "@bitr/logger";
 import { expect, spy } from "chai";
-import * as _ from "lodash";
 import { DateTime } from "luxon";
 
 import BrokerAdapterRouter from "../src/brokerAdapterRouter";

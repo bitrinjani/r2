@@ -3,8 +3,8 @@ import type { HistoricalOrderStore } from "../src/types";
 import { expect } from "chai";
 
 import { createOrder } from "./helper";
-import { getHistoricalOrderStore } from "../src/HistoricalOrderStore";
 import { ChronoDB } from "../src/chrono";
+import { getHistoricalOrderStore } from "../src/historicalOrderStore";
 import { OrderSide, CashMarginType, OrderType } from "../src/types";
 
 
