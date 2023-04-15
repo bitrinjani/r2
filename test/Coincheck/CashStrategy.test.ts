@@ -1,121 +1,123 @@
-import { CashMarginType, OrderSide, OrderType, Broker, OrderStatus } from '../../src/types';
-import CashStrategy from '../../src/Coincheck/CashStrategy';
-import BrokerApi from '../../src/Coincheck/BrokerApi';
-import nocksetup from './nocksetup';
-import * as nock from 'nock';
-import { options } from '@bitr/logger';
-import { createOrder } from '../helper';
-import { expect } from 'chai';
+import { options } from "@bitr/logger";
+import { expect } from "chai";
+import * as nock from "nock";
+
+import nocksetup from "./nocksetup";
+import BrokerApi from "../../src/Coincheck/BrokerApi";
+import CashStrategy from "../../src/Coincheck/CashStrategy";
+import { CashMarginType, OrderSide, OrderType, Broker, OrderStatus } from "../../src/types";
+import { createOrder } from "../helper";
+
 options.enabled = false;
 
 nocksetup();
 
-describe('CashStrategy', function(){
-  it('send buy limit', async () => {
-    const strategy = new CashStrategy(new BrokerApi('', ''));
+describe("CashStrategy", function(){
+  it("send buy limit", async () => {
+    const strategy = new CashStrategy(new BrokerApi("", ""));
     const order = createOrder(
-      'Coincheck',
+      "Coincheck",
       OrderSide.Buy,
       0.005,
       300000,
       CashMarginType.Cash, OrderType.Limit, undefined as any);
     await strategy.send(order);
     expect(order.status).to.equal(OrderStatus.New);
-    expect(order.brokerOrderId).to.equal('12345');
+    expect(order.brokerOrderId).to.equal("12345");
   });
 
-  it('send fails - not Cash order', async () => {
-    const strategy = new CashStrategy(new BrokerApi('', ''));
+  it("send fails - not Cash order", async () => {
+    const strategy = new CashStrategy(new BrokerApi("", ""));
     const order = createOrder(
-      'Coincheck',
+      "Coincheck",
       OrderSide.Buy,
       0.005,
       300000,
       CashMarginType.MarginOpen, OrderType.Limit, undefined as any);
-    try {
+    try{
       await strategy.send(order);
-    } catch (ex) {
+    } catch(ex){
       return;
     }
     expect(false).to.equal(true);
   });
 
-  it('getBtcPosition', async () => {
-    const strategy = new CashStrategy(new BrokerApi('', ''));
+  it("getBtcPosition", async () => {
+    const strategy = new CashStrategy(new BrokerApi("", ""));
     const result = await strategy.getBtcPosition();
     expect(result).to.equal(0.123);
   });
 
-  it('cash market buy', () => {
+  it("cash market buy", () => {
     const strategy = new CashStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.Cash,
       side: OrderSide.Buy,
-      type: OrderType.Market
+      type: OrderType.Market,
     };
     const target = strategy["getBrokerOrderType"](order as any);
-    expect(target).to.equal('market_buy');
+    expect(target).to.equal("market_buy");
   });
 
-  it('cash limit buy', () => {
+  it("cash limit buy", () => {
     const strategy = new CashStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.Cash,
       side: OrderSide.Buy,
-      type: OrderType.Limit
+      type: OrderType.Limit,
     };
     const target = strategy["getBrokerOrderType"](order as any);
-    expect(target).to.equal('buy');
+    expect(target).to.equal("buy");
   });
 
-  it('cash invalid buy', () => {
+  it("cash invalid buy", () => {
     const strategy = new CashStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.Cash,
       side: OrderSide.Buy,
-      type: OrderType.StopLimit
+      type: OrderType.StopLimit,
     };
     expect(() => strategy["getBrokerOrderType"](order as any)).to.throw();
   });
 
-  it('cash sell market', () => {
+  it("cash sell market", () => {
     const strategy = new CashStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.Cash,
       side: OrderSide.Sell,
-      type: OrderType.Market
+      type: OrderType.Market,
     };
     const target = strategy["getBrokerOrderType"](order as any);
-    expect(target).to.equal('market_sell');
+    expect(target).to.equal("market_sell");
   });
 
-  it('cash sell limit', () => {
+  it("cash sell limit", () => {
     const strategy = new CashStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.Cash,
       side: OrderSide.Sell,
-      type: OrderType.Limit
+      type: OrderType.Limit,
     };
     const target = strategy["getBrokerOrderType"](order as any);
-    expect(target).to.equal('sell');
+    expect(target).to.equal("sell");
   });
 
-  it('cash sell invalid', () => {
+  it("cash sell invalid", () => {
     const strategy = new CashStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.Cash,
       side: OrderSide.Sell,
-      type: OrderType.Stop
+      type: OrderType.Stop,
     };
     expect(() => strategy["getBrokerOrderType"](order as any)).to.throw();
   });
 
-  it('cash invalid side', () => {
+  it("cash invalid side", () => {
     const strategy = new CashStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.Cash,
-      side: 'Invalid',
-      type: OrderType.Stop
+      side: "Invalid",
+      type: OrderType.Stop,
     };
     expect(() => strategy["getBrokerOrderType"](order as any)).to.throw();
   });

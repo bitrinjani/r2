@@ -1,9 +1,10 @@
-import * as util from '../src/util';
-import { findBrokerConfig } from '../src/configUtil';
-import { expect } from 'chai';
+import { expect } from "chai";
+
+import { findBrokerConfig } from "../src/configUtil";
+import * as util from "../src/util";
 
 
-it('nonce', async () => {
+it("nonce", async () => {
   const result: string[] = [];
   setTimeout(() => result.push(util.nonce()), 50);
   setTimeout(() => result.push(util.nonce()), 50);
@@ -17,7 +18,7 @@ it('nonce', async () => {
   expect(result.length).to.equal(resultSet.size);
 });
 
-it('almostEqual', () => {
+it("almostEqual", () => {
   expect(util.almostEqual(1, 1, 0)).to.equal(true);
   expect(util.almostEqual(1, 1, 1)).to.equal(true);
   expect(util.almostEqual(1, 0.99, 2)).to.equal(true);
@@ -30,12 +31,12 @@ it('almostEqual', () => {
   expect(util.almostEqual(1.50001, 0.99, 20)).to.equal(false);
 });
 
-it('findBrokerConfig with no config', () => {
-  expect(() => findBrokerConfig({ brokers: [] } as any, 'Bitflyer')).to.throw();
+it("findBrokerConfig with no config", () => {
+  expect(() => findBrokerConfig({ brokers: [] } as any, "Bitflyer")).to.throw();
 });
 
-it('safeQueryStringStringify', () => {
+it("safeQueryStringStringify", () => {
   const o = { a: 1, b: undefined };
   const result = util.safeQueryStringStringify(o);
-  expect(result).to.equal('a=1');
+  expect(result).to.equal("a=1");
 });

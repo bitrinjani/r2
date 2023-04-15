@@ -24,7 +24,7 @@ const writeFile = promisify(fs.writeFile);
 
 function cwd() {
   return process.env.NODE_ENV === "test"
-    ? `${process.cwd()}/src/__tests__/sandbox`
+    ? `${process.cwd()}../test/sandbox`
     : process.cwd();
 }
 

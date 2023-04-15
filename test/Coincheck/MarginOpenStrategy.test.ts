@@ -1,95 +1,97 @@
-import { CashMarginType, OrderSide, OrderType, OrderStatus } from '../../src/types';
-import MarginOpenStrategy from '../../src/Coincheck/MarginOpenStrategy';
-import nocksetup from './nocksetup';
-import BrokerApi from '../../src/Coincheck/BrokerApi';
-import * as nock from 'nock';
-import { options } from '@bitr/logger';
-import { createOrder } from '../helper';
-import { expect } from 'chai';
+import { options } from "@bitr/logger";
+import { expect } from "chai";
+import * as nock from "nock";
+
+import nocksetup from "./nocksetup";
+import BrokerApi from "../../src/Coincheck/BrokerApi";
+import MarginOpenStrategy from "../../src/Coincheck/MarginOpenStrategy";
+import { CashMarginType, OrderSide, OrderType, OrderStatus } from "../../src/types";
+import { createOrder } from "../helper";
+
 options.enabled = false;
 
 nocksetup();
 
-describe('MarginOpenStrategy', function(){
-  it('send leverage buy limit', async () => {
-    const strategy = new MarginOpenStrategy(new BrokerApi('', ''));
+describe("MarginOpenStrategy", function(){
+  it("send leverage buy limit", async () => {
+    const strategy = new MarginOpenStrategy(new BrokerApi("", ""));
     const order = createOrder(
-      'Coincheck',
+      "Coincheck",
       OrderSide.Buy,
       0.005,
       300000,
       CashMarginType.MarginOpen, OrderType.Limit, undefined as any);
     await strategy.send(order);
     expect(order.status).to.equal(OrderStatus.New);
-    expect(order.brokerOrderId).to.equal('340622252');
+    expect(order.brokerOrderId).to.equal("340622252");
   });
 
-  it('send fails - not MarginOpen order', async () => {
-    const strategy = new MarginOpenStrategy(new BrokerApi('', ''));
+  it("send fails - not MarginOpen order", async () => {
+    const strategy = new MarginOpenStrategy(new BrokerApi("", ""));
     const order = createOrder(
-      'Coincheck',
+      "Coincheck",
       OrderSide.Buy,
       0.005,
       300000,
       CashMarginType.Cash, OrderType.Limit, undefined as any);
-    try {
+    try{
       await strategy.send(order);
-    } catch (ex) {
+    } catch(ex){
       return;
     }
     expect(false).to.equal(true);
   });
 
-  it('send fails', async () => {
-    const strategy = new MarginOpenStrategy(new BrokerApi('', ''));
+  it("send fails", async () => {
+    const strategy = new MarginOpenStrategy(new BrokerApi("", ""));
     const order = createOrder(
-      'Coincheck',
+      "Coincheck",
       OrderSide.Buy,
       0.005,
       300000,
       CashMarginType.MarginOpen, OrderType.Limit, undefined as any);
-    try {
+    try{
       await strategy.send(order);
-    } catch (ex) {
+    } catch(ex){
       return;
     }
     expect(false).to.equal(true);
   });
 
-  it('getBtcPosition Margin', async () => {
-    const strategy = new MarginOpenStrategy(new BrokerApi('', ''));
+  it("getBtcPosition Margin", async () => {
+    const strategy = new MarginOpenStrategy(new BrokerApi("", ""));
     const result = await strategy.getBtcPosition();
     expect(result).to.equal(-0.14007);
   });
 
-  it('open buy limit', () => {
+  it("open buy limit", () => {
     const strategy = new MarginOpenStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.MarginOpen,
       side: OrderSide.Buy,
-      type: OrderType.Limit
+      type: OrderType.Limit,
     };
     const target = strategy["getBrokerOrderType"](order as any);
-    expect(target).to.equal('leverage_buy');
+    expect(target).to.equal("leverage_buy");
   });
 
-  it('open sell limit', () => {
+  it("open sell limit", () => {
     const strategy = new MarginOpenStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.MarginOpen,
       side: OrderSide.Sell,
-      type: OrderType.Limit
+      type: OrderType.Limit,
     };
     const target = strategy["getBrokerOrderType"](order as any);
-    expect(target).to.equal('leverage_sell');
+    expect(target).to.equal("leverage_sell");
   });
 
-  it('open invalid side limit', () => {
+  it("open invalid side limit", () => {
     const strategy = new MarginOpenStrategy({} as BrokerApi);
     const order = {
       cashMarginType: CashMarginType.MarginOpen,
-      side: 'Invalid',
-      type: OrderType.Limit
+      side: "Invalid",
+      type: OrderType.Limit,
     };
     expect(() => strategy["getBrokerOrderType"](order as any)).to.throw();
   });

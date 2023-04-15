@@ -1,4 +1,5 @@
 import * as Module from "module";
+
 import { spy } from "chai";
 
 const originalRequire = Module.prototype.require;
@@ -21,21 +22,22 @@ Module.prototype.require = new Proxy(Module.prototype.require, {
   },
 });
 
-import { pretty } from '../../transport/transform';
-import { Readable } from 'stream';
+import { pretty } from "../../transport/transform";
 
-it('pretty split callback throws', () => {
+import { Readable } from "stream";
+
+it("pretty split callback throws", () => {
   const result = pretty({ colorize: true, withLabel: true, debug: true, hidden: false });
   const stream = new Readable();
-  stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 40, "label": "TestStream" }');
+  stream.push("{ \"msg\": \"Test message\", \"time\": 1514074545477, \"level\": 40, \"label\": \"TestStream\" }");
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);
 });
 
-it('pretty split callback throws 2', () => {
+it("pretty split callback throws 2", () => {
   const result = pretty({ colorize: true, withLabel: true, debug: true, hidden: false });
   const stream = new Readable();
-  stream.push('{ "msg": "Test message", "time": 1514074545477, "level": 40, "label": "TestStream" }');
+  stream.push("{ \"msg\": \"Test message\", \"time\": 1514074545477, \"level\": 40, \"label\": \"TestStream\" }");
   stream.push(null);
   stream.pipe(result).pipe(process.stdout);
 });

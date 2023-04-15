@@ -1,5 +1,6 @@
-import { Broker, OrderSide, CashMarginType, OrderType } from '../src/types';
-import OrderImpl from '../src/orderImpl';
+import type { Broker, OrderSide, CashMarginType, OrderType } from "../src/types";
+
+import OrderImpl from "../src/orderImpl";
 
 export function createOrder(
   broker: Broker,
@@ -11,13 +12,13 @@ export function createOrder(
   leverageLevel: number
 ) {
   return new OrderImpl({
-    symbol: 'BTC/JPY',
+    symbol: "BTC/JPY",
     broker,
     side,
     size,
     price,
     cashMarginType,
     type,
-    leverageLevel
+    leverageLevel,
   });
 }

@@ -1,16 +1,18 @@
-import AppRoot from '../appRoot';
-import { options } from '@bitr/logger';
-import symbols from '../symbols';
-import { expect, spy } from 'chai';
+import { options } from "@bitr/logger";
+import { expect, spy } from "chai";
+
+import AppRoot from "../src/appRoot";
+import symbols from "../src/symbols";
+
 options.enabled = false;
 
-describe('AppRoot', () => {
-  it('start and stop', async () => {
+describe("AppRoot", () => {
+  it("start and stop", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
     container.get = symbol => {
-      if (symbol === symbols.ConfigStore) {
-        return { config: { brokers: [{ broker: 'Bitflyer' }, { broker: 'Coincheck' }, { broker: 'Quoine' }] } };
+      if(symbol === symbols.ConfigStore){
+        return { config: { brokers: [{ broker: "Bitflyer" }, { broker: "Coincheck" }, { broker: "Quoine" }] } };
       }
       return service;
     };
@@ -24,12 +26,12 @@ describe('AppRoot', () => {
     expect(service.stop).to.be.called();
   });
 
-  it('unknown broker', async () => {
+  it("unknown broker", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
     container.get = symbol => {
-      if (symbol === symbols.ConfigStore) {
-        return { config: { brokers: [{ broker: 'Unknown' }, { broker: 'Coincheck' }, { broker: 'Quoine' }] } };
+      if(symbol === symbols.ConfigStore){
+        return { config: { brokers: [{ broker: "Unknown" }, { broker: "Coincheck" }, { broker: "Quoine" }] } };
       }
       return service;
     };
@@ -41,15 +43,15 @@ describe('AppRoot', () => {
     expect(service.start).not.to.be.called();
   });
 
-  it('unknown broker with npmPath', async () => {
+  it("unknown broker with npmPath", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
     container.get = symbol => {
-      if (symbol === symbols.ConfigStore) {
+      if(symbol === symbols.ConfigStore){
         return {
           config: {
-            brokers: [{ broker: 'Unknown', npmPath: 'Unknown' }, { broker: 'Coincheck' }, { broker: 'Quoine' }]
-          }
+            brokers: [{ broker: "Unknown", npmPath: "Unknown" }, { broker: "Coincheck" }, { broker: "Quoine" }],
+          },
         };
       }
       return service;
@@ -62,15 +64,15 @@ describe('AppRoot', () => {
     expect(service.start).not.to.be.called();
   });
 
-  it('unknown broker with wrong npmPath', async () => {
+  it("unknown broker with wrong npmPath", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
     container.get = symbol => {
-      if (symbol === symbols.ConfigStore) {
+      if(symbol === symbols.ConfigStore){
         return {
           config: {
-            brokers: [{ broker: 'Unknown', npmPath: '@bitr/castable' }, { broker: 'Coincheck' }, { broker: 'Quoine' }]
-          }
+            brokers: [{ broker: "Unknown", npmPath: "@bitr/castable" }, { broker: "Coincheck" }, { broker: "Quoine" }],
+          },
         };
       }
       return service;
@@ -83,17 +85,17 @@ describe('AppRoot', () => {
     expect(service.start).not.to.be.called();
   });
 
-  it('start throws', async () => {
+  it("start throws", async () => {
     const service = {
       start: async () => {
-        throw new Error('Mock start failed.');
+        throw new Error("Mock start failed.");
       },
-      stop: spy()
+      stop: spy(),
     };
     const container = {} as any;
     container.get = symbol => {
-      if (symbol === symbols.ConfigStore) {
-        return { config: { brokers: [{ broker: 'Bitflyer' }] } };
+      if(symbol === symbols.ConfigStore){
+        return { config: { brokers: [{ broker: "Bitflyer" }] } };
       }
       return service;
     };
@@ -104,17 +106,17 @@ describe('AppRoot', () => {
     await target.start();
   });
 
-  it('stop throws', async () => {
+  it("stop throws", async () => {
     const service = {
       start: spy(),
       stop: async () => {
-        throw new Error('Mock stop failed.');
-      }
+        throw new Error("Mock stop failed.");
+      },
     };
     const container = {} as any;
     container.get = symbol => {
-      if (symbol === symbols.ConfigStore) {
-        return { config: { brokers: [{ broker: 'Bitflyer' }] } };
+      if(symbol === symbols.ConfigStore){
+        return { config: { brokers: [{ broker: "Bitflyer" }] } };
       }
       return service;
     };
@@ -126,12 +128,12 @@ describe('AppRoot', () => {
     await target.stop();
   });
 
-  it('stop with undefined arbitrager', async () => {
+  it("stop with undefined arbitrager", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
     container.get = symbol => {
-      if (symbol === symbols.ConfigStore) {
-        return { config: { brokers: [{ broker: 'Bitflyer' }] } };
+      if(symbol === symbols.ConfigStore){
+        return { config: { brokers: [{ broker: "Bitflyer" }] } };
       }
       return service;
     };

@@ -1,47 +1,52 @@
-import 'reflect-metadata';
-import JsonConfigStore from '../src/jsonConfigStore';
-import { ConfigRoot } from '../src/types';
-import { options } from '@bitr/logger';
-import { delay } from '../src/util';
-import * as _ from 'lodash';
-import { Socket, socket } from 'zeromq';
-import { configStoreSocketUrl } from '../src/constants';
-import { ConfigRequester } from '../src/messages';
-import { expect } from 'chai';
+import "reflect-metadata";
+import type { ConfigRoot } from "../src/types";
+import type { Socket } from "zeromq";
+
+import { options } from "@bitr/logger";
+import { expect } from "chai";
+import * as _ from "lodash";
+import { socket } from "zeromq";
+
+import { configStoreSocketUrl } from "../src/constants";
+import JsonConfigStore from "../src/jsonConfigStore";
+import { ConfigRequester } from "../src/messages";
+import { delay } from "../src/util";
+
+
 options.enabled = false;
 
 function parseBuffer<T>(buffer: Buffer): T | undefined {
-  try {
+  try{
     return JSON.parse(buffer.toString());
-  } catch (ex) {
+  } catch(ex){
     return undefined;
   }
 }
 
-describe('JsonConfigStore', () => {
-  it('JsonConfigStore', async () => {
+describe("JsonConfigStore", () => {
+  it("JsonConfigStore", async () => {
     const validator = { validate: (config: ConfigRoot) => true };
     const store = new JsonConfigStore(validator as any);
     // @ts-expect-error
     store.TTL = 5;
-    expect(store.config.language).to.equal('en');
+    expect(store.config.language).to.equal("en");
     expect(store.config.demoMode).to.equal(true);
     expect(store.config.priceMergeSize).to.equal(100);
     expect(store.config.brokers.length).to.equal(3);
     await delay(10);
-    expect(store.config.brokers[0].broker).to.equal('Coincheck');
+    expect(store.config.brokers[0].broker).to.equal("Coincheck");
     expect(store.config.brokers[0].enabled).to.equal(false);
     expect(store.config.brokers[0].maxLongPosition).to.equal(0.3);
-    expect(store.config.brokers[1].broker).to.equal('Bitflyer');
+    expect(store.config.brokers[1].broker).to.equal("Bitflyer");
     expect(store.config.brokers[1].enabled).to.equal(true);
     expect(store.config.brokers[1].maxLongPosition).to.equal(0.2);
     store.close();
     await delay(10);
   });
 
-  it('set', async () => {
+  it("set", async () => {
     let store: JsonConfigStore;
-    try {
+    try{
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
@@ -51,21 +56,21 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).to.equal(0.001);
       await store.set(_.merge({}, store.config, { minSize: 0.01 }));
       expect(store.config.minSize).to.equal(0.01);
-    } catch (ex) {
+    } catch(ex){
       console.log(ex);
       expect(true).to.equal(false);
-    } finally {
+    } finally{
       // @ts-expect-error
-      if (store) {
+      if(store){
         store.close();
       }
     }
   });
 
-  it('server', async () => {
+  it("server", async () => {
     let store: JsonConfigStore;
     let client: ConfigRequester;
-    try {
+    try{
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
@@ -73,16 +78,16 @@ describe('JsonConfigStore', () => {
       expect(store.config.minSize).to.equal(0.01);
 
       client = new ConfigRequester(configStoreSocketUrl);
-      await client.request({ type: 'set', data: { minSize: 0.002 } });
+      await client.request({ type: "set", data: { minSize: 0.002 } });
       expect(store.config.minSize).to.equal(0.002);
 
-      await client.request({ type: 'set', data: { minSize: 0.01 } });
+      await client.request({ type: "set", data: { minSize: 0.01 } });
       expect(store.config.minSize).to.equal(0.01);
-    } catch (ex) {
+    } catch(ex){
       console.log(ex);
-      if (process.env.CI && ex.message === 'Address already in use') return;
+      if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
-    } finally {
+    } finally{
       // @ts-expect-error
       store.close();
       // @ts-expect-error
@@ -90,31 +95,31 @@ describe('JsonConfigStore', () => {
     }
   });
 
-  it('server: invalid message', async () => {
+  it("server: invalid message", async () => {
     let store: JsonConfigStore;
     let client: Socket;
-    try {
+    try{
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
       store.TTL = 5;
       expect(store.config.minSize).to.equal(0.01);
 
-      client = socket('req');
+      client = socket("req");
       client.connect(configStoreSocketUrl);
       const reply = await new Promise<any>(resolve => {
-        client.once('message', resolve);
-        client.send('invalid message');
+        client.once("message", resolve);
+        client.send("invalid message");
       });
       const parsed = JSON.parse(reply.toString());
       expect(parsed.success).to.equal(false);
-      expect(parsed.reason).to.equal('invalid message');
+      expect(parsed.reason).to.equal("invalid message");
       expect(store.config.minSize).to.equal(0.01);
-    } catch (ex) {
+    } catch(ex){
       console.log(ex);
-      if (process.env.CI && ex.message === 'Address already in use') return;
+      if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
-    } finally {
+    } finally{
       // @ts-expect-error
       store.close();
       // @ts-expect-error
@@ -122,17 +127,17 @@ describe('JsonConfigStore', () => {
     }
   });
 
-  it('server: configValidator throws', async () => {
+  it("server: configValidator throws", async () => {
     let store: JsonConfigStore;
     let client: ConfigRequester;
-    try {
+    try{
       const validator = {
         validate: (config: ConfigRoot) => {
-          if (config.maxNetExposure <= 0) {
+          if(config.maxNetExposure <= 0){
             throw new Error();
           }
           return true;
-        }
+        },
       };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
@@ -141,15 +146,15 @@ describe('JsonConfigStore', () => {
 
       client = new ConfigRequester(configStoreSocketUrl);
 
-      const reply = await client.request({ type: 'set', data: { maxNetExposure: -1 } });
+      const reply = await client.request({ type: "set", data: { maxNetExposure: -1 } });
       expect(reply.success).to.equal(false);
-      expect(reply.reason).to.equal('invalid config');
+      expect(reply.reason).to.equal("invalid config");
       expect(store.config.minSize).to.equal(0.01);
-    } catch (ex) {
+    } catch(ex){
       console.log(ex);
-      if (process.env.CI && ex.message === 'Address already in use') return;
+      if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
-    } finally {
+    } finally{
       // @ts-expect-error
       store.close();
       // @ts-expect-error
@@ -157,10 +162,10 @@ describe('JsonConfigStore', () => {
     }
   });
 
-  it('server: invalid message type', async () => {
+  it("server: invalid message type", async () => {
     let store: JsonConfigStore;
     let client: ConfigRequester;
-    try {
+    try{
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
@@ -169,26 +174,26 @@ describe('JsonConfigStore', () => {
 
       client = new ConfigRequester(configStoreSocketUrl);
 
-      const reply = await client.request({ type: 'invalid' });
+      const reply = await client.request({ type: "invalid" });
       expect(reply.success).to.equal(false);
-      expect(reply.reason).to.equal('invalid message type');
+      expect(reply.reason).to.equal("invalid message type");
       expect(store.config.minSize).to.equal(0.01);
-    } catch (ex) {
+    } catch(ex){
       console.log(ex);
-      if (process.env.CI && ex.message === 'Address already in use') return;
+      if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
-    } finally {
+    } finally{
       // @ts-expect-error
-      if (store) store.close();
+      if(store) store.close();
       // @ts-expect-error
-      if (client) client.dispose();
+      if(client) client.dispose();
     }
   });
 
-  it('server: get', async () => {
+  it("server: get", async () => {
     let store: JsonConfigStore;
     let client: ConfigRequester;
-    try {
+    try{
       const validator = { validate: (config: ConfigRoot) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
@@ -197,19 +202,19 @@ describe('JsonConfigStore', () => {
 
       client = new ConfigRequester(configStoreSocketUrl);
 
-      const reply = await client.request({ type: 'get' });
+      const reply = await client.request({ type: "get" });
       expect(reply.success).to.equal(true);
       expect(reply.data?.minSize).to.equal(0.01);
       expect(store.config.minSize).to.equal(0.01);
-    } catch (ex) {
+    } catch(ex){
       console.log(ex);
-      if (process.env.CI && ex.message === 'Address already in use') return;
+      if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
-    } finally {
+    } finally{
       // @ts-expect-error
-      if (store) store.close();
+      if(store) store.close();
       // @ts-expect-error
-      if (client) client.dispose();
+      if(client) client.dispose();
     }
   });
 });

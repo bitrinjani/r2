@@ -1,15 +1,16 @@
-import { expect } from 'chai';
-import { getChronoDB, closeChronoDB } from '../src/chrono';
+import { expect } from "chai";
 
-describe("ChronoTest", function(){
-  it('close undefined', () => {
+import { getChronoDB, closeChronoDB } from "../src/chrono";
+
+describe("ChronoTest", () =>{
+  it("close undefined", () => {
     closeChronoDB();
   });
 
-  it('get twice', () => {
+  it("get twice", () => {
     const store = getChronoDB(`${__dirname}/datastore/chronoDBTest`);
     const store2 = getChronoDB(`${__dirname}/datastore/chronoDBTest`);
-    expect(store).to.equal(store2);  
+    expect(store).to.equal(store2);
     closeChronoDB();
   });
 });

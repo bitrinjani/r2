@@ -1,10 +1,14 @@
-import { getHistoricalOrderStore } from '../src/HistoricalOrderStore';
-import { ChronoDB } from '../src/chrono';
-import { createOrder } from './helper';
-import { OrderSide, CashMarginType, OrderType, HistoricalOrderStore } from '../src/types';
-import { expect } from 'chai';
+import type { HistoricalOrderStore } from "../src/types";
 
-describe('HistoricalOrderStore', function(){
+import { expect } from "chai";
+
+import { createOrder } from "./helper";
+import { getHistoricalOrderStore } from "../src/HistoricalOrderStore";
+import { ChronoDB } from "../src/chrono";
+import { OrderSide, CashMarginType, OrderType } from "../src/types";
+
+
+describe("HistoricalOrderStore", function(){
   let store: HistoricalOrderStore;
   let chronoDB;
   this.beforeAll(async () => {
@@ -18,8 +22,8 @@ describe('HistoricalOrderStore', function(){
     await chronoDB.close();
   });
 
-  it('put/get', async () => {
-    const order = createOrder('Dummy1', OrderSide.Buy, 0.001, 1000000, CashMarginType.Cash, OrderType.Limit, 1);
+  it("put/get", async () => {
+    const order = createOrder("Dummy1", OrderSide.Buy, 0.001, 1000000, CashMarginType.Cash, OrderType.Limit, 1);
     const key = await store.put(order);
     const result = await store.get(key);
     expect(result.creationTime).to.equal(order.creationTime);
@@ -27,10 +31,10 @@ describe('HistoricalOrderStore', function(){
     expect(result.side).to.equal(order.side);
   });
 
-  it('put twice, getAll, del', async () => {
+  it("put twice, getAll, del", async () => {
     await store.delAll();
-    const order1 = createOrder('Dummy1', OrderSide.Buy, 0.001, 1000000, CashMarginType.Cash, OrderType.Limit, 1);
-    const order2 = createOrder('Dummy1', OrderSide.Buy, 0.001, 1000000, CashMarginType.Cash, OrderType.Limit, 1);
+    const order1 = createOrder("Dummy1", OrderSide.Buy, 0.001, 1000000, CashMarginType.Cash, OrderType.Limit, 1);
+    const order2 = createOrder("Dummy1", OrderSide.Buy, 0.001, 1000000, CashMarginType.Cash, OrderType.Limit, 1);
     const key1 = await store.put(order1);
     const key2 = await store.put(order2);
     const result = await store.getAll();

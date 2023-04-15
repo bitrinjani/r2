@@ -1,75 +1,76 @@
-import { expect } from 'chai';
-import BrokerStabilityTracker from '../src/brokerStabilityTracker';
-import { delay } from '../src/util';
+import { expect } from "chai";
 
-describe('BrokerStabilityTracker', () => {
-  it('start/stop', async () => {
+import BrokerStabilityTracker from "../src/brokerStabilityTracker";
+import { delay } from "../src/util";
+
+describe("BrokerStabilityTracker", () => {
+  it("start/stop", async () => {
     const config = {
       stabilityTracker: {
         threshold: 8,
-        recoveryInterval: 1000
+        recoveryInterval: 1000,
       },
       brokers: [
-        { broker: 'dummy1' },
-        { broker: 'dummy2' }
-      ]
+        { broker: "dummy1" },
+        { broker: "dummy2" },
+      ],
     };
     const bst = new BrokerStabilityTracker({ config } as any);
     await bst.start();
     await bst.stop();
   });
 
-  it('check stability', async () => {
+  it("check stability", async () => {
     const config = {
       stabilityTracker: {
         threshold: 8,
-        recoveryInterval: 5
+        recoveryInterval: 5,
       },
       brokers: [
-        { broker: 'dummy1' },
-        { broker: 'dummy2' }
-      ]
+        { broker: "dummy1" },
+        { broker: "dummy2" },
+      ],
     };
     const bst = new BrokerStabilityTracker({ config } as any);
     await bst.start();
-    bst.decrement('dummy1');
-    bst.decrement('dummy3');
-    expect(bst.stability('dummy1')).to.equal(9);
-    expect(bst.isStable('dummy1')).to.equal(true);    
-    expect(bst.isStable('dummy3')).to.equal(false);
+    bst.decrement("dummy1");
+    bst.decrement("dummy3");
+    expect(bst.stability("dummy1")).to.equal(9);
+    expect(bst.isStable("dummy1")).to.equal(true);
+    expect(bst.isStable("dummy3")).to.equal(false);
     await delay(20);
-    expect(bst.stability('dummy1')).to.equal(10);    
-    bst.decrement('dummy1');
-    bst.decrement('dummy1');
-    bst.decrement('dummy1');
-    expect(bst.stability('dummy1')).to.equal(7);
-    expect(bst.isStable('dummy1')).to.equal(false);
+    expect(bst.stability("dummy1")).to.equal(10);
+    bst.decrement("dummy1");
+    bst.decrement("dummy1");
+    bst.decrement("dummy1");
+    expect(bst.stability("dummy1")).to.equal(7);
+    expect(bst.isStable("dummy1")).to.equal(false);
     await bst.stop();
   });
 
-  it('start/stop with no config', async () => {
+  it("start/stop with no config", async () => {
     const config = {
       brokers: [
-        { broker: 'dummy1' },
-        { broker: 'dummy2' }
-      ]
+        { broker: "dummy1" },
+        { broker: "dummy2" },
+      ],
     };
     const bst = new BrokerStabilityTracker({ config } as any);
     await bst.start();
     await bst.stop();
   });
 
-  it('start/stop with imcomplete config', async () => {
+  it("start/stop with imcomplete config", async () => {
     const config = {
       stabilityTracker: {},
       brokers: [
-        { broker: 'dummy1' },
-        { broker: 'dummy2' }
-      ]
+        { broker: "dummy1" },
+        { broker: "dummy2" },
+      ],
     };
     const bst = new BrokerStabilityTracker({ config } as any);
     await bst.start();
-    expect(bst.isStable('dummy1')).to.equal(true);
+    expect(bst.isStable("dummy1")).to.equal(true);
     await bst.stop();
   });
 });

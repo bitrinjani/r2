@@ -1,8 +1,9 @@
-import { expect, spy } from 'chai';
-import { getSpreadStatTimeSeries } from '../src/spreadStatTimeSeries';
+import { expect, spy } from "chai";
 
-describe('SpreadStatTimeSeries', () => {
-  it('get', () => {
+import { getSpreadStatTimeSeries } from "../src/spreadStatTimeSeries";
+
+describe("SpreadStatTimeSeries", () => {
+  it("get", () => {
     let dbMockCount = 0;
     const dbMock = { getTimeSeries: spy(() => ++dbMockCount) };
     getSpreadStatTimeSeries(dbMock as any);

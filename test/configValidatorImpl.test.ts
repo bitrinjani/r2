@@ -1,18 +1,20 @@
-import { expect } from 'chai';
-import ConfigValidator from '../src/configValidator';
-import { ConfigRoot } from '../src/types';
-import { options } from '@bitr/logger';
+import type { ConfigRoot } from "../src/types";
+
+import { options } from "@bitr/logger";
+import { expect } from "chai";
+
+import ConfigValidator from "../src/configValidator";
 options.enabled = false;
 
-const config: ConfigRoot = require('./config_test.json');
+const config: ConfigRoot = require("./config_test.json");
 
-describe('ConfigValidator', () => {
-  it('validate valid config', () => {
+describe("ConfigValidator", () => {
+  it("validate valid config", () => {
     const target = new ConfigValidator();
     target.validate(config);
   });
 
-  it('validate valid config with a brokers is disabled', () => {
+  it("validate valid config with a brokers is disabled", () => {
     const target = new ConfigValidator();
     config.brokers[0].enabled = false;
     target.validate(config);
@@ -24,7 +26,7 @@ describe('ConfigValidator', () => {
     target.validate(config);
   });
 
-  it('validate with only one broker is enabled', () => {
+  it("validate with only one broker is enabled", () => {
     const target = new ConfigValidator();
     config.brokers[0].enabled = false;
     config.brokers[1].enabled = false;

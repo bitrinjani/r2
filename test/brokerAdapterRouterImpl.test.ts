@@ -1,186 +1,187 @@
-import 'reflect-metadata';
-import { CashMarginType, OrderType, OrderSide } from '../src/types';
-import BrokerAdapterRouter from '../src/brokerAdapterRouter';
-import { options } from '@bitr/logger';
-import { createOrder } from './helper';
-import BrokerStabilityTracker from '../src/brokerStabilityTracker';
-import { expect, spy } from 'chai';
+import "reflect-metadata";
+import { options } from "@bitr/logger";
+import { expect, spy } from "chai";
+
+import { createOrder } from "./helper";
+import BrokerAdapterRouter from "../src/brokerAdapterRouter";
+import BrokerStabilityTracker from "../src/brokerStabilityTracker";
+import { CashMarginType, OrderType, OrderSide } from "../src/types";
 options.enabled = false;
 
 const baBitflyer = {
-  broker: 'Bitflyer',
+  broker: "Bitflyer",
   send: spy(),
   cancel: spy(),
   fetchQuotes: spy(),
   getBtcPosition: spy(),
-  refresh: spy()
+  refresh: spy(),
 };
 
 const baQuoine = {
-  broker: 'Quoine',
+  broker: "Quoine",
   send: spy(),
   cancel: spy(),
   fetchQuotes: spy(),
   getBtcPosition: spy(),
-  refresh: spy()
+  refresh: spy(),
 };
 
 const brokerAdapters = [baBitflyer, baQuoine];
 
 const config = {
-  symbol: 'BTC/JPY',
+  symbol: "BTC/JPY",
   stabilityTracker: {
     threshold: 8,
-    recoveryInterval: 1000
+    recoveryInterval: 1000,
   },
-  brokers: [{ broker: 'dummy1' }, { broker: 'dummy2' }]
+  brokers: [{ broker: "dummy1" }, { broker: "dummy2" }],
 };
 
 const orderService = {
-  emitOrderUpdated: spy()
+  emitOrderUpdated: spy(),
 };
 
 const bst = new BrokerStabilityTracker({ config } as any);
 const baRouter = new BrokerAdapterRouter(brokerAdapters as any, bst, { config } as any, orderService as any);
 
-describe('BrokerAdapterRouter', () => {
-  it('send', async () => {
-    const order = createOrder('Bitflyer', OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
+describe("BrokerAdapterRouter", () => {
+  it("send", async () => {
+    const order = createOrder("Bitflyer", OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.send(order);
     expect(baBitflyer.send).to.be.called.exactly(1);
     expect(baQuoine.send).to.be.called.exactly(0);
   });
 
-  it('fetchQuotes', async () => {
-    await baRouter.fetchQuotes('Bitflyer');
+  it("fetchQuotes", async () => {
+    await baRouter.fetchQuotes("Bitflyer");
     expect(baBitflyer.fetchQuotes).to.be.called.exactly(1);
     expect(baQuoine.fetchQuotes).to.be.called.exactly(0);
   });
 
-  it('cancel', async () => {
-    const order = createOrder('Bitflyer', OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
+  it("cancel", async () => {
+    const order = createOrder("Bitflyer", OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.cancel(order);
     expect(baBitflyer.cancel).to.be.called.exactly(1);
     expect(baQuoine.cancel).to.be.called.exactly(0);
   });
 
-  it('getBtcPosition', async () => {
-    await baRouter.getPositions('Quoine');
+  it("getBtcPosition", async () => {
+    await baRouter.getPositions("Quoine");
     expect(baBitflyer.getBtcPosition).to.be.called.exactly(0);
     expect(baQuoine.getBtcPosition).to.be.called.exactly(1);
   });
 
-  it('refresh', async () => {
-    const order = createOrder('Quoine', OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
+  it("refresh", async () => {
+    const order = createOrder("Quoine", OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
     await baRouter.refresh(order);
     expect(baBitflyer.refresh).to.be.called.exactly(0);
     expect(baQuoine.refresh).to.be.called.exactly(1);
   });
 
-  it('send throws', async () => {
+  it("send throws", async () => {
     const baBitflyer = {
-      broker: 'Bitflyer',
+      broker: "Bitflyer",
       send: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
       cancel: spy(),
       fetchQuotes: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
       getBtcPosition: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
-      refresh: spy()
+      refresh: spy(),
     };
 
     const brokerAdapters = [baBitflyer];
     const baRouter = new BrokerAdapterRouter(brokerAdapters as any, bst, { config } as any, orderService as any);
-    try {
-      await baRouter.send({ broker: 'Bitflyer' } as any);
-    } catch (ex) {
-      expect(ex.message).to.equal('dummy');
+    try{
+      await baRouter.send({ broker: "Bitflyer" } as any);
+    } catch(ex){
+      expect(ex.message).to.equal("dummy");
       return;
     }
     expect(true).to.equal(false);
   });
 
-  it('fetchQuotes throws', async () => {
+  it("fetchQuotes throws", async () => {
     const baBitflyer = {
-      broker: 'Bitflyer',
+      broker: "Bitflyer",
       send: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
       cancel: spy(),
       fetchQuotes: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
       getBtcPosition: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
-      refresh: spy()
+      refresh: spy(),
     };
 
     const brokerAdapters = [baBitflyer];
     const baRouter = new BrokerAdapterRouter(brokerAdapters as any, bst, { config } as any, orderService as any);
 
-    const quotes = await baRouter.fetchQuotes('Bitflyer');
+    const quotes = await baRouter.fetchQuotes("Bitflyer");
     expect(quotes).to.equal([]);
   });
 
-  it('getBtcPosition throws', async () => {
+  it("getBtcPosition throws", async () => {
     const baBitflyer = {
-      broker: 'Bitflyer',
+      broker: "Bitflyer",
       send: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
       cancel: spy(),
       fetchQuotes: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
       getBtcPosition: () => {
-        throw new Error('dummy');
+        throw new Error("dummy");
       },
-      refresh: spy()
+      refresh: spy(),
     };
 
     const brokerAdapters = [baBitflyer];
     const baRouter = new BrokerAdapterRouter(brokerAdapters as any, bst, { config } as any, orderService as any);
-    try {
-      await baRouter.getPositions('Bitflyer');
-    } catch (ex) {
-      expect(ex.message).to.equal('dummy');
+    try{
+      await baRouter.getPositions("Bitflyer");
+    } catch(ex){
+      expect(ex.message).to.equal("dummy");
       return;
     }
     expect(true).to.equal(false);
   });
 
-  it('getBtcPosition/getPositions not found', async () => {
+  it("getBtcPosition/getPositions not found", async () => {
     const baBitflyer = {
-      broker: 'Bitflyer'
+      broker: "Bitflyer",
     };
 
     const brokerAdapters = [baBitflyer];
-    const conf = Object.assign({}, config, { symbol: 'XXX/YYY' });
+    const conf = Object.assign({}, config, { symbol: "XXX/YYY" });
     const baRouter = new BrokerAdapterRouter(brokerAdapters as any, bst, { config: conf } as any, orderService as any);
-    try {
-      await baRouter.getPositions('Bitflyer');
-    } catch (ex) {
-      expect(ex.message).to.equal('Unable to find a method to get positions.');
+    try{
+      await baRouter.getPositions("Bitflyer");
+    } catch(ex){
+      expect(ex.message).to.equal("Unable to find a method to get positions.");
       return;
     }
     expect(true).to.equal(false);
   });
 
-  it('getPositions for non BTC/JPY symbol', async () => {
+  it("getPositions for non BTC/JPY symbol", async () => {
     const baBitflyer = {
-      broker: 'Bitflyer',
-      getPositions: spy()
+      broker: "Bitflyer",
+      getPositions: spy(),
     };
 
     const brokerAdapters = [baBitflyer];
-    const conf = Object.assign({}, config, { symbol: 'XXX/YYY' });
+    const conf = Object.assign({}, config, { symbol: "XXX/YYY" });
     const baRouter = new BrokerAdapterRouter(brokerAdapters as any, bst, { config: conf } as any, orderService as any);
-    await baRouter.getPositions('Bitflyer');
+    await baRouter.getPositions("Bitflyer");
     expect(baBitflyer.getPositions).to.be.called();
   });
 });
