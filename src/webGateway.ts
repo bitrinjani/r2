@@ -1,10 +1,10 @@
+import type { ConfigRoot } from "./config";
 import type OrderImpl from "./orderImpl";
 import type {
   Quote,
   BrokerPosition,
   BrokerMap,
   SpreadAnalysisResult,
-  ConfigRoot,
   LimitCheckResult
 } from "./types";
 import type * as http from "http";
