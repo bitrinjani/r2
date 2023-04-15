@@ -1,7 +1,4 @@
 node_modules
 dist
-plugins
-test
-webui
 *.json
 *.js

@@ -16,6 +16,7 @@ export function getConfigRoot(): ConfigRoot {
   const configPath = path.join(process.cwd(), "./config.json");
   if(!fs.existsSync(configPath)){
     console.error("There's no configure file.");
+    process.exit(1);
   }
   const config = new ConfigRoot(JSON.parse(
     stripJsonComments(fs.readFileSync(configPath, "utf-8"))));

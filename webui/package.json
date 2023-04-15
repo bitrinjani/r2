@@ -24,8 +24,8 @@
     "@bitr/castable": "^1.0.3",
     "core-js": "^3.30.1",
     "lodash": "^4.17.5",
-    "rxjs": "^7.4.0",
     "reconnecting-websocket": "^4.4.0",
+    "rxjs": "^7.4.0",
     "zone.js": "^0.13.0"
   },
   "devDependencies": {
@@ -36,7 +36,14 @@
     "@types/jasminewd2": "^2.0.2",
     "@types/lodash": "^4.14.104",
     "@types/node": "~18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
     "codelyzer": "^6.0.2",
+    "eslint": "^8.38.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-named-import-spacing": "^1.0.3",
+    "eslint-plugin-node": "^11.1.0",
     "jasmine-core": "^4.6.0",
     "jasmine-spec-reporter": "^7.0.0",
     "karma": "^6.4.1",
@@ -47,7 +54,6 @@
     "lite-server": "^2.3.0",
     "protractor": "^7.0.0",
     "ts-node": "^10.9.1",
-    "tslint": "^6.1.3",
     "typescript": "^4.9.2"
   }
 }
