@@ -2,7 +2,7 @@ import type OrderImpl from "./orderImpl";
 
 import { format } from "util";
 
-import * as _ from "lodash";
+import _ from "lodash";
 
 import t from "./i18n";
 import { splitSymbol } from "./util";

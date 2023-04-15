@@ -4,7 +4,7 @@ import type { Broker, BrokerAdapter, BrokerMap, Order, Quote } from "./types";
 
 import { getLogger } from "@bitr/logger";
 import { injectable, multiInject, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import BrokerStabilityTracker from "./brokerStabilityTracker";
 import OrderService from "./orderService";

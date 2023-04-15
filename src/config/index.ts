@@ -4,7 +4,7 @@ import type { Broker } from "../types/common";
 import * as fs from "fs";
 import * as path from "path";
 
-import * as _ from "lodash";
+import stripJsonComments from "strip-json-comments";
 
 import { ConfigRoot } from "./type";
 
@@ -12,18 +12,14 @@ export * from "./type";
 export * from "./validator";
 export * from "./jsonConfigStore";
 
-const defaultValues = {
-  symbol: "BTC/JPY",
-};
-
-
 export function getConfigRoot(): ConfigRoot {
-  const configPath = path.join(process.cwd(), "config.json");
+  const configPath = path.join(process.cwd(), "./config.json");
   if(!fs.existsSync(configPath)){
-    console.log("There's no configure file.");
+    console.error("There's no configure file.");
   }
-  const config = new ConfigRoot(JSON.parse(fs.readFileSync(configPath, "utf-8")));
-  return _.defaultsDeep({}, config, defaultValues);
+  const config = new ConfigRoot(JSON.parse(
+    stripJsonComments(fs.readFileSync(configPath, "utf-8"))));
+  return config;
 }
 
 export function findBrokerConfig(configRoot: ConfigRoot, broker: Broker): BrokerConfig {

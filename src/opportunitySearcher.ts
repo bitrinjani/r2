@@ -11,7 +11,7 @@ import { EventEmitter } from "events";
 
 import { getLogger } from "@bitr/logger";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { LOT_MIN_DECIMAL_PLACE } from "./constants";
 import t from "./i18n";

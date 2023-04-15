@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES2021",
     "module": "commonjs",
     "outDir": "dist",
     "alwaysStrict": true,
@@ -9,21 +9,20 @@
     "noImplicitThis": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
+    "esModuleInterop": true,
     "noUnusedLocals": false,
     "types": ["reflect-metadata", "mocha", "chai", "chai-spies"],
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "pretty": true,
-    "ignoreDeprecations": "5.0",
     "skipLibCheck": true
   },
   "files": [
     "./node_modules/@types/node/index.d.ts"
   ],
   "include": [
-    "./src/**/*.ts", "./analytics/**/*.ts"
+    "./src/**/*.ts"
   ],
   "exclude": [
     "node_modules", "./webui/**/*"

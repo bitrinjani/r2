@@ -3,7 +3,7 @@ import { EOL } from "os";
 import chalk from "chalk";
 import { format as formatDate } from "date-fns";
 import * as Parse from "fast-json-parse";
-import * as split from "split2";
+import split from "split2";
 
 interface LogObject {
   level: number;

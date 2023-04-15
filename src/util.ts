@@ -3,7 +3,7 @@ import type { Execution, Order, Broker, QuoteSide, Quote } from "./types";
 import * as crypto from "crypto";
 import * as querystring from "querystring";
 
-import * as _ from "lodash";
+import _ from "lodash";
 
 interface ToStringable {
   toString: () => string;

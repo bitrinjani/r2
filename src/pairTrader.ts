@@ -8,7 +8,7 @@ import { EventEmitter } from "events";
 
 import { getLogger } from "@bitr/logger";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import BrokerAdapterRouter from "./brokerAdapterRouter";
 import { findBrokerConfig } from "./config";

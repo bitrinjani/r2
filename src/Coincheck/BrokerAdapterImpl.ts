@@ -9,7 +9,7 @@ import type {
 
 import { getLogger } from "@bitr/logger";
 import { addMinutes } from "date-fns";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import BrokerApi from "./BrokerApi";
 import CashStrategy from "./CashStrategy";

@@ -8,7 +8,7 @@ import type {
 } from "../types";
 
 import Decimal from "decimal.js";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import BrokerApi from "./BrokerApi";
 import CashStrategy from "./CashStrategy";

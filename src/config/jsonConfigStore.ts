@@ -9,7 +9,7 @@ import { promisify } from "util";
 
 import { getLogger } from "@bitr/logger";
 import { injectable } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { getConfigRoot } from ".";
 import { ConfigValidator } from "./validator";

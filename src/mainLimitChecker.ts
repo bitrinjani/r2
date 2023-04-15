@@ -8,7 +8,7 @@ import type {
 } from "./types";
 
 import { getLogger } from "@bitr/logger";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import t from "./i18n";
 import { calcProfit } from "./pnl";

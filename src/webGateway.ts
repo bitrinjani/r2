@@ -11,10 +11,10 @@ import type * as http from "http";
 
 import { getLogger } from "@bitr/logger";
 import { autobind } from "core-decorators";
-import * as express from "express";
+import express from "express";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
-import * as WebSocket from "ws";
+import _ from "lodash";
+import WebSocket from "ws";
 
 import { wssPort } from "./constants";
 import OppotunitySearcher from "./opportunitySearcher";

@@ -2,7 +2,7 @@ import type { ConfigRoot } from "./config";
 import type OrderImpl from "./orderImpl";
 
 
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { findBrokerConfig } from "./config";
 import { OrderSide } from "./types";

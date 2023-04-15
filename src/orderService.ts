@@ -3,7 +3,7 @@ import type { OrderInit } from "./orderImpl";
 import { EventEmitter } from "events";
 
 import { injectable, inject } from "inversify";
-import _ = require("lodash");
+import _ from "lodash";
 
 import OrderImpl from "./orderImpl";
 import symbols from "./symbols";

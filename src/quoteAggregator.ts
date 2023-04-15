@@ -4,7 +4,7 @@ import type { Broker, Quote } from "./types";
 import { AwaitableEventEmitter } from "@bitr/awaitable-event-emitter";
 import { getLogger } from "@bitr/logger";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 import { DateTime, Interval } from "luxon";
 
 import BrokerAdapterRouter from "./brokerAdapterRouter";

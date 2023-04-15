@@ -6,7 +6,7 @@ import { EventEmitter } from "events";
 import { getLogger } from "@bitr/logger";
 import Decimal from "decimal.js";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import BrokerAdapterRouter from "./brokerAdapterRouter";
 import BrokerStabilityTracker from "./brokerStabilityTracker";

@@ -3,7 +3,7 @@ import type { OrderPair } from "./types";
 
 import { getLogger } from "@bitr/logger";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import BrokerAdapterRouter from "./brokerAdapterRouter";
 import { LOT_MIN_DECIMAL_PLACE } from "./constants";

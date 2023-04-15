@@ -1,7 +1,7 @@
 import type { ConfigRoot, BrokerConfig } from "./type";
 
 import { injectable } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { findBrokerConfig } from "./";
 import t from "../i18n";

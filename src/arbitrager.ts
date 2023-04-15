@@ -2,7 +2,7 @@ import type { Quote } from "./types";
 
 import { getLogger } from "@bitr/logger";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { fatalErrors } from "./constants";
 import t from "./i18n";

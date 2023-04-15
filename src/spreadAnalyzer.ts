@@ -12,7 +12,7 @@ import type {
 import { getLogger } from "@bitr/logger";
 import Decimal from "decimal.js";
 import { injectable, inject } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { findBrokerConfig } from "./config";
 import { LOT_MIN_DECIMAL_PLACE } from "./constants";

@@ -1,6 +1,6 @@
 import type { LevelUp, QueryOptions } from "./types";
 
-import * as _ from "lodash";
+import _ from "lodash";
 import * as through2 from "through2";
 import { v1 as uuid } from "uuid";
 

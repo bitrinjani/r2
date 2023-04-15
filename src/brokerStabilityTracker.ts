@@ -2,7 +2,7 @@ import type { Broker } from "./types";
 
 
 import { inject, injectable } from "inversify";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import symbols from "./symbols";
 import { ConfigStore } from "./types";

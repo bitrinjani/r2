@@ -3,10 +3,10 @@ import type { Server as httpServer } from "http";
 
 import * as fs from "fs";
 
-import * as express from "express";
-import * as _ from "lodash";
+import express from "express";
+import _ from "lodash";
 import mkdirp from "mkdirp";
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 
 import LineIntegration from "./LineIntegration";
 import SlackIntegration from "./SlackIntegration";

@@ -53,6 +53,7 @@
     "reflect-metadata": "^0.1.13",
     "simple-statistics": "^7.8.3",
     "split2": "^4.2.0",
+    "strip-json-comments": "^3.1.1",
     "uuid": "^9.0.0",
     "ws": "^8.13.0",
     "zeromq": "^5.3.1"

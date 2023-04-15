@@ -1,7 +1,7 @@
 import type BrokerApi from "./BrokerApi";
 import type { CashMarginTypeStrategy } from "./types";
 
-import * as _ from "lodash";
+import _ from "lodash";
 
 export default class NetOutStrategy implements CashMarginTypeStrategy {
   constructor(private readonly brokerApi: BrokerApi) {}

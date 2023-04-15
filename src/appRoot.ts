@@ -1,4 +1,3 @@
-
 import type { BrokerAdapter, ConfigStore } from "./types";
 import type { Container } from "inversify";
 

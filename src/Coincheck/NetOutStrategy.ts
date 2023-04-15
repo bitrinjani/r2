@@ -2,7 +2,7 @@ import type BrokerApi from "./BrokerApi";
 import type { CashMarginTypeStrategy, NewOrderRequest, LeveragePosition } from "./types";
 import type { Order } from "../types";
 
-import * as _ from "lodash";
+import _ from "lodash";
 
 import { OrderStatus, OrderSide, CashMarginType, OrderType } from "../types";
 import { eRound, almostEqual } from "../util";
