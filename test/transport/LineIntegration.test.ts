@@ -1,4 +1,4 @@
-import type { LineConfig } from "../../src/types";
+import type { LineConfig } from "../../src/config";
 
 import * as nock from "nock";
 

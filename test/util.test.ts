@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { findBrokerConfig } from "../src/configUtil";
+import { findBrokerConfig } from "../src/config";
 import * as util from "../src/util";
 
 

@@ -1,4 +1,4 @@
-import type { SlackConfig } from "../../src/types";
+import type { SlackConfig } from "../../src/config";
 
 import * as nock from "nock";
 

@@ -1,6 +1,6 @@
+import type { ConfigRoot } from "../src/config";
 import type QuoteAggregator from "../src/quoteAggregator";
 import type {
-  ConfigRoot,
   ConfigStore,
   Order,
   Execution } from "../src/types";

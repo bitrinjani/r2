@@ -1,9 +1,9 @@
-import type { ConfigRoot } from "../src/types";
+import type { ConfigRoot } from "../src/config";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
 
-import ConfigValidator from "../src/configValidator";
+import { ConfigValidator } from "../src/config";
 options.enabled = false;
 
 const config: ConfigRoot = require("./config_test.json");

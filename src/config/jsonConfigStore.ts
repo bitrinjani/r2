@@ -20,7 +20,7 @@ import { ConfigResponder } from "../messages";
 const writeFile = promisify(fs.writeFile);
 
 @injectable()
-export default class JsonConfigStore extends EventEmitter implements ConfigStore {
+export class JsonConfigStore extends EventEmitter implements ConfigStore {
   private readonly log = getLogger(this.constructor.name);
   private timer: NodeJS.Timer;
   private readonly responder: ConfigResponder;

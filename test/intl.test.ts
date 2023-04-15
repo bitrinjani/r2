@@ -1,6 +1,6 @@
 import { expect, spy } from "chai";
 
-import * as config from "../src/configUtil";
+import * as config from "../src/config";
 
 // @ts-ignore 2540
 config.getConfigRoot = spy(() => {

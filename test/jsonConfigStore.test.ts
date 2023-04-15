@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import type { ConfigRoot } from "../src/types";
+import type { ConfigRoot } from "../src/config";
 import type { Socket } from "zeromq";
 
 import { options } from "@bitr/logger";
@@ -7,8 +7,8 @@ import { expect } from "chai";
 import * as _ from "lodash";
 import { socket } from "zeromq";
 
+import { JsonConfigStore } from "../src/config";
 import { configStoreSocketUrl } from "../src/constants";
-import JsonConfigStore from "../src/jsonConfigStore";
 import { ConfigRequester } from "../src/messages";
 import { delay } from "../src/util";
 

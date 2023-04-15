@@ -1,5 +1,5 @@
+import type { OnSingleLegConfig } from "../src/config";
 import type OrderImpl from "../src/orderImpl";
-import type { OnSingleLegConfig } from "../src/types";
 
 import { options } from "@bitr/logger";
 import { expect, spy } from "chai";

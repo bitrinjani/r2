@@ -10,6 +10,7 @@ import { ConfigRoot } from "./type";
 
 export * from "./type";
 export * from "./validator";
+export * from "./jsonConfigStore";
 
 const defaultValues = {
   symbol: "BTC/JPY",

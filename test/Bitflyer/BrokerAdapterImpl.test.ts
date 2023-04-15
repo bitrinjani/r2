@@ -1,4 +1,4 @@
-import type { BrokerConfigType } from "../../src/types";
+import type { BrokerConfigType } from "../../src/config";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
