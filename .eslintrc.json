@@ -1,7 +1,7 @@
 {
     "root": true,
     "extends": [
-      "eslint:recommended", 
+      "eslint:recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:eslint-comments/recommended"
     ],
@@ -315,6 +315,44 @@
       "no-extra-semi": "off",
       "indent": "off"
     },
-    "overrides": []
+    "overrides": [
+      {
+        "files": [
+          "./test/**/*.ts"
+        ],
+        "parserOptions": {
+          "project": "./tsconfig.test.json"
+        },
+        "rules": {
+          "@typescript-eslint/no-invalid-this": "off",
+          "@typescript-eslint/no-unused-vars": "off",
+          "@typescript-eslint/no-unused-expressions": "off",
+          "@typescript-eslint/no-floating-promises": "off",
+          "@typescript-eslint/no-non-null-assertion": "off",
+          "@typescript-eslint/no-shadow": "off"
+        }
+      },
+      {
+        "files": [
+          "./tools/**/*.ts"
+        ],
+        "parserOptions": {
+          "project": "./tsconfig.test.json"
+        },
+        "rules": {
+          "@typescript-eslint/no-floating-promises": "off"
+        }
+      },
+      {
+        "files": [
+          "./webui/**/*.ts",
+          "./webui/**/*.js"
+        ],
+        "parserOptions": {
+          "project": "./tsconfig.test.json"
+        },
+        "rules": {}
+      }
+    ]
   }
   

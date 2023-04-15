@@ -268,6 +268,7 @@ describe("Quote Aggregator", () => {
     const baRouter = new (BrokerAdapterRouter as any)(baList);
     const aggregator: QuoteAggregator = new QuoteAggregator(configStore as any, baRouter);
     let fnCalledCount = 0;
+    // eslint-disable-next-line no-void
     const fn = spy(async () => void ++fnCalledCount);
     aggregator.on("quoteUpdated", fn);
     await aggregator.start();

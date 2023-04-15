@@ -35,7 +35,7 @@ class EmittableActivePairStore extends EventEmitter implements ActivePairStore {
     return this.timeSeries.del(key);
   }
 
-  delAll(): Promise<{}> {
+  delAll(): Promise<void> {
     this.emit("change");
     return this.timeSeries.delAll();
   }

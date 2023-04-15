@@ -15,7 +15,8 @@ import { calcProfit } from "./pnl";
 
 export default class MainLimitChecker implements LimitChecker {
   private readonly log = getLogger(this.constructor.name);
-  private readonly limits: LimitChecker[];
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly
+  private limits: LimitChecker[];
 
   constructor(
     configStore: ConfigStore,

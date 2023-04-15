@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import { getLogger } from "@bitr/logger";
 
 import t from "./i18n";
@@ -14,6 +15,7 @@ import { closeChronoDB } from "./chrono";
 import Arbitrager from "./arbitrager";
 import BrokerStabilityTracker from "./brokerStabilityTracker";
 import WebGateway from "./webGateway";
+/* eslint-enable import/order */
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);

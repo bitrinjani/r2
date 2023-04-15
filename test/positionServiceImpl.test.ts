@@ -74,10 +74,10 @@ describe("Position Service", () => {
   });
 
   it("positions smaller than minSize", async () => {
-    const baRouter = {
+    const localBaRouter = {
       getPositions: broker => broker === "Quoine" ? new Map([["BTC", 0.000002]]) : new Map([["BTC", -0.3]]),
     };
-    const ps = new PositionService(configStore as any, baRouter as any, bst as any);
+    const ps = new PositionService(configStore as any, localBaRouter as any, bst as any);
     await ps.start();
     const positions = _.values(ps.positionMap);
     const exposure = ps.netExposure;
@@ -124,7 +124,7 @@ describe("Position Service", () => {
   });
 
   it("no pos in getPositions", async () => {
-    const config = {
+    const localConfig = {
       symbol: "XXX/YYY",
       minSize: 0.01,
       positionRefreshInterval: 5000,
@@ -144,12 +144,12 @@ describe("Position Service", () => {
       ],
     };
 
-    const configStore = { config };
-    const baRouter = {
+    const localConfigStore = { config: localConfig };
+    const localBaRouter = {
       getPositions: broker => broker === "Quoine" ? new Map([["BTC", 0.2]]) : new Map([["BTC", -0.3]]),
     };
-    const bst = new BrokerStabilityTracker(configStore as any);
-    const ps = new PositionService(configStore as any, baRouter as any, bst as any);
+    const localBst = new BrokerStabilityTracker(localConfigStore as any);
+    const ps = new PositionService(localConfigStore as any, localBaRouter as any, localBst as any);
     await ps.start();
     const positions = _.values(ps.positionMap);
     expect(positions.length).to.equal(0);

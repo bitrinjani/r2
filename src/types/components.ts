@@ -82,7 +82,7 @@ export interface ActivePairStore extends EventEmitter {
   getAll: () => Promise<OrderPairKeyValue[]>;
   put: (value: OrderPair) => Promise<string>;
   del: (key: string) => Promise<void>;
-  delAll: () => Promise<{}>;
+  delAll: () => Promise<void>;
 }
 
 export type SpreadStatTimeSeries = TimeSeries<SpreadStat>;
@@ -94,5 +94,5 @@ export interface HistoricalOrderStore extends EventEmitter {
   getAll: () => Promise<OrderKeyValue[]>;
   put: (value: Order) => Promise<string>;
   del: (key: string) => Promise<void>;
-  delAll: () => Promise<{}>;
+  delAll: () => Promise<void>;
 }

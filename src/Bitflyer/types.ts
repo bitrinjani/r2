@@ -36,6 +36,7 @@ export interface CancelChildOrderRequest {
   child_order_id?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface CancelChildOrderResponse {}
 
 export interface ExecutionsParam {

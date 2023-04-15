@@ -1,12 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { WsService } from '../ws.service';
-import { Observable } from 'rxjs/Observable';
-import { ConfigRoot } from '../types';
-import { Subscription } from 'rxjs/Subscription';
+import type { OnInit, OnDestroy } from "@angular/core";
+import type { Subscription } from "rxjs/Subscription";
+
+import { Component } from "@angular/core";
+import { Observable } from "rxjs/Observable";
+
+import { ConfigRoot } from "../types";
+import { WsService } from "../ws.service";
 
 @Component({
-  selector: 'app-config-form',
-  templateUrl: './config-form.component.html'
+  selector: "app-config-form",
+  templateUrl: "./config-form.component.html",
 })
 export class ConfigFormComponent implements OnInit, OnDestroy {
   private subscription: Subscription;

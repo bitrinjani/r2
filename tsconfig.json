@@ -16,7 +16,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "pretty": true,
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "5.0",
+    "skipLibCheck": true
   },
   "files": [
     "./node_modules/@types/node/index.d.ts"
@@ -24,9 +25,9 @@
   "include": [
     "./src/**/*.ts",
     "./test/**/*.ts",
+    "./analytics/**/*.ts",
   ],
   "exclude": [
     "node_modules",
-  //  "test"
   ]
 }

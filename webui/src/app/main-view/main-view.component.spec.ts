@@ -1,16 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from "@angular/core/testing";
 
-import { MainViewComponent } from './main-view.component';
+import { async, TestBed } from "@angular/core/testing";
 
-describe('MainViewComponent', () => {
+import { MainViewComponent } from "./main-view.component";
+
+describe("MainViewComponent", () => {
   let component: MainViewComponent;
   let fixture: ComponentFixture<MainViewComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MainViewComponent ]
+      declarations: [ MainViewComponent ],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +21,7 @@ describe('MainViewComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

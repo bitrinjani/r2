@@ -1,16 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from "@angular/core/testing";
 
-import { DepthComponent } from './depth.component';
+import { async, TestBed } from "@angular/core/testing";
 
-describe('DepthComponent', () => {
+import { DepthComponent } from "./depth.component";
+
+describe("DepthComponent", () => {
   let component: DepthComponent;
   let fixture: ComponentFixture<DepthComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DepthComponent ]
+      declarations: [ DepthComponent ],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +21,7 @@ describe('DepthComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

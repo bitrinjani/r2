@@ -1,4 +1,4 @@
-import type { LineConfig } from "../types";
+import type { LineConfig } from "../config";
 import type { RequestInit as FetchRequestInit } from "node-fetch";
 
 import * as querystring from "querystring";

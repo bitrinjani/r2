@@ -1,5 +1,8 @@
-import * as _ from 'lodash';
-import { Quote, QuoteSide, DepthLine, BrokerPosition, BrokerMap, ConfigRoot } from '../types';
+import type { Quote, DepthLine, BrokerPosition, BrokerMap, ConfigRoot } from "../types";
+
+import * as _ from "lodash";
+
+import { QuoteSide } from "../types";
 
 class DepthTable {
   private readonly depthSize = 100;
@@ -17,14 +20,14 @@ class DepthTable {
     const bids = this.quotes.filter(q => q.side === QuoteSide.Bid);
     this.bestTradableAsk = _(asks)
       .filter(q => this.isTradable(q))
-      .minBy('price');
+      .minBy("price");
     this.bestTradableBid = _(bids)
       .filter(q => this.isTradable(q))
-      .maxBy('price');
+      .maxBy("price");
     const depthLines = _(this.quotes)
       .groupBy(q => q.price)
       .map((quotes: Quote[]) => _.reduce(quotes, this.depthReducer.bind(this), this.blankDepthLine()))
-      .orderBy(['priceCell.value'], ['desc'])
+      .orderBy(["priceCell.value"], ["desc"])
       .value();
     const middlePart = _(depthLines)
       .filter(l => l.priceCell.value >= this.bestTradableAsk.price && l.priceCell.value <= this.bestTradableBid.price)
@@ -39,7 +42,7 @@ class DepthTable {
       .takeRightWhile(l => l.priceCell.value < this.bestTradableAsk.price)
       .take(whiskerSize + residual)
       .value();
-    if (middlePart.length <= this.depthSize) {
+    if(middlePart.length <= this.depthSize){
       return _.concat(upperPart, middlePart, bottomPart);
     }
     return _.concat(
@@ -66,12 +69,12 @@ class DepthTable {
   private depthReducer(depthLine: DepthLine, q: Quote): DepthLine {
     depthLine.priceCell.value = q.price;
     const tradable = this.isTradable(q);
-    if (q.side === QuoteSide.Ask) {
+    if(q.side === QuoteSide.Ask){
       depthLine.askBrokerCells.push({ value: q.broker, tradable });
       depthLine.askSizeCells.push({ value: q.volume, tradable });
       depthLine.isBestAsk = depthLine.isBestAsk || q === this.bestTradableAsk;
       depthLine.priceCell.askTradable = depthLine.priceCell.askTradable || tradable;
-    } else {
+    }else{
       depthLine.bidBrokerCells.push({ value: q.broker, tradable });
       depthLine.bidSizeCells.push({ value: q.volume, tradable });
       depthLine.isBestBid = depthLine.isBestBid || q === this.bestTradableBid;
@@ -88,7 +91,7 @@ class DepthTable {
       bidSizeCells: [],
       bidBrokerCells: [],
       isBestAsk: false,
-      isBestBid: false
+      isBestBid: false,
     };
   }
 }

@@ -17,6 +17,7 @@ export interface OrderInit {
   leverageLevel: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 function revive<T, K>(t: Function, o: K): T {
   const newObject = Object.create(t.prototype);
   return Object.assign(newObject, o) as T;

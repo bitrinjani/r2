@@ -1,6 +1,6 @@
 import * as i18next from "i18next";
 
-import { getConfigRoot } from "./configUtil";
+import { getConfigRoot } from "./config";
 import { en, ja } from "./stringResources";
 
 let lng = "en";
@@ -25,6 +25,6 @@ i18next.init({
   },
 });
 
-export default function translateTaggedTemplate(strings: TemplateStringsArray, ...keys: string[]): string {
+export default function translateTaggedTemplate(strings: TemplateStringsArray): string {
   return i18next.t(strings.raw[0]);
 }

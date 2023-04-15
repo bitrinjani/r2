@@ -1,4 +1,4 @@
-import type { SlackConfig } from "../types";
+import type { SlackConfig } from "../config";
 import type { RequestInit as FetchRequestInit } from "node-fetch";
 
 import fetch from "node-fetch";

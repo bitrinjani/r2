@@ -10,7 +10,7 @@ import { getLogger } from "@bitr/logger";
 import { injectable } from "inversify";
 import * as _ from "lodash";
 
-import { getConfigRoot, getConfigPath } from "./configUtil";
+import { getConfigRoot } from "./configUtil";
 import ConfigValidator from "./configValidator";
 import { configStoreSocketUrl } from "./constants";
 import { ConfigResponder } from "./messages";
@@ -45,7 +45,7 @@ export default class JsonConfigStore extends EventEmitter implements ConfigStore
 
   async set(config: ConfigRoot) {
     this.configValidator.validate(config);
-    await writeFile(getConfigPath(), JSON.stringify(config, undefined, 2));
+    await writeFile(`${process.cwd()}/config.json`, JSON.stringify(config, undefined, 2));
     this.updateCache(config);
   }
 

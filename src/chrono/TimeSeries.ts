@@ -68,6 +68,7 @@ export class TimeSeries<T> {
     const that = this;
     return this.store.createReadStream({ gt, lt }).pipe(
       through2.obj(function(kv: any) {
+        // eslint-disable-next-line @typescript-eslint/no-invalid-this
         this.push({
           key: kv.key,
           value: that.reviver ? that.reviver(kv.value) : kv.value,
@@ -86,12 +87,12 @@ export class TimeSeries<T> {
     await this.store.del(key);
   }
 
-  async delAll(): Promise<{}> {
-    return new Promise((resolve, reject) =>
+  async delAll(): Promise<void> {
+    return new Promise<void>((resolve, reject) =>
       this.store
         .createKeyStream(this.queryAll)
         .on("data", key => this.store.del(key))
-        .on("end", () => resolve({}))
+        .on("end", () => resolve())
         .on("error", reject)
     );
   }

@@ -87,7 +87,7 @@ export default class PositionService extends EventEmitter {
         .map((p: BrokerPosition) => [p.broker, p])
         .fromPairs()
         .value();
-      await this.emit("positionUpdated", this.positionMap);
+      this.emit("positionUpdated", this.positionMap);
     } catch(ex){
       this.log.error(ex.message);
       this.log.debug(ex.stack);

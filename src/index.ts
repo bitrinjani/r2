@@ -20,7 +20,7 @@ process.on("SIGINT", async () => {
   exit();
 });
 
-process.on("unhandledRejection", async (reason, p) => {
+process.on("unhandledRejection", async (reason) => {
   console.error(reason);
   await app.stop();
   console.log("Stopped app.");

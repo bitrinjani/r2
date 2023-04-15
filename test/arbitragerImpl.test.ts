@@ -449,8 +449,8 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders filled with different send size", async () => {
-    const chronoDB = new ChronoDB(`${__dirname}/datastore/diff_size`);
-    const activePairStore = getActivePairStore(chronoDB);
+    const localChronoDB = new ChronoDB(`${__dirname}/datastore/diff_size`);
+    const localActivePairStore = getActivePairStore(localChronoDB);
     baRouter.refresh = spy(order => {
       order.status = OrderStatus.Filled;
     });
@@ -475,9 +475,9 @@ describe("Arbitrager", function(){
       positionService,
       spreadAnalyzer,
       limitCheckerFactory,
-      activePairStore
+      localActivePairStore
     );
-    const trader = new PairTrader(configStore, baRouter, activePairStore, new SingleLegHandler(baRouter, configStore));
+    const trader = new PairTrader(configStore, baRouter, localActivePairStore, new SingleLegHandler(baRouter, configStore));
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
@@ -486,10 +486,10 @@ describe("Arbitrager", function(){
     expect(baRouter.refresh).to.be.called.twice;
     expect(baRouter.send).to.be.called.twice;
     expect(baRouter.cancel).to.be.called.exactly(0);
-    const all = await activePairStore.getAll();
+    const all = await localActivePairStore.getAll();
     expect(all.length).to.equal(0);
-    await activePairStore.delAll();
-    await chronoDB.close();
+    await localActivePairStore.delAll();
+    await localChronoDB.close();
   });
 
   it("Send and only buy order filled", async () => {
@@ -1484,7 +1484,7 @@ describe("Arbitrager", function(){
   });
 
   it("Close filled orders", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1494,11 +1494,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1506,23 +1506,23 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Closed");
     expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
   it("Close two sets of filled orders", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
       toQuote("Coincheck", QuoteSide.Bid, 400, 1),
     ];
-    const quotes2 = [
+    const localQuotes2 = [
       toQuote("Quoine", QuoteSide.Bid, 601, 4),
       toQuote("Coincheck", QuoteSide.Ask, 501, 1),
     ];
@@ -1530,11 +1530,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1543,28 +1543,28 @@ describe("Arbitrager", function(){
     positionService.isStarted = true;
     await arbitrager.start();
 
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
 
-    await quoteAggregator.emitParallel("quoteUpdated", quotes2);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes2);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(2);
  
     // closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Closed");
     const pairs = await activePairStore.getAll();
     expect(pairs.length).to.equal(1);
     expect(pairs[0].value[0].price).to.equal(501);
  
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Closed");
     expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
   it("Close filled orders with minExitTargetProfitPercent", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1574,11 +1574,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfitPercent = -80;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1586,17 +1586,17 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Closed");
     expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
   it("Not close filled orders with minExitTargetProfitPercent", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1606,11 +1606,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfitPercent = -20;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1618,17 +1618,17 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(2);
   });
 
   it("Close two filled orders", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1638,11 +1638,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -200;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1650,30 +1650,30 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(2);
 
     //closing
-    const quotes2 = [
+    const localQuotes2 = [
       toQuote("Quoine", QuoteSide.Ask, 620, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
       toQuote("Coincheck", QuoteSide.Bid, 450, 1),
     ];
-    await quoteAggregator.emitParallel("quoteUpdated", quotes2);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes2);
     expect(arbitrager.status).to.equal("Closed");
     expect((await activePairStore.getAll()).length).to.equal(1);
-    await quoteAggregator.emitParallel("quoteUpdated", quotes2);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes2);
     expect(arbitrager.status).to.equal("Closed");
     expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
   it("Closing filled orders with no lastResult in spread analyzer", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1683,11 +1683,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1695,17 +1695,17 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Closed");
     expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
   it("Closing filled orders when spread analyzer throws", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1715,11 +1715,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1727,7 +1727,7 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
@@ -1737,7 +1737,8 @@ describe("Arbitrager", function(){
   });
 
   it("Not close filled orders with maxTargetVolumePercent", async () => {
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    const originalRefresh = baRouter.refresh;
+    baRouter.refresh = spy(order => order.status = OrderStatus.Filled);
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
@@ -1783,10 +1784,12 @@ describe("Arbitrager", function(){
     await quoteAggregator.emitParallel("quoteUpdated", []);
     expect(arbitrager.status).to.equal("Too large Volume");
     expect((await activePairStore.getAll()).length).to.equal(1);
+
+    baRouter.refresh = originalRefresh;
   });
 
   it("Close filled orders with exitNetProfitRatio", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1800,11 +1803,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.exitNetProfitRatio = -200;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1812,17 +1815,17 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Closed");
     expect((await activePairStore.getAll()).length).to.equal(0);
   });
 
   it("Not close filled orders with exitNetProfitRatio", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1836,11 +1839,11 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.exitNetProfitRatio = -199;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1848,17 +1851,17 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // Not closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(2);
   });
 
   it("Not close filled orders with exitNetProfitRatio and commission", async () => {
-    const quotes = [
+    const localQuotes = [
       toQuote("Quoine", QuoteSide.Ask, 700, 4),
       toQuote("Quoine", QuoteSide.Bid, 600, 4),
       toQuote("Coincheck", QuoteSide.Ask, 500, 1),
@@ -1874,11 +1877,11 @@ describe("Arbitrager", function(){
     config.exitNetProfitRatio = 399;
     config.brokers[0].commissionPercent = 0.15;
     config.brokers[1].commissionPercent = 0.15;
-    const spreadAnalyzer = new SpreadAnalyzer(configStore);
+    const localSpreadAnalyzer = new SpreadAnalyzer(configStore);
     const searcher = new OppotunitySearcher(
       configStore,
       positionService,
-      spreadAnalyzer,
+      localSpreadAnalyzer,
       limitCheckerFactory,
       activePairStore
     );
@@ -1886,11 +1889,11 @@ describe("Arbitrager", function(){
     const arbitrager = new Arbitrager(quoteAggregator, configStore, positionService, searcher, trader);
     positionService.isStarted = true;
     await arbitrager.start();
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(1);
     // Not closing
-    await quoteAggregator.emitParallel("quoteUpdated", quotes);
+    await quoteAggregator.emitParallel("quoteUpdated", localQuotes);
     expect(arbitrager.status).to.equal("Filled");
     expect((await activePairStore.getAll()).length).to.equal(2);
   });

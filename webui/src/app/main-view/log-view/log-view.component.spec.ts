@@ -1,22 +1,24 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from "@angular/core/testing";
 
-import { LogViewComponent } from './log-view.component';
-import { LogService } from '../log.service';
+import { async, TestBed } from "@angular/core/testing";
+
+import { LogViewComponent } from "./log-view.component";
+import { LogService } from "../log.service";
 
 const logServiceStub = {
-  connect: []
-}
+  connect: [],
+};
 
-describe('LogViewComponent', () => {
+describe("LogViewComponent", () => {
   let component: LogViewComponent;
   let fixture: ComponentFixture<LogViewComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ LogViewComponent ],
-      providers: [ {provide: LogService, useValue: logServiceStub}]
+      providers: [ { provide: LogService, useValue: logServiceStub }],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -25,7 +27,7 @@ describe('LogViewComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

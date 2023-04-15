@@ -30,7 +30,9 @@ decorate(injectable(), EventEmitter);
 decorate(injectable(), AwaitableEventEmitter);
 
 const container = new Container();
-container.bind<Arbitrager>(Arbitrager).toSelf();
+container
+  .bind<Arbitrager>(Arbitrager)
+  .toSelf();
 container
   .bind<ConfigStore>(symbols.ConfigStore)
   .to(JsonConfigStore)

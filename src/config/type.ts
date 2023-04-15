@@ -1,6 +1,6 @@
 import { Castable, cast, element } from "@bitr/castable";
 
-import { CashMarginType } from "./types";
+import { CashMarginType } from "../types/common";
 
 export interface BrokerConfigType {
   broker: string;
@@ -26,9 +26,7 @@ export class BrokerConfig extends Castable implements BrokerConfigType {
   @cast cashMarginType: CashMarginType;
   @cast leverageLevel: number;
   @cast commissionPercent: number;
-  @cast
-  @element(Array, String)
-  noTradePeriods: string[][];
+  @cast @element(Array, String) noTradePeriods: string[][];
 }
 
 export class SlackConfig extends Castable {
@@ -60,7 +58,7 @@ export class OnSingleLegConfig extends Castable {
   @cast options: CancelOption | ReverseOption | ProceedOption;
 }
 
-export type CancelOption = {};
+export type CancelOption = Record<string, never>;
 
 export class ReverseOption extends Castable {
   @cast limitMovePercent: number;
@@ -80,6 +78,8 @@ export class AnalyticsConfig extends Castable {
 
 export class WebGatewayConfig extends Castable {
   @cast enabled: boolean;
+  @cast host: string;
+  @cast openBrowser: boolean;
 }
 
 export class StabilityTrackerConfig extends Castable {
@@ -116,5 +116,5 @@ export class ConfigRoot extends Castable {
   @cast
   @element(BrokerConfig)
   brokers: BrokerConfig[];
-  @cast logging: LoggingConfig;
+  @cast logging?: LoggingConfig;
 }

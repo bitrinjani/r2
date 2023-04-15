@@ -32,7 +32,7 @@ class EmittableHistoricalOrderStore extends EventEmitter implements HistoricalOr
     return this.timeSeries.del(key);
   }
 
-  delAll(): Promise<{}> {
+  delAll(): Promise<void> {
     this.emit("change");
     return this.timeSeries.delAll();
   }

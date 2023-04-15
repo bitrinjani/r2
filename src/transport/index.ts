@@ -1,4 +1,4 @@
-import type { SlackConfig, LineConfig } from "../types";
+import type { SlackConfig, LineConfig } from "../config";
 import type { Server as httpServer } from "http";
 
 import * as fs from "fs";
@@ -11,7 +11,7 @@ import * as WebSocket from "ws";
 import LineIntegration from "./LineIntegration";
 import SlackIntegration from "./SlackIntegration";
 import { pretty, splitToJson } from "./transform";
-import { getConfigRoot } from "../configUtil";
+import { getConfigRoot } from "../config";
 import { wssLogPort } from "../constants";
 
 
@@ -70,7 +70,7 @@ if(webGatewayConfig && webGatewayConfig.enabled){
   });
   wss = new WebSocket.Server({ server });
   wss.on("connection", ws => {
-    ws.on("error", err => {
+    ws.on("error", () => {
       _.noop();
     });
     clients.push(ws);

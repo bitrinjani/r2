@@ -1,15 +1,15 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed, inject } from "@angular/core/testing";
 
-import { DepthService } from './depth.service';
+import { DepthService } from "./depth.service";
 
-describe('DepthService', () => {
+describe("DepthService", () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [DepthService]
+      providers: [DepthService],
     });
   });
 
-  it('should be created', inject([DepthService], (service: DepthService) => {
+  it("should be created", inject([DepthService], (service: DepthService) => {
     expect(service).toBeTruthy();
   }));
 });

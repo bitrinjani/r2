@@ -1,16 +1,18 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import type { ComponentFixture } from "@angular/core/testing";
 
-import { DepthBrokerCellComponent } from './depth-broker-cell.component';
+import { async, TestBed } from "@angular/core/testing";
 
-describe('DepthBrokerCellComponent', () => {
+import { DepthBrokerCellComponent } from "./depth-broker-cell.component";
+
+describe("DepthBrokerCellComponent", () => {
   let component: DepthBrokerCellComponent;
   let fixture: ComponentFixture<DepthBrokerCellComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DepthBrokerCellComponent ]
+      declarations: [ DepthBrokerCellComponent ],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,7 +21,7 @@ describe('DepthBrokerCellComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

@@ -1,11 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { WsService } from '../../ws.service';
-import { SpreadAnalysisResult, LimitCheckResult } from '../../types';
-import { Subscription } from 'rxjs/Subscription';
+import type { SpreadAnalysisResult, LimitCheckResult } from "../../types";
+import type { OnInit, OnDestroy } from "@angular/core";
+import type { Subscription } from "rxjs/Subscription";
+
+import { Component } from "@angular/core";
+
+import { WsService } from "../../ws.service";
 
 @Component({
-  selector: 'app-spread-analysis',
-  templateUrl: './spread-analysis.component.html'
+  selector: "app-spread-analysis",
+  templateUrl: "./spread-analysis.component.html",
 })
 export class SpreadAnalysisComponent implements OnInit, OnDestroy {
   private subscription: Subscription;

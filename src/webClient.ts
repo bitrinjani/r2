@@ -17,7 +17,7 @@ export default class WebClient {
     const url = this.baseUrl + path;
     this.log.debug(`Sending HTTP request... URL: ${url} Request: ${JSON.stringify(init)}`);
     const res = await fetch(url, init);
-    let logText = `Response from ${res.url}. ` + `Status Code: ${res.status} (${res.statusText}) `;
+    let logText = `Response from ${res.url}. Status Code: ${res.status} (${res.statusText}) `;
     this.log.debug(logText);
     const content = await res.text();
     if(!res.ok){

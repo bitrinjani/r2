@@ -11,12 +11,14 @@ import { OrderSide, CashMarginType, OrderType } from "../src/types";
 describe("HistoricalOrderStore", function(){
   let store: HistoricalOrderStore;
   let chronoDB;
+   
   this.beforeAll(async () => {
     chronoDB = new ChronoDB(`${__dirname}/datastore/histtest`);
     store = getHistoricalOrderStore(chronoDB);
     await store.delAll();
   });
 
+   
   this.afterAll(async () => {
     await store.delAll();
     await chronoDB.close();

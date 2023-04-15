@@ -119,7 +119,7 @@ export default class SpreadAnalyzer {
       })
       .value();
     const flattened = _(byBroker)
-      .map((v, k) => [v.ask, v.bid])
+      .map((v) => [v.ask, v.bid])
       .flatten()
       .filter(q => q !== undefined)
       .value() as Quote[];
