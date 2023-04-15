@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { getConfigRoot } from '../configUtil';
+import { getConfigRoot } from '../src/configUtil';
 import { expect, spy } from 'chai';
 
 let existsSyncCount = 0;

@@ -1,12 +1,12 @@
 import 'reflect-metadata';
-import JsonConfigStore from '../jsonConfigStore';
-import { ConfigRoot } from '../types';
+import JsonConfigStore from '../src/jsonConfigStore';
+import { ConfigRoot } from '../src/types';
 import { options } from '@bitr/logger';
-import { delay } from '../util';
+import { delay } from '../src/util';
 import * as _ from 'lodash';
 import { Socket, socket } from 'zeromq';
-import { configStoreSocketUrl } from '../constants';
-import { ConfigRequester } from '../messages';
+import { configStoreSocketUrl } from '../src/constants';
+import { ConfigRequester } from '../src/messages';
 import { expect } from 'chai';
 options.enabled = false;
 

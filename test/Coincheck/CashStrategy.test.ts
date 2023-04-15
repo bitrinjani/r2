@@ -1,6 +1,6 @@
-import { CashMarginType, OrderSide, OrderType, Broker, OrderStatus } from '../../types';
-import CashStrategy from '../../Coincheck/CashStrategy';
-import BrokerApi from '../../Coincheck/BrokerApi';
+import { CashMarginType, OrderSide, OrderType, Broker, OrderStatus } from '../../src/types';
+import CashStrategy from '../../src/Coincheck/CashStrategy';
+import BrokerApi from '../../src/Coincheck/BrokerApi';
 import nocksetup from './nocksetup';
 import * as nock from 'nock';
 import { options } from '@bitr/logger';

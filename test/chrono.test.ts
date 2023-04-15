@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { getChronoDB, closeChronoDB } from '../chrono';
+import { getChronoDB, closeChronoDB } from '../src/chrono';
 
 describe("ChronoTest", function(){
   it('close undefined', () => {

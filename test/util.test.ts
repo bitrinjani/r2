@@ -1,7 +1,5 @@
-import * as util from '../util';
-import { Broker, OrderSide, CashMarginType, OrderType } from '../types';
-import { findBrokerConfig } from '../configUtil';
-import OrderImpl from '../orderImpl';
+import * as util from '../src/util';
+import { findBrokerConfig } from '../src/configUtil';
 import { expect } from 'chai';
 
 

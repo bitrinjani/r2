@@ -1,7 +1,7 @@
-import { getHistoricalOrderStore } from '../HistoricalOrderStore';
-import { ChronoDB } from '../chrono';
+import { getHistoricalOrderStore } from '../src/HistoricalOrderStore';
+import { ChronoDB } from '../src/chrono';
 import { createOrder } from './helper';
-import { OrderSide, CashMarginType, OrderType, HistoricalOrderStore } from '../types';
+import { OrderSide, CashMarginType, OrderType, HistoricalOrderStore } from '../src/types';
 import { expect } from 'chai';
 
 describe('HistoricalOrderStore', function(){

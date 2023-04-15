@@ -1,5 +1,5 @@
-import CashStrategy from '../../Quoine/CashStrategy';
-import BrokerApi from '../../Quoine/BrokerApi';
+import CashStrategy from '../../src/Quoine/CashStrategy';
+import BrokerApi from '../../src/Quoine/BrokerApi';
 import nocksetup from './nocksetup';
 import * as nock from 'nock';
 import { options } from '@bitr/logger';

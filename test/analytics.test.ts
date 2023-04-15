@@ -1,9 +1,9 @@
 import AnalyticsService from '../analytics/AnalyticsService';
 import { socket } from 'zeromq';
-import { configStoreSocketUrl, reportServicePubUrl, reportServiceRepUrl } from '../constants';
-import { delay } from '../util';
+import { configStoreSocketUrl, reportServicePubUrl, reportServiceRepUrl } from '../src/constants';
+import { delay } from '../src/util';
 import { options } from '@bitr/logger';
-import { ConfigResponder, SnapshotResponder } from '../messages';
+import { ConfigResponder, SnapshotResponder } from '../src/messages';
 import { expect } from 'chai';
 
 options.enabled = false;

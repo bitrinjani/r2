@@ -1,6 +1,6 @@
 
 // tslint:disable:max-line-length
-import WebClient from '../webClient';
+import WebClient from '../src/webClient';
 import { RequestInit } from 'node-fetch';
 import * as nock from 'nock';
 import { options } from '@bitr/logger';

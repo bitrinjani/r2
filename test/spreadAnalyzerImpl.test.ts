@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import SpreadAnalyzer from '../spreadAnalyzer';
-import { QuoteSide, ConfigStore } from '../types';
+import SpreadAnalyzer from '../src/spreadAnalyzer';
+import { QuoteSide, ConfigStore } from '../src/types';
 import * as _ from 'lodash';
 import { options } from '@bitr/logger';
-import { toQuote } from '../util';
+import { toQuote } from '../src/util';
 import { expect } from 'chai';
 options.enabled = false;
 

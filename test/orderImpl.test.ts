@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import OrderImpl from '../orderImpl';
-import { Broker, OrderSide, OrderType, CashMarginType, Execution } from '../types';
-import { toExecution } from '../util';
+import { OrderSide, OrderType, CashMarginType, Execution } from '../src/types';
+import { toExecution } from '../src/util';
 import { createOrder } from './helper';
 
 describe('Order', () => {

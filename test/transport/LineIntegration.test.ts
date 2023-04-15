@@ -1,7 +1,7 @@
-import LineIntegration from '../../transport/LineIntegration';
-import { LineConfig } from '../../types';
+import LineIntegration from '../../src/transport/LineIntegration';
+import { LineConfig } from '../../src/types';
 import * as nock from 'nock';
-import { delay } from '../../util';
+import { delay } from '../../src/util';
 
 const lineUrl = 'https://notify-api.line.me/api/notify';
 const lineApi = nock(lineUrl);

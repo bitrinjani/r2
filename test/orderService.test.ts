@@ -1,7 +1,7 @@
 import { expect, spy } from 'chai';
-import OrderService from '../orderService';
-import { OrderSide, CashMarginType, OrderType, OrderStatus } from '../types';
-import { delay } from '../util';
+import OrderService from '../src/rderService';
+import { OrderSide, CashMarginType, OrderType, OrderStatus } from '../src/types';
+import { delay } from '../src/util';
 
 describe('OrderService', () => {
   const store = { put: spy() };

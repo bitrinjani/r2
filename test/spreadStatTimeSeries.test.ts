@@ -1,5 +1,5 @@
 import { expect, spy } from 'chai';
-import { getSpreadStatTimeSeries } from '../spreadStatTimeSeries';
+import { getSpreadStatTimeSeries } from '../src/spreadStatTimeSeries';
 
 describe('SpreadStatTimeSeries', () => {
   it('get', () => {

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import BrokerStabilityTracker from '../brokerStabilityTracker';
-import { delay } from '../util';
+import BrokerStabilityTracker from '../src/brokerStabilityTracker';
+import { delay } from '../src/util';
 
 describe('BrokerStabilityTracker', () => {
   it('start/stop', async () => {

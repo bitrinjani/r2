@@ -1,7 +1,7 @@
-import SlackIntegration from '../../transport/SlackIntegration';
-import { SlackConfig } from '../../types';
+import SlackIntegration from '../../src/transport/SlackIntegration';
+import { SlackConfig } from '../../src/types';
 import * as nock from 'nock';
-import * as util from '../../util';
+import * as util from '../../src/util';
 
 const slackUrl = 'https://hooks.slack.com/services';
 const slackApi = nock(slackUrl);

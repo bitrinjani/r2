@@ -1,12 +1,12 @@
-import ReportService from '../reportService';
+import ReportService from '../src/reportService';
 import * as rimraf from 'rimraf';
 import * as mkdirp from 'mkdirp';
-import { toQuote } from '../util';
-import { QuoteSide } from '../types';
-import SpreadAnalyzer from '../spreadAnalyzer';
-import { reportServiceRepUrl } from '../constants';
-import { SnapshotRequester } from '../messages';
-import QuoteAggregator from '../quoteAggregator';
+import { toQuote } from '../src/util';
+import { QuoteSide } from '../src/types';
+import SpreadAnalyzer from '../src/spreadAnalyzer';
+import { reportServiceRepUrl } from '../src/constants';
+import { SnapshotRequester } from '../src/messages';
+import QuoteAggregator from '../src/quoteAggregator';
 import { AwaitableEventEmitter } from '@bitr/awaitable-event-emitter';
 import { expect, spy } from 'chai';
 

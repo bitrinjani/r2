@@ -12,6 +12,7 @@
     "start": "npm run build && npm run onlystart",
     "test": "mocha --exit -- -r ts-node/register -r ./test/importSpy.ts ./test/**/*.test.ts",
     "lint": "tsc && eslint ./src/**/*.ts",
+    "testlint": "tsc && eslint ./test/**/*.test.ts",
     "cleanup": "rimraf dist/",
     "clearPairs": "ts-node ./tools/clearPairs.ts",
     "getBalance": "ts-node ./tools/getBalance.ts",

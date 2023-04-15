@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import ConfigValidator from '../configValidator';
-import { ConfigRoot } from '../types';
+import ConfigValidator from '../src/configValidator';
+import { ConfigRoot } from '../src/types';
 import { options } from '@bitr/logger';
 options.enabled = false;
 
