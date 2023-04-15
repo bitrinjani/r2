@@ -14,15 +14,15 @@ import Arbitrager from "../src/arbitrager";
 import { ChronoDB } from "../src/chrono";
 import LimitCheckerFactory from "../src/limitCheckerFactory";
 import OppotunitySearcher from "../src/opportunitySearcher";
+import PairTrader from "../src/pairTrader";
+import SingleLegHandler from "../src/singleLegHandler";
+import SpreadAnalyzer from "../src/spreadAnalyzer";
 import {
   QuoteSide,
   CashMarginType,
   OrderStatus,
-  OrderSide} from "../src/types";
-import PairTrader from "../src/pairTrader";
-import SpreadAnalyzer from "../src/spreadAnalyzer";
+  OrderSide } from "../src/types";
 import { toQuote } from "../src/util";
-import SingleLegHandler from "../src/singleLegHandler";
 
 options.enabled = false;
 
