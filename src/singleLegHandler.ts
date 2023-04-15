@@ -1,4 +1,5 @@
-import type { OnSingleLegConfig, ReverseOption, ProceedOption, OrderPair } from "./types";
+import type { OnSingleLegConfig, ReverseOption, ProceedOption } from "./config";
+import type { OrderPair } from "./types";
 
 import { getLogger } from "@bitr/logger";
 import { injectable, inject } from "inversify";

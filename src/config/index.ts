@@ -9,7 +9,7 @@ import * as _ from "lodash";
 import { ConfigRoot } from "./type";
 
 export * from "./type";
-export * from "./validator";
+export ConfigValidator from "./validator";
 
 const defaultValues = {
   symbol: "BTC/JPY",

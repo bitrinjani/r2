@@ -1,6 +1,6 @@
-import type { ConfigStore, ConfigRoot } from ".";
+import type { ConfigRoot } from "./type";
 import type { ConfigRequest, ConfigResponse } from "../messages";
-
+import type { ConfigStore } from "../types";
 
 import { EventEmitter } from "events";
 import * as fs from "fs";

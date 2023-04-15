@@ -1,4 +1,4 @@
-import type { BrokerConfig } from "./config"
+import type { BrokerConfig } from "./config";
 import type { BrokerMap, BrokerPosition } from "./types";
 
 import { EventEmitter } from "events";

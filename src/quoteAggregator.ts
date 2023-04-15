@@ -1,4 +1,5 @@
-import type { BrokerConfig, Broker, Quote } from "./types";
+import type { BrokerConfig } from "./config";
+import type { Broker, Quote } from "./types";
 
 import { AwaitableEventEmitter } from "@bitr/awaitable-event-emitter";
 import { getLogger } from "@bitr/logger";

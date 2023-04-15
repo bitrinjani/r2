@@ -14,7 +14,7 @@ import Decimal from "decimal.js";
 import { injectable, inject } from "inversify";
 import * as _ from "lodash";
 
-import { findBrokerConfig } from "./configUtil";
+import { findBrokerConfig } from "./config";
 import { LOT_MIN_DECIMAL_PLACE } from "./constants";
 import t from "./i18n";
 import { calcCommission } from "./pnl";
