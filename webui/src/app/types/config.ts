@@ -60,7 +60,7 @@ export class OnSingleLegConfig extends Castable {
   @cast options: CancelOption | ReverseOption | ProceedOption;
 }
 
-export type CancelOption = {};
+export type CancelOption = Record<string, never>;
 
 export class ReverseOption extends Castable {
   @cast limitMovePercent: number;

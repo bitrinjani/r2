@@ -5,7 +5,7 @@ import { options } from "@bitr/logger";
 import * as _ from "lodash";
 
 import BitflyerApi from "../src/Bitflyer/BrokerApi";
-import { getConfigRoot, findBrokerConfig } from "../src/configUtil";
+import { getConfigRoot, findBrokerConfig } from "../src/config";
 
 options.enabled = false;
 
@@ -30,5 +30,4 @@ async function main() {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();

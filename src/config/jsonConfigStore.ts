@@ -12,7 +12,7 @@ import { injectable } from "inversify";
 import * as _ from "lodash";
 
 import { getConfigRoot } from ".";
-import ConfigValidator from "./validator";
+import { ConfigValidator } from "./validator";
 import { configStoreSocketUrl } from "../constants";
 import { ConfigResponder } from "../messages";
 

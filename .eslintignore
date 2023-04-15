@@ -2,3 +2,4 @@ node_modules
 dist
 plugins
 *.json
+*.js

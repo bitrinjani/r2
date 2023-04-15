@@ -1,12 +1,11 @@
 import type { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from "./types";
+import type { BrokerConfigType } from "../config";
 import type {
   BrokerAdapter,
   Order,
   Execution,
-  Quote,
-  BrokerConfigType
+  Quote
 } from "../types";
-
 
 import Decimal from "decimal.js";
 import * as _ from "lodash";

@@ -1,6 +1,6 @@
 import type { Quote, Broker, Order } from "./common";
-import type { ConfigRoot } from "./config";
 import type { TimeSeries } from "../chrono";
+import type { ConfigRoot } from "../config";
 import type OrderImpl from "../orderImpl";
 import type { EventEmitter } from "events";
 

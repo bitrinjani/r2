@@ -1,4 +1,4 @@
-import type { BrokerConfigType } from "../types";
+import type { BrokerConfigType } from "../config";
 
 import BrokerAdapterImpl from "./BrokerAdapterImpl";
 

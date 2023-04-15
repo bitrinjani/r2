@@ -8,4 +8,7 @@
     "./webui/**/*.ts",
     "./tools/**/*.ts"
   ],
+  "exclude": [
+    "./src/**/*.ts"
+  ]
 }

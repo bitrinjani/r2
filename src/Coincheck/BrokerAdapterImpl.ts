@@ -1,10 +1,10 @@
 import type { OrderBooksResponse, CashMarginTypeStrategy } from "./types";
+import type { BrokerConfigType } from "../config";
 import type {
   Order,
   Execution,
   BrokerAdapter,
-  Quote,
-  BrokerConfigType
+  Quote
 } from "../types";
 
 import { getLogger } from "@bitr/logger";

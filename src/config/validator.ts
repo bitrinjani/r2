@@ -8,7 +8,7 @@ import t from "../i18n";
 import { CashMarginType } from "../types";
 
 @injectable()
-export default class ConfigValidator {
+export class ConfigValidator {
   validate(config: ConfigRoot): void {
     const enabledBrokers = config.brokers.filter(b => b.enabled);
     this.throwIf(enabledBrokers.length < 2, t`AtLeastTwoBrokersMustBeEnabled`);

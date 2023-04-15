@@ -8,6 +8,7 @@ describe("poc App", () => {
   });
 
   it("should display welcome message", () => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     page.navigateTo();
     expect(page.getParagraphText()).toEqual("Welcome to app!");
   });

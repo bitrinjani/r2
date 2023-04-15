@@ -345,8 +345,7 @@
       },
       {
         "files": [
-          "./webui/**/*.ts",
-          "./webui/**/*.js"
+          "./webui/**/*.ts"
         ],
         "parserOptions": {
           "project": "./tsconfig.test.json"

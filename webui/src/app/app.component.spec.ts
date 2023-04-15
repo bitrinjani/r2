@@ -10,7 +10,7 @@ import { DepthSizeCellComponent } from "./depth-size-cell/depth-size-cell.compon
 import { LogViewComponent } from "./log-view/log-view.component";
 import { MainViewComponent } from "./main-view/main-view.component";
 describe("AppComponent", () => {
-  beforeEach(async(() => {
+  beforeEach((() => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent,

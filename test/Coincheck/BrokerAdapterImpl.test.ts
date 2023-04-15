@@ -1,5 +1,5 @@
 // tslint:disable
-import type { ConfigRoot, BrokerConfigType } from "../../src/types";
+import type { ConfigRoot, BrokerConfigType } from "../../src/config";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";

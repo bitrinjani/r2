@@ -3,7 +3,7 @@
 import { options } from "@bitr/logger";
 
 import CoincheckApi from "../src/Coincheck/BrokerApi";
-import { getConfigRoot, findBrokerConfig } from "../src/configUtil";
+import { getConfigRoot, findBrokerConfig } from "../src/config";
 
 options.enabled = false;
 
@@ -29,5 +29,4 @@ async function main() {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
 main();
