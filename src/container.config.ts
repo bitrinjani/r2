@@ -11,7 +11,7 @@ import BrokerAdapterRouter from "./brokerAdapterRouter";
 import BrokerStabilityTracker from "./brokerStabilityTracker";
 import { getChronoDB } from "./chrono";
 import { ConfigValidator } from "./config";
-import JsonConfigStore from "./config/jsonConfigStore";
+import { JsonConfigStore } from "./config";
 import { getHistoricalOrderStore } from "./historicalOrderStore";
 import LimitCheckerFactory from "./limitCheckerFactory";
 import OppotunitySearcher from "./opportunitySearcher";

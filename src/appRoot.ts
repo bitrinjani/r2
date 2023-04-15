@@ -1,21 +1,20 @@
-/* eslint-disable import/order */
+
+import type { BrokerAdapter, ConfigStore } from "./types";
+import type { Container } from "inversify";
+
 import { getLogger } from "@bitr/logger";
 
+import Arbitrager from "./arbitrager";
+import BrokerStabilityTracker from "./brokerStabilityTracker";
+import { closeChronoDB } from "./chrono";
 import t from "./i18n";
 import "reflect-metadata";
 import PositionService from "./positionService";
 import QuoteAggregator from "./quoteAggregator";
 import ReportService from "./reportService";
 import symbols from "./symbols";
-
-import type { BrokerAdapter, ConfigStore } from "./types";
-import type { Container } from "inversify";
-
-import { closeChronoDB } from "./chrono";
-import Arbitrager from "./arbitrager";
-import BrokerStabilityTracker from "./brokerStabilityTracker";
 import WebGateway from "./webGateway";
-/* eslint-enable import/order */
+
 
 export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
