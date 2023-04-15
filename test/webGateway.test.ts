@@ -1,6 +1,6 @@
 import { spy } from 'chai';
-import WebGateway from '../webGateway';
-import { delay } from '../util';
+import WebGateway from '../src/webGateway';
+import { delay } from '../src/util';
 import { EventEmitter } from 'events';
 import * as WebSocket from 'ws';
 
