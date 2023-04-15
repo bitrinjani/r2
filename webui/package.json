@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "^15.2.6",
     "@angular/router": "^15.2.6",
     "@bitr/castable": "^1.0.3",
-    "core-js": "^3.30.0",
+    "core-js": "^3.30.1",
     "lodash": "^4.17.5",
     "rxjs": "^7.4.0",
     "reconnecting-websocket": "^4.4.0",
