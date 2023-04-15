@@ -22,7 +22,7 @@ Module.prototype.require = new Proxy(Module.prototype.require, {
   },
 });
 
-import { pretty } from "../../transport/transform";
+import { pretty } from "../../src/transport/transform";
 
 import { Readable } from "stream";
 
