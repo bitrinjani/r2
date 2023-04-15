@@ -11,7 +11,7 @@ import { injectable, inject } from "inversify";
 import * as _ from "lodash";
 
 import BrokerAdapterRouter from "./brokerAdapterRouter";
-import { findBrokerConfig } from "./configUtil";
+import { findBrokerConfig } from "./config";
 import t from "./i18n";
 import OrderImpl from "./orderImpl";
 import * as OrderUtil from "./orderUtil";

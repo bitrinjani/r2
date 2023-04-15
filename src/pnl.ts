@@ -1,9 +1,10 @@
+import type { ConfigRoot } from "./config";
 import type OrderImpl from "./orderImpl";
-import type { ConfigRoot } from "./types";
+
 
 import * as _ from "lodash";
 
-import { findBrokerConfig } from "./configUtil";
+import { findBrokerConfig } from "./config";
 import { OrderSide } from "./types";
 
 export function calcCommission(price: number, volume: number, commissionPercent: number): number {

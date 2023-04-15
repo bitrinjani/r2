@@ -1,4 +1,5 @@
-import type { ConfigRoot, SpreadStat } from "./types";
+import type { ConfigRoot } from "./config";
+import type { SpreadStat } from "./types";
 
 import { ZmqResponder, ZmqRequester } from "./zmq";
 

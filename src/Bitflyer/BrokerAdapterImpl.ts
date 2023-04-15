@@ -1,12 +1,11 @@
 import type { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from "./types";
+import type { BrokerConfigType } from "../config";
 import type {
   BrokerAdapter,
   Order,
   Execution,
-  Quote,
-  BrokerConfigType
+  Quote
 } from "../types";
-
 
 import { getLogger } from "@bitr/logger";
 import * as _ from "lodash";

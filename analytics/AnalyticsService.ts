@@ -1,4 +1,5 @@
-import type { SpreadStat, AnalyticsConfig } from "../src/types";
+import type { AnalyticsConfig } from "../src/config";
+import type { SpreadStat } from "../src/types";
 
 import { getLogger } from "@bitr/logger";
 
