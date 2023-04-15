@@ -1,4 +1,5 @@
 import * as Module from "module";
+import { Readable } from "stream";
 
 import { spy } from "chai";
 
@@ -23,8 +24,6 @@ Module.prototype.require = new Proxy(Module.prototype.require, {
 });
 
 import { pretty } from "../../src/transport/transform";
-
-import { Readable } from "stream";
 
 it("pretty split callback throws", () => {
   const result = pretty({ colorize: true, withLabel: true, debug: true, hidden: false });
