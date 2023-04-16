@@ -1,103 +1,120 @@
-import type { Static } from "@sinclair/typebox";
+import { Castable, cast, element } from "@bitr/castable";
 
-import { Type } from "@sinclair/typebox";
+import { CashMarginType } from "../types/common";
 
-const StabilityTrackerConfig = Type.Object({
-  threshold: Type.Number({ default: 8 }),
-  recoveryInterval: Type.Number({ default: 300000 }),
-});
+export interface BrokerConfigType {
+  broker: string;
+  npmPath?: string;
+  enabled: boolean;
+  key: string;
+  secret: string;
+  maxLongPosition: number;
+  maxShortPosition: number;
+  cashMarginType: CashMarginType;
+  leverageLevel: number;
+  commissionPercent: number;
+}
 
-const OnSingleLegConfig = Type.Object({
-  action: Type.Union([
-    Type.Literal("Cancel"),
-    Type.Literal("Reverse"),
-    Type.Literal("Proceed"),
-  ]),
-  actionOnExit: Type.Union([
-    Type.Literal("Cancel"),
-    Type.Literal("Reverse"),
-    Type.Literal("Proceed"),
-  ]),
-  options: Type.Object({
-    limitMovePercent: Type.Number(),
-    ttl: Type.Number(),
-  }),
-});
+export class BrokerConfig extends Castable implements BrokerConfigType {
+  @cast broker: string;
+  @cast npmPath?: string;
+  @cast enabled: boolean;
+  @cast key: string;
+  @cast secret: string;
+  @cast maxLongPosition: number;
+  @cast maxShortPosition: number;
+  @cast cashMarginType: CashMarginType;
+  @cast leverageLevel: number;
+  @cast commissionPercent: number;
+  @cast @element(Array, String) noTradePeriods: string[][];
+}
 
-const AnalyticsConfig = Type.Object({
-  enabled: Type.Boolean({ default: false }),
-  plugin: Type.Optional(Type.String()),
-  initialHistory: Type.Optional(Type.Object({
-    minutes: Type.Number({ default: 30 }),
-  })),
-});
+export class SlackConfig extends Castable {
+  @cast enabled: boolean;
+  @cast url: string;
+  @cast channel: string;
+  @cast username: string;
+  @cast
+  @element(String)
+  keywords: string[];
+}
 
-const WebGatewayConfig = Type.Object({
-  enabled: Type.Boolean({ default: false }),
-  host: Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
-  openBrowser: Type.Boolean({ default: true }),
-});
+export class LineConfig extends Castable {
+  @cast enabled: boolean;
+  @cast token: string;
+  @cast
+  @element(String)
+  keywords: string[];
+}
 
-const LoggingConfig = Type.Optional(Type.Object({
-  webhook: Type.Optional(Type.Object({
-    enabled: Type.Boolean({ default: false }),
-    payload: Type.String(),
-    keywords: Type.Array(Type.String()),
-  })),
-  line: Type.Optional(Type.Object({
-    enabled: Type.Boolean({ default: false }),
-    keywords: Type.Array(Type.String()),
-  })),
-}));
+export class LoggingConfig extends Castable {
+  @cast slack: SlackConfig;
+  @cast line: LineConfig;
+}
 
-const BrokerConfig = Type.Object({
-  broker: Type.String(),
-  enabled: Type.Boolean(),
-  maxLongPosition: Type.Number(),
-  maxShortPosition: Type.Number(),
-  cashMarginType: Type.Optional(Type.Union([
-    Type.Literal("Cash"),
-    Type.Literal("MarginOpen"),
-    Type.Literal("NetOut"),
-  ])),
-  leverageLevel: Type.Number(),
-  commissionPercent: Type.Number(),
-  noTradePeriods: Type.Optional(Type.Array(
-    Type.Array(Type.String())
-  )),
-});
+export class OnSingleLegConfig extends Castable {
+  @cast action: "Cancel" | "Reverse" | "Proceed";
+  @cast actionOnExit: "Cancel" | "Reverse" | "Proceed";
+  @cast options: CancelOption | ReverseOption | ProceedOption;
+}
 
-export const ConfigRoot = Type.Object({
-  language: Type.Union([
-    Type.Literal("en"),
-    Type.Literal("ja"),
-  ], { default: "en" }),
-  demoMode: Type.Boolean({ default: true }),
-  debug: Type.Boolean({ default: false }),
-  symbol: Type.String({ minLength: 7, default: "BTC/JPY" }),
-  priceMergeSize: Type.Number({ default: 100 }),
-  maxSize: Type.Number({ default: 0.01 }),
-  minSize: Type.Number({ default: 0.01 }),
-  minTargetProfitPercent: Type.Optional(Type.Number({ maximum: 100, default: 1 })),
-  maxTargetProfit: Type.Optional(Type.Number()),
-  maxTargetProfitPercent: Type.Optional(Type.Number({ maximum: 100 })),
-  exitNetProfitRatio: Type.Number({ maximum: 100, default: 20 }),
-  maxTargetVolumePercent: Type.Optional(Type.Number({ maximum: 100, default: 50 })),
-  acceptablePriceRange: Type.Optional(Type.Number({ maximum: 100 })),
-  iterationInterval: Type.Number({ default: 3000 }),
-  positionRefreshInterval: Type.Number({ default: 5000 }),
-  sleepAfterSend: Type.Number({ default: 5000 }),
-  maxNetExposure: Type.Number({ default: 0.1 }),
-  maxRetryCount: Type.Number({ default: 10 }),
-  orderStatusCheckInterval: Type.Number({ default: 3000 }),
-  onSingleLeg: OnSingleLegConfig,
-  stabilityTracker: StabilityTrackerConfig,
-  analytics: AnalyticsConfig,
-  webGateway: WebGatewayConfig,
-  logging: Type.Optional(LoggingConfig),
-  brokers: Type.Array(BrokerConfig),
-});
+export type CancelOption = Record<string, never>;
 
-export type BrokerConfigType = Static<typeof BrokerConfig>;
-export type ConfigRootType = Static<typeof ConfigRoot>;
-export type AnalyticsConfigType = Static<typeof AnalyticsConfig>;
+export class ReverseOption extends Castable {
+  @cast limitMovePercent: number;
+  @cast ttl: number;
+}
+
+export class ProceedOption extends Castable {
+  @cast limitMovePercent: number;
+  @cast ttl: number;
+}
+
+export class AnalyticsConfig extends Castable {
+  @cast enabled: boolean;
+  @cast plugin: string;
+  @cast initialHistory: object;
+}
+
+export class WebGatewayConfig extends Castable {
+  @cast enabled: boolean;
+  @cast host: string;
+  @cast openBrowser: boolean;
+}
+
+export class StabilityTrackerConfig extends Castable {
+  @cast threshold: number;
+  @cast recoveryInterval: number;
+}
+
+export class ConfigRoot extends Castable {
+  @cast language: string;
+  @cast demoMode: boolean;
+  @cast symbol: string;
+  @cast priceMergeSize: number;
+  @cast maxSize: number;
+  @cast minSize: number;
+  @cast minTargetProfit: number;
+  @cast minExitTargetProfit: number;
+  @cast minTargetProfitPercent: number;
+  @cast minExitTargetProfitPercent: number;
+  @cast exitNetProfitRatio: number;
+  @cast maxTargetProfit: number;
+  @cast maxTargetProfitPercent: number;
+  @cast maxTargetVolumePercent: number;
+  @cast acceptablePriceRange: number;
+  @cast iterationInterval: number;
+  @cast positionRefreshInterval: number;
+  @cast sleepAfterSend: number;
+  @cast maxNetExposure: number;
+  @cast maxRetryCount: number;
+  @cast orderStatusCheckInterval: number;
+  @cast stabilityTracker: StabilityTrackerConfig;
+  @cast onSingleLeg: OnSingleLegConfig;
+  @cast analytics: AnalyticsConfig;
+  @cast webGateway: WebGatewayConfig;
+  @cast
+  @element(BrokerConfig)
+  brokers: BrokerConfig[];
+  @cast logging?: LoggingConfig;
+}

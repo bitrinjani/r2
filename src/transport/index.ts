@@ -1,3 +1,4 @@
+import type { SlackConfig, LineConfig } from "../config";
 import type { Server as httpServer } from "http";
 
 import * as fs from "fs";
@@ -10,7 +11,7 @@ import WebSocket from "ws";
 import LineIntegration from "./LineIntegration";
 import SlackIntegration from "./SlackIntegration";
 import { pretty, splitToJson } from "./transform";
-import { getConfig } from "../config";
+import { getConfigRoot } from "../config";
 import { wssLogPort } from "../constants";
 
 
@@ -33,7 +34,7 @@ mkdirp.sync(logdir);
 let configRoot;
 
 try{
-  configRoot = getConfig();
+  configRoot = getConfigRoot();
 } catch(ex){
   console.log(ex.message);
 }
@@ -100,7 +101,7 @@ function broadcast(clients: WebSocket[], type: string, body: any) {
 
 function addIntegration(
   Integration: { new (_config: any): SlackIntegration | LineIntegration },
-  config
+  config: SlackConfig | LineConfig | undefined
 ): void {
   if(config && config.enabled){
     const integration = new Integration(config);

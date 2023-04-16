@@ -1,3 +1,4 @@
+import type { OnSingleLegConfig, ReverseOption, ProceedOption } from "./config";
 import type { OrderPair } from "./types";
 
 import { getLogger } from "@bitr/logger";
@@ -16,7 +17,7 @@ import { delay, splitSymbol } from "./util";
 @injectable()
 export default class SingleLegHandler {
   private readonly log = getLogger(this.constructor.name);
-  private readonly onSingleLegConfig;
+  private readonly onSingleLegConfig: OnSingleLegConfig;
   private readonly symbol: string;
 
   constructor(
@@ -38,15 +39,15 @@ export default class SingleLegHandler {
     const { options } = this.onSingleLegConfig;
     switch(action){
       case "Reverse":
-        return this.reverseLeg(orders, options);
+        return this.reverseLeg(orders, options as ReverseOption);
       case "Proceed":
-        return this.proceedLeg(orders, options);
+        return this.proceedLeg(orders, options as ProceedOption);
       default:
         throw new Error("Invalid action.");
     }
   }
 
-  private async reverseLeg(orders: OrderPair, options): Promise<OrderImpl[]> {
+  private async reverseLeg(orders: OrderPair, options: ReverseOption): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
     const sign = largeLeg.side === OrderSide.Buy ? -1 : 1;
@@ -68,7 +69,7 @@ export default class SingleLegHandler {
     return [reversalOrder];
   }
 
-  private async proceedLeg(orders: OrderPair, options): Promise<OrderImpl[]> {
+  private async proceedLeg(orders: OrderPair, options: ProceedOption): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
     const sign = smallLeg.side === OrderSide.Buy ? 1 : -1;

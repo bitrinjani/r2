@@ -1,3 +1,4 @@
+import type { SlackConfig } from "../config";
 import type { RequestInit as FetchRequestInit } from "node-fetch";
 
 import fetch from "node-fetch";
@@ -6,7 +7,7 @@ import fetch from "node-fetch";
 export default class SlackIntegration {
   static fetchTimeout = 5000;
 
-  constructor(private readonly config) {
+  constructor(private readonly config: SlackConfig) {
     this.config = config;
   }
 

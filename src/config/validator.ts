@@ -1,3 +1,5 @@
+import type { ConfigRoot, BrokerConfig } from "./type";
+
 import { injectable } from "inversify";
 import _ from "lodash";
 
@@ -7,7 +9,7 @@ import { CashMarginType } from "../types";
 
 @injectable()
 export class ConfigValidator {
-  validate(config): void {
+  validate(config: ConfigRoot): void {
     const enabledBrokers = config.brokers.filter(b => b.enabled);
     this.throwIf(enabledBrokers.length < 2, t`AtLeastTwoBrokersMustBeEnabled`);
     this.mustBePositive(config.iterationInterval, "iterationInterval");
@@ -21,13 +23,13 @@ export class ConfigValidator {
     this.mustBePositive(config.priceMergeSize, "priceMergeSize");
     this.mustBePositive(config.sleepAfterSend, "sleepAfterSend");
 
-    const bitflyer = findBrokerConfig("Bitflyer");
+    const bitflyer = findBrokerConfig(config, "Bitflyer");
     if(this.isEnabled(bitflyer)){
       this.throwIf(bitflyer.cashMarginType !== CashMarginType.Cash, "CashMarginType must be Cash for Bitflyer.");
       this.validateBrokerConfigCommon(bitflyer);
     }
 
-    const coincheck = findBrokerConfig("Coincheck");
+    const coincheck = findBrokerConfig(config, "Coincheck");
     if(this.isEnabled(coincheck)){
       const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.MarginOpen, CashMarginType.NetOut];
       this.throwIf(
@@ -37,7 +39,7 @@ export class ConfigValidator {
       this.validateBrokerConfigCommon(coincheck);
     }
 
-    const quoine = findBrokerConfig("Quoine");
+    const quoine = findBrokerConfig(config, "Quoine");
     if(this.isEnabled(quoine)){
       const allowedCashMarginType = [CashMarginType.Cash, CashMarginType.NetOut];
       this.throwIf(
@@ -56,12 +58,12 @@ export class ConfigValidator {
     this.throwIf(n < 0, `${name} must be zero or positive.`);
   }
 
-  private validateBrokerConfigCommon(brokerConfig): void {
+  private validateBrokerConfigCommon(brokerConfig: BrokerConfig): void {
     this.mustBeGreaterThanZero(brokerConfig.maxLongPosition, "maxLongPosition");
     this.mustBeGreaterThanZero(brokerConfig.maxShortPosition, "maxShortPosition");
   }
 
-  private isEnabled(brokerConfig?): boolean {
+  private isEnabled(brokerConfig?: BrokerConfig): boolean {
     return brokerConfig !== undefined && brokerConfig.enabled;
   }
 

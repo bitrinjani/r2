@@ -84,8 +84,8 @@ export default class OppotunitySearcher extends EventEmitter {
   private async findClosable(
     quotes: Quote[]
   ): Promise<{ closable: boolean, key?: string, exitAnalysisResult?: SpreadAnalysisResult }> {
-    const { exitNetProfitRatio } = this.configStore.config;
-    if([exitNetProfitRatio].every(_.isUndefined)){
+    const { minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio } = this.configStore.config;
+    if([minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio].every(_.isUndefined)){
       return { closable: false };
     }
     const activePairsMap = await this.activePairStore.getAll();
@@ -123,7 +123,7 @@ export default class OppotunitySearcher extends EventEmitter {
   }
 
   private getPairSummary(pair: OrderPair, exitAnalysisResult?: SpreadAnalysisResult): PairSummary {
-    const entryProfit = calcProfit(pair).profit;
+    const entryProfit = calcProfit(pair, this.configStore.config).profit;
     const buyLeg = pair.find(o => o.side === OrderSide.Buy) as OrderImpl;
     const sellLeg = pair.find(o => o.side === OrderSide.Sell) as OrderImpl;
     const midNotional = _.mean([buyLeg.averageFilledPrice, sellLeg.averageFilledPrice]) * buyLeg.filledSize;

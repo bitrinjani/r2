@@ -1,4 +1,4 @@
-import type { AnalyticsConfigType } from "../config";
+import type { AnalyticsConfig } from "../config";
 import type { SpreadStat } from "../types";
 
 import { getLogger } from "@bitr/logger";
@@ -12,7 +12,7 @@ export interface SpreadStatHandlerPlugin {
 }
 
 export default class AnalyticsService {
-  private config: AnalyticsConfigType;
+  private config: AnalyticsConfig;
   private isHandling: boolean;
   private readonly log = getLogger(this.constructor.name);
   private readonly pluginDir = `${process.cwd()}/plugins`;
@@ -59,7 +59,7 @@ export default class AnalyticsService {
     this.log.debug("Stopped.");
   }
 
-  private async getConfig(): Promise<AnalyticsConfigType> {
+  private async getConfig(): Promise<AnalyticsConfig> {
     const reply = await this.configRequester.request({ type: "get" });
     if(!reply.success || reply.data === undefined){
       throw new Error("Analytics failed to get the config.");

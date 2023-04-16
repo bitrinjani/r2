@@ -1,4 +1,4 @@
-import type { ConfigRootType } from "./config";
+import type { ConfigRoot } from "./config";
 import type OrderImpl from "./orderImpl";
 import type {
   Quote,
@@ -139,11 +139,11 @@ export default class WebGateway {
     this.broadcast("orderFinalized", order);
   }
 
-  private configUpdated(config: ConfigRootType) {
+  private configUpdated(config: ConfigRoot) {
     this.broadcast("configUpdated", this.sanitize(config));
   }
 
-  private sanitize(config: ConfigRootType): ConfigRootType {
+  private sanitize(config: ConfigRoot): ConfigRoot {
     const copy = _.cloneDeep(config);
     delete copy.logging;
     return copy;
