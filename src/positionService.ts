@@ -1,4 +1,4 @@
-import type { BrokerConfig } from "./config";
+import type { FormedBrokerConfigType } from "./config";
 import type { BrokerMap, BrokerPosition } from "./types";
 
 import { EventEmitter } from "events";
@@ -98,7 +98,7 @@ export default class PositionService extends EventEmitter {
     }
   }
 
-  private async getBrokerPosition(brokerConfig: BrokerConfig, minSize: number): Promise<BrokerPosition> {
+  private async getBrokerPosition(brokerConfig: FormedBrokerConfigType, minSize: number): Promise<BrokerPosition> {
     const { baseCcy } = splitSymbol(this.configStore.config.symbol);
     const positions = await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
     const baseCcyPosition = positions.get(baseCcy);
@@ -109,12 +109,12 @@ export default class PositionService extends EventEmitter {
       0,
       new Decimal(brokerConfig.maxLongPosition).minus(baseCcyPosition)
         .toNumber(),
-    ]) as number;
+    ]);
     const allowedShortSize = _.max([
       0,
       new Decimal(brokerConfig.maxShortPosition).plus(baseCcyPosition)
         .toNumber(),
-    ]) as number;
+    ]);
     const isStable = this.brokerStabilityTracker.isStable(brokerConfig.broker);
     return {
       broker: brokerConfig.broker,

@@ -179,7 +179,7 @@ export default class SpreadAnalyzer {
 
   private calculateTotalCommission(quotes: Quote[], targetVolume: number): number {
     return _(quotes).sumBy(q => {
-      const brokerConfig = findBrokerConfig(this.configStore.config, q.broker);
+      const brokerConfig = findBrokerConfig(q.broker);
       return calcCommission(q.price, targetVolume, brokerConfig.commissionPercent);
     });
   }

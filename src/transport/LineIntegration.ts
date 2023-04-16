@@ -1,4 +1,3 @@
-import type { LineConfig } from "../config";
 import type { RequestInit as FetchRequestInit } from "node-fetch";
 
 import * as querystring from "querystring";
@@ -10,7 +9,7 @@ export default class LineIntegration {
   static fetchTimeout = 5000;
   static apiUrl = "https://notify-api.line.me/api/notify";
 
-  constructor(private readonly config: LineConfig) {
+  constructor(private readonly config) {
     this.config = config;
   }
 

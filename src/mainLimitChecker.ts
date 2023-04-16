@@ -36,7 +36,6 @@ export default class MainLimitChecker implements LimitChecker {
       this.limits = [
         new MaxNetExposureLimit(configStore, positionService),
         new InvertedSpreadLimit(spreadAnalysisResult),
-        new MinTargetProfitLimit(configStore, spreadAnalysisResult),
         new MaxTargetProfitLimit(configStore, spreadAnalysisResult),
         new MaxTargetVolumeLimit(configStore, spreadAnalysisResult),
         new DemoModeLimit(configStore),
@@ -83,15 +82,9 @@ class MinExitTargetProfitLimit implements LimitChecker {
 
   private getEffectiveMinExitTargetProfit() {
     const pair = this.orderPair;
-    const { bid, ask, targetVolume } = this.spreadAnalysisResult;
-    const targetVolumeNotional = _.mean([ask.price, bid.price]) * targetVolume;
-    const { minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio } = this.configStore.config;
-    const openProfit = calcProfit(pair, this.configStore.config).profit;
-    return _.max([
-      minExitTargetProfit,
-      minExitTargetProfitPercent !== undefined
-        ? _.round(minExitTargetProfitPercent / 100 * targetVolumeNotional)
-        : Number.MIN_SAFE_INTEGER,
+    const { exitNetProfitRatio } = this.configStore.config;
+    const openProfit = calcProfit(pair).profit;
+    return _.max([Number.MIN_SAFE_INTEGER,
       exitNetProfitRatio !== undefined ? openProfit * (exitNetProfitRatio / 100 - 1) : Number.MIN_SAFE_INTEGER,
     ]) as number;
   }
@@ -122,33 +115,6 @@ class InvertedSpreadLimit implements LimitChecker {
     const reason = "Spread not inverted";
     const message = t`NoArbitrageOpportunitySpreadIsNotInverted`;
     return { success, reason, message };
-  }
-}
-
-class MinTargetProfitLimit implements LimitChecker {
-  constructor(private readonly configStore: ConfigStore, private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
-
-  check() {
-    const success = this.isTargetProfitLargeEnough();
-    if(success){
-      return { success, reason: "", message: "" };
-    }
-    const reason = "Too small profit";
-    const message = t`TargetProfitIsSmallerThanMinProfit`;
-    return { success, reason, message };
-  }
-
-  private isTargetProfitLargeEnough(): boolean {
-    const config = this.configStore.config;
-    const { bid, ask, targetVolume, targetProfit } = this.spreadAnalysisResult;
-    const targetVolumeNotional = _.mean([ask.price, bid.price]) * targetVolume;
-    const effectiveMinTargetProfit = _.max([
-      config.minTargetProfit,
-      config.minTargetProfitPercent !== undefined
-        ? _.round(config.minTargetProfitPercent / 100 * targetVolumeNotional)
-        : 0,
-    ]) as number;
-    return targetProfit >= effectiveMinTargetProfit;
   }
 }
 

@@ -1,6 +1,6 @@
 import type { Quote, Broker, Order } from "./common";
 import type { TimeSeries } from "../chrono";
-import type { ConfigRoot } from "../config";
+import type { FormedConfigRootType } from "../config";
 import type OrderImpl from "../orderImpl";
 import type { EventEmitter } from "events";
 
@@ -63,7 +63,7 @@ export interface LimitCheckResult {
 }
 
 export interface ConfigStore extends EventEmitter {
-  config: ConfigRoot;
+  config: FormedConfigRootType;
 }
 
 export interface BrokerPosition {
