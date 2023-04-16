@@ -1,4 +1,4 @@
-import type { ConfigRoot } from "./config";
+import type { ConfigRootType } from "./config";
 import type { SpreadStat } from "./types";
 
 import { ZmqResponder, ZmqRequester } from "./zmq";
@@ -15,7 +15,7 @@ export interface GenericResponse<T> {
 }
 
 export type ConfigRequest = GenericRequest<any>;
-export type ConfigResponse = GenericResponse<ConfigRoot>;
+export type ConfigResponse = GenericResponse<ConfigRootType>;
 export class ConfigRequester extends ZmqRequester<ConfigRequest, ConfigResponse> {}
 export class ConfigResponder extends ZmqResponder<ConfigRequest, ConfigResponse> {}
 

@@ -1,4 +1,4 @@
-import type { BrokerConfig } from "./config";
+import type { BrokerConfigType } from "./config";
 import type { Broker, Quote } from "./types";
 
 import { AwaitableEventEmitter } from "@bitr/awaitable-event-emitter";
@@ -80,7 +80,7 @@ export default class QuoteAggregator extends AwaitableEventEmitter {
       .value();
   }
 
-  private timeFilter(brokerConfig: BrokerConfig): boolean {
+  private timeFilter(brokerConfig: BrokerConfigType): boolean {
     if(_.isEmpty(brokerConfig.noTradePeriods)){
       return true;
     }

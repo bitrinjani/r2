@@ -1,4 +1,4 @@
-import type { ConfigRoot } from "./type";
+import type { ConfigRootType } from "./type";
 import type { ConfigRequest, ConfigResponse } from "../messages";
 import type { ConfigStore } from "../types";
 
@@ -11,7 +11,7 @@ import { getLogger } from "@bitr/logger";
 import { injectable } from "inversify";
 import _ from "lodash";
 
-import { getConfigRoot } from ".";
+import { getConfig } from ".";
 import { ConfigValidator } from "./validator";
 import { configStoreSocketUrl } from "../constants";
 import { ConfigResponder } from "../messages";
@@ -25,7 +25,7 @@ export class JsonConfigStore extends EventEmitter implements ConfigStore {
   private timer: NodeJS.Timer;
   private readonly responder: ConfigResponder;
   private readonly TTL = 5 * 1000;
-  private cache?: ConfigRoot;
+  private cache?: ConfigRootType;
 
   constructor(private readonly configValidator: ConfigValidator) {
     super();
@@ -34,17 +34,17 @@ export class JsonConfigStore extends EventEmitter implements ConfigStore {
     );
   }
 
-  get config(): ConfigRoot {
+  get config(): ConfigRootType {
     if(this.cache){
       return this.cache;
     }
-    const config = getConfigRoot();
+    const config = getConfig();
     this.configValidator.validate(config);
     this.updateCache(config);
     return config;
   }
 
-  async set(config: ConfigRoot) {
+  async set(config: ConfigRootType) {
     this.configValidator.validate(config);
     await writeFile(`${process.cwd()}/config.json`, JSON.stringify(config, undefined, 2));
     this.updateCache(config);
@@ -64,7 +64,7 @@ export class JsonConfigStore extends EventEmitter implements ConfigStore {
       case "set":
         try{
           const newConfig = request.data;
-          await this.set(_.merge({}, getConfigRoot(), newConfig));
+          await this.set(_.merge({}, getConfig(), newConfig));
           respond({ success: true });
           this.log.debug(`Config updated with ${JSON.stringify(newConfig)}`);
         } catch(ex){
@@ -74,7 +74,7 @@ export class JsonConfigStore extends EventEmitter implements ConfigStore {
         }
         break;
       case "get":
-        respond({ success: true, data: getConfigRoot() });
+        respond({ success: true, data: getConfig() });
         break;
       default:
         this.log.warn(`ConfigStore received an invalid message. Message: ${request}`);
@@ -83,7 +83,7 @@ export class JsonConfigStore extends EventEmitter implements ConfigStore {
     }
   }
 
-  private updateCache(config: ConfigRoot) {
+  private updateCache(config: ConfigRootType) {
     this.cache = config;
     clearTimeout(this.timer);
     this.timer = setTimeout(() => this.cache = undefined, this.TTL);
