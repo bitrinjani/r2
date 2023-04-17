@@ -86,7 +86,7 @@
     "nock": "^13.3.0",
     "rimraf": "^5.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.4"
   },
   "keywords": [],
   "author": "bitrinjani",
