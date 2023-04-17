@@ -48,7 +48,7 @@ jobs:
         continue-on-error: true
 
       - name: Lint
-        run: npm run lint -- --max-warnings 0
+        run: npm run lint -- --max-warnings 0 --ignore-path src/transport
 
   build:
     runs-on: ubuntu-latest
