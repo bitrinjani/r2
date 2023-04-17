@@ -19,7 +19,7 @@ updates:
       - dependency-name: "strip-json-comments"
         update-types: ["version-update:semver-major"]
 
-# actions
+  # actions
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
