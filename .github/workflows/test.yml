@@ -12,7 +12,8 @@ on:
       - README.md
       - .github/**
       - .vscode/**
-      - src/test/**
+      - src/transport/**
+      - test/**
   pull_request:
   workflow_dispatch:
 
