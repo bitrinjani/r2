@@ -1,6 +1,6 @@
 {
   "name": "r2-re",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Bitcoin arbitrarger powered by Node.js + TypeScript",
   "engines": {
     "node": ">=16.0.0"
