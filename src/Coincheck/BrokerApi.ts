@@ -118,9 +118,6 @@ export default class BrokerApi {
       "ACCESS-NONCE": n,
       "ACCESS-SIGNATURE": sign,
     };
-    if(method === "POST"){
-      headers["Content-Type"] = "application/x-www-form-urlencoded";
-    }
     const init = { method, headers, body };
     return this.webClient.fetch<R>(path, init);
   }

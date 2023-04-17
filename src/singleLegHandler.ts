@@ -46,7 +46,7 @@ export default class SingleLegHandler {
     }
   }
 
-  private async reverseLeg(orders: OrderPair, options): Promise<OrderImpl[]> {
+  private async reverseLeg(orders: OrderPair, options: any): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
     const sign = largeLeg.side === "Buy" ? -1 : 1;
@@ -68,7 +68,7 @@ export default class SingleLegHandler {
     return [reversalOrder];
   }
 
-  private async proceedLeg(orders: OrderPair, options): Promise<OrderImpl[]> {
+  private async proceedLeg(orders: OrderPair, options: any): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
     const sign = smallLeg.side === "Buy" ? 1 : -1;

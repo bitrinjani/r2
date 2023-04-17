@@ -23,8 +23,6 @@
   },
   "dependencies": {
     "@bitr/awaitable-event-emitter": "^1.0.3",
-    "@bitr/bitbankcc": "^1.0.5",
-    "@bitr/btcbox": "^1.0.3",
     "@bitr/castable": "^1.0.3",
     "@bitr/logger": "^1.0.1",
     "@sinclair/typebox": "^0.27.8",

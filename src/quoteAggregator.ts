@@ -14,7 +14,7 @@ import { ConfigStore } from "./types";
 @injectable()
 export default class QuoteAggregator extends AwaitableEventEmitter {
   private readonly log = getLogger(this.constructor.name);
-  private timer;
+  private timer: any;
   private isRunning: boolean;
   private quotes: Quote[] = [];
 
@@ -85,7 +85,7 @@ export default class QuoteAggregator extends AwaitableEventEmitter {
       return true;
     }
     const current = DateTime.local();
-    const outOfPeriod = period => {
+    const outOfPeriod = (period: any) => {
       const interval = Interval.fromISO(`${period[0]}/${period[1]}`);
       if(!interval.isValid){
         this.log.warn("Invalid noTradePeriods. Ignoring the config.");

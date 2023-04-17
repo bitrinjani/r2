@@ -2,29 +2,38 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "CommonJS",
-    "outDir": "dist",
-    "forceConsistentCasingInFileNames": true,
-    "alwaysStrict": true,
+    "outDir": "dist/",
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": false,
+    "strictBindCallApply": true,
     "strictNullChecks": false,
     "esModuleInterop": true,
-    "noUnusedLocals": false,
-    "types": ["reflect-metadata", "mocha", "chai", "chai-spies"],
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "pretty": true,
-    "skipLibCheck": true
-  },
-  "files": [
-    "./node_modules/@types/node/index.d.ts"
-  ],
+    "skipLibCheck": true,
+    "types": ["reflect-metadata", "mocha", "chai", "chai-spies"],
+    "lib": ["ES2022"]
+   },
   "include": [
     "./src/**/*.ts"
   ],
   "exclude": [
-    "node_modules", "./webui/**/*"
+    "**/node_modules",
+    "./webui/**/*",
+    "./test",
+    "./util",
+    "./dist",
+    "**/.*/",
+    "./src/transport/**.ts"
   ]
 }

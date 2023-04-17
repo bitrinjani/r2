@@ -1,7 +1,7 @@
 import type { RequestInit as FetchRequestInit } from "node-fetch";
 
 import { getLogger } from "@bitr/logger";
-import "node-fetch";
+import fetch from "node-fetch";
 
 export default class WebClient {
   static fetchTimeout = 5000;

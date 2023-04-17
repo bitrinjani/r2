@@ -19,7 +19,7 @@ import { hr, eRound, splitSymbol, padEnd, padStart } from "./util";
 @injectable()
 export default class PositionService extends EventEmitter {
   private readonly log = getLogger(this.constructor.name);
-  private timer;
+  private timer: any;
   private isRefreshing: boolean;
   private _positionMap: BrokerMap<BrokerPosition>;
 
@@ -48,7 +48,7 @@ export default class PositionService extends EventEmitter {
 
   print(): void {
     const { baseCcy } = splitSymbol(this.configStore.config.symbol);
-    const isOk = b => b ? "OK" : "NG";
+    const isOk = (b: any) => b ? "OK" : "NG";
     const formatBrokerPosition = (brokerPosition: BrokerPosition) =>
       `${padEnd(brokerPosition.broker, 10)}: ${padStart(_.round(brokerPosition.baseCcyPosition, 3), 6)} ${baseCcy}, `
       + `${t`LongAllowed`}: ${isOk(brokerPosition.longAllowed)}, `

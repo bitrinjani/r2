@@ -9,7 +9,7 @@ export default class LineIntegration {
   static fetchTimeout = 5000;
   static apiUrl = "https://notify-api.line.me/api/notify";
 
-  constructor(private readonly config) {
+  constructor(private readonly config: any) {
     this.config = config;
   }
 

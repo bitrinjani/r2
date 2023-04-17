@@ -100,7 +100,7 @@ function broadcast(clients: WebSocket[], type: string, body: any) {
 
 function addIntegration(
   Integration: { new (_config: any): SlackIntegration | LineIntegration },
-  config
+  config: any
 ): void {
   if(config && config.enabled){
     const integration = new Integration(config);

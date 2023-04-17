@@ -13,7 +13,7 @@ const MIN = 1;
 @injectable()
 export default class BrokerStabilityTracker {
   private readonly stabilityMap: Map<Broker, number>;
-  private timer;
+  private timer: any;
 
   constructor(@inject(symbols.ConfigStore) private readonly configStore: ConfigStore) {
     const brokers = this.configStore.config.brokers.map(b => b.broker);

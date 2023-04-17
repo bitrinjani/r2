@@ -6,7 +6,7 @@ import fetch from "node-fetch";
 export default class SlackIntegration {
   static fetchTimeout = 5000;
 
-  constructor(private readonly config) {
+  constructor(private readonly config: any) {
     this.config = config;
   }
 

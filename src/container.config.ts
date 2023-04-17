@@ -49,7 +49,9 @@ container
   .bind<BrokerAdapterRouter>(BrokerAdapterRouter)
   .toSelf()
   .inSingletonScope();
-container.bind<SpreadAnalyzer>(SpreadAnalyzer).toSelf();
+container
+  .bind<SpreadAnalyzer>(SpreadAnalyzer)
+  .toSelf();
 container
   .bind<ConfigValidator>(ConfigValidator)
   .toSelf()
@@ -82,7 +84,9 @@ container
   .bind<WebGateway>(WebGateway)
   .toSelf()
   .inSingletonScope();
-container.bind<ActivePairStore>(symbols.ActivePairStore).toConstantValue(getActivePairStore(getChronoDB()));
+container
+  .bind<ActivePairStore>(symbols.ActivePairStore)
+  .toConstantValue(getActivePairStore(getChronoDB()));
 container
   .bind<SpreadStatTimeSeries>(symbols.SpreadStatTimeSeries)
   .toConstantValue(getSpreadStatTimeSeries(getChronoDB()));
