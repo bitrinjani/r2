@@ -10,7 +10,7 @@ import Arbitrager from "./arbitrager";
 import BrokerAdapterRouter from "./brokerAdapterRouter";
 import BrokerStabilityTracker from "./brokerStabilityTracker";
 import { getChronoDB } from "./chrono";
-import { ConfigValidator } from "./config";
+import { ConfigValidator } from "./config/validator";
 import { JsonConfigStore } from "./config";
 import { getHistoricalOrderStore } from "./historicalOrderStore";
 import LimitCheckerFactory from "./limitCheckerFactory";

@@ -1,10 +1,13 @@
 {
   "language": "en",
+  "debug": true,
   "demoMode": true,
   "symbol": "BTC/JPY",
   "priceMergeSize": 100,
   "maxSize": 0.01,
   "minSize": 0.01,
+  "minTargetProfit": 1,
+  "minExitTargetProfit": 20,
   "minTargetProfitPercent": 1.0,
   "exitNetProfitRatio": 20,
   "maxTargetVolumePercent": 50.0,

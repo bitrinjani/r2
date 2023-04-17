@@ -2,6 +2,7 @@ import type { FormedConfigRootType } from ".";
 import type { ConfigRequest, ConfigResponse } from "../messages";
 import type { ConfigStore } from "../types";
 
+import "reflect-metadata";
 import { EventEmitter } from "events";
 import * as fs from "fs";
 import { setTimeout } from "timers";

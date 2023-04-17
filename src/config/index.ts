@@ -13,7 +13,6 @@ import { ConfigRoot } from "./type";
 import { CashMarginType } from "../types/common";
 
 export { AnalyticsConfigType } from "./type";
-export * from "./validator";
 export * from "./jsonConfigStore";
 
 const DEVELOPMENT_PHASE = false;
@@ -53,7 +52,7 @@ class ConfigLoader {
     };
   }
   
-  protected load(){
+  load(){
     const configPath = path.join(process.cwd(), "./config.json");
 
     if(!fs.existsSync(configPath)){
@@ -110,6 +109,7 @@ class ConfigLoader {
 }
 
 export function getConfig(){
+  ConfigLoader.instance.load;
   return ConfigLoader.instance.config;
 }
 

@@ -34,7 +34,7 @@ const AnalyticsConfig = Type.Object({
 
 const WebGatewayConfig = Type.Object({
   enabled: Type.Boolean({ default: false }),
-  host: Type.RegEx(/^https?:\/\/[\w!?/+\-_~;.,*&@#$%()'[\]]+$/),
+  host: Type.String(),
   openBrowser: Type.Boolean({ default: true }),
 });
 
@@ -60,7 +60,7 @@ const BrokerConfig = Type.Object({
     Type.Literal("MarginOpen"),
     Type.Literal("NetOut"),
   ])),
-  leverageLevel: Type.Number(),
+  leverageLevel: Type.Optional(Type.Number()),
   commissionPercent: Type.Number(),
   noTradePeriods: Type.Optional(Type.Array(
     Type.Array(Type.String())
