@@ -20,6 +20,8 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "node-fetch"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "open"
+        update-types: ["version-update:semver-major"]
         
   # actions
   - package-ecosystem: github-actions
