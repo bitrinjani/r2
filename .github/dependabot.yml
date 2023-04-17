@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # master branch
+  # console
   - package-ecosystem: npm
     directory: "/"
     schedule:
@@ -15,20 +15,6 @@ updates:
       - "dependencies"
     allow:
       - dependency-type: "direct"
-
-  # actions (master)
-  - package-ecosystem: github-actions
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "09:00"
-      timezone: "Asia/Tokyo"
-    commit-message:
-      prefix: "Update(action):"
-    target-branch: "master"
-    labels:
-      - "dependencies"
-      - "github_actions"
       
   # webui
   - package-ecosystem: npm
@@ -46,9 +32,9 @@ updates:
     allow:
       - dependency-type: "direct"
 
-  # actions (webui)
+  # actions
   - package-ecosystem: github-actions
-    directory: "/webui"
+    directory: "/"
     schedule:
       interval: "daily"
       time: "09:00"
