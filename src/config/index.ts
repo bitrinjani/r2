@@ -13,7 +13,7 @@ import { ConfigRoot } from "./type";
 import { CashMarginType } from "../types/common";
 
 export { AnalyticsConfigType } from "./type";
-export * from "./jsonConfigStore";
+export * from "./configStore";
 
 const DEVELOPMENT_PHASE = false;
 
@@ -109,7 +109,7 @@ class ConfigLoader {
 }
 
 export function getConfig(){
-  ConfigLoader.instance.load;
+  ConfigLoader.instance.load();
   return ConfigLoader.instance.config;
 }
 

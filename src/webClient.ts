@@ -1,7 +1,7 @@
 import type { RequestInit as FetchRequestInit } from "node-fetch";
 
 import { getLogger } from "@bitr/logger";
-import fetch from "node-fetch";
+import "node-fetch";
 
 export default class WebClient {
   static fetchTimeout = 5000;
@@ -11,12 +11,12 @@ export default class WebClient {
 
   async fetch<T>(
     path: string,
-    init: FetchRequestInit = {},
+    init: FetchRequestInit,
     verbose: boolean = true
   ): Promise<T> {
     const url = this.baseUrl + path;
     this.log.debug(`Sending HTTP request... URL: ${url} Request: ${JSON.stringify(init)}`);
-    const res = await fetch(url, init);
+    const res = await fetch(url);
     let logText = `Response from ${res.url}. Status Code: ${res.status} (${res.statusText}) `;
     this.log.debug(logText);
     const content = await res.text();

@@ -2,13 +2,13 @@ import "reflect-metadata";
 import { injectable } from "inversify";
 import _ from "lodash";
 
-import { findBrokerConfig } from "./";
+import { FormedConfigRootType, findBrokerConfig } from "./";
 import t from "../i18n";
 import { CashMarginType } from "../types";
 
 @injectable()
 export class ConfigValidator {
-  validate(config): void {
+  validate(config: FormedConfigRootType): void {
     const enabledBrokers = config.brokers.filter(b => b.enabled);
     this.throwIf(enabledBrokers.length < 2, t`AtLeastTwoBrokersMustBeEnabled`);
     this.mustBePositive(config.iterationInterval, "iterationInterval");
