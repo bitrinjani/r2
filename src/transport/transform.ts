@@ -2,6 +2,7 @@ import { EOL } from "os";
 
 import chalk from "chalk";
 import { format as formatDate } from "date-fns";
+// @ts-ignore
 import * as Parse from "fast-json-parse";
 import split from "split2";
 
@@ -53,6 +54,7 @@ export function pretty(opts: { colorize: boolean, withLabel: boolean, debug: boo
         return "";
       }
       const dateString = formatDate(new Date(logObj.time), dateFormat);
+      // @ts-ignore
       const levelString = levelColors[logObj.level](levels[logObj.level]);
       const labelString = withLabel ? `[${logObj.label}] ` : "";
       return `${dateString} ${levelString} ${labelString}${logObj.msg}${EOL}`;
@@ -76,6 +78,7 @@ export function splitToJson() {
       }
       return JSON.stringify({
         time: logObj.time,
+        // @ts-ignore
         level: levels[logObj.level],
         msg: logObj.msg,
       });

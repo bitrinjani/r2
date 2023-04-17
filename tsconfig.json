@@ -10,7 +10,7 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "noUnusedLocals": false,
-    "strictBindCallApply": true,
+//    "strictBindCallApply": true,
     "strictNullChecks": false,
     "esModuleInterop": true,
     "sourceMap": true,
@@ -34,6 +34,5 @@
     "./util",
     "./dist",
     "**/.*/",
-    "./src/transport/**.ts"
   ]
 }
