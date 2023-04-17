@@ -4,7 +4,7 @@ import * as fs from "fs";
 
 import express from "express";
 import _ from "lodash";
-import mkdirp from "mkdirp";
+import { mkdirp } from "mkdirp";
 import WebSocket from "ws";
 
 import LineIntegration from "./LineIntegration";

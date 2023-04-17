@@ -74,10 +74,10 @@ export default class SpreadAnalyzer {
     }
 
     const invertedSpread = bid.price - ask.price;
-    const availableVolume = _.floor(_.min([bid.volume, ask.volume]) as number, LOT_MIN_DECIMAL_PLACE);
+    const availableVolume = _.floor(_.min([bid.volume, ask.volume]), LOT_MIN_DECIMAL_PLACE);
     const allowedShortSize = positionMap[bid.broker].allowedShortSize;
     const allowedLongSize = positionMap[ask.broker].allowedLongSize;
-    let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]) as number;
+    let targetVolume = _.min([availableVolume, config.maxSize, allowedShortSize, allowedLongSize]);
     targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
     if(closingPair){
       targetVolume = closingPair[0].size;
@@ -122,7 +122,7 @@ export default class SpreadAnalyzer {
       .map((v) => [v.ask, v.bid])
       .flatten()
       .filter(q => q !== undefined)
-      .value() as Quote[];
+      .value();
     const { ask: bestAsk, bid: bestBid } = this.getBest(flattened) as { ask: Quote, bid: Quote };
     const { ask: worstAsk, bid: worstBid } = this.getWorst(flattened) as { ask: Quote, bid: Quote };
     const bestCase = this.getEstimate(bestAsk, bestBid);
@@ -137,8 +137,8 @@ export default class SpreadAnalyzer {
 
   private getEstimate(ask: Quote, bid: Quote): SpreadAnalysisResult {
     const invertedSpread = bid.price - ask.price;
-    const availableVolume = _.floor(_.min([bid.volume, ask.volume]) as number, LOT_MIN_DECIMAL_PLACE);
-    let targetVolume = _.min([availableVolume, this.configStore.config.maxSize]) as number;
+    const availableVolume = _.floor(_.min([bid.volume, ask.volume]), LOT_MIN_DECIMAL_PLACE);
+    let targetVolume = _.min([availableVolume, this.configStore.config.maxSize]);
     targetVolume = _.floor(targetVolume, LOT_MIN_DECIMAL_PLACE);
     const commission = this.calculateTotalCommission([bid, ask], targetVolume);
     const targetProfit = _.round(invertedSpread * targetVolume - commission);

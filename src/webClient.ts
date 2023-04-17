@@ -11,7 +11,7 @@ export default class WebClient {
 
   async fetch<T>(
     path: string,
-    init: FetchRequestInit = { timeout: WebClient.fetchTimeout },
+    init: FetchRequestInit = {},
     verbose: boolean = true
   ): Promise<T> {
     const url = this.baseUrl + path;

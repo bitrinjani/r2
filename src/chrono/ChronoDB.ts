@@ -3,7 +3,7 @@ import type { Readable } from "stream";
 
 import { Level } from "level";
 import { EntryStream, KeyStream } from "level-read-stream";
-import mkdirp from "mkdirp";
+import { mkdirp } from "mkdirp";
 
 import { TimeSeries } from "./TimeSeries";
 

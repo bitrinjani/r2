@@ -1,15 +1,15 @@
 import type { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from "./types";
-import type { FormedBrokerConfigType } from "../../config";
+import type { FormedBrokerConfigType } from "../config";
 import type {
   BrokerAdapter,
   Order,
   Execution,
   Quote
-} from "../../types";
+} from "../types";
 
 import { getLogger } from "@bitr/logger";
 import _ from "lodash";
-
+import "dotenv/config";
 import BrokerApi from "./BrokerApi";
 import {
   OrderStatus,
@@ -18,8 +18,8 @@ import {
   OrderSide,
   CashMarginType,
   QuoteSide
-} from "../../types";
-import { eRound, toExecution } from "../../util";
+} from "../types";
+import { eRound, toExecution } from "../util";
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
@@ -27,7 +27,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   readonly broker = "Bitflyer";
 
   constructor(private readonly config: FormedBrokerConfigType) {
-    this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
+    this.brokerApi = new BrokerApi(process.env.BITFLYER_TOKEN, process.env.BITFLYER_SECRET);
   }
 
   async send(order: Order): Promise<void> {

@@ -15,8 +15,8 @@ import {
   ChildOrder,
   Balance
 } from "./types";
-import { hmac, nonce, safeQueryStringStringify } from "../../util";
-import WebClient from "../../webClient";
+import { hmac, nonce, safeQueryStringStringify } from "../util";
+import WebClient from "../webClient";
 
 export default class BrokerApi {
   private readonly baseUrl = "https://api.bitflyer.jp";

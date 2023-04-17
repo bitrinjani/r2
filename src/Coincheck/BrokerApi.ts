@@ -6,7 +6,6 @@ import type {
   Transaction } from "./types";
 
 import { setTimeout } from "timers";
-
 import _ from "lodash";
 
 import {
@@ -19,8 +18,8 @@ import {
   TransactionsResponse,
   LeverageBalanceResponse
 } from "./types";
-import { hmac, nonce, safeQueryStringStringify } from "../../util";
-import WebClient from "../../webClient";
+import { hmac, nonce, safeQueryStringStringify } from "../util";
+import WebClient from "../webClient";
 
 export default class BrokerApi {
   private static readonly CACHE_MS = 1000;
@@ -64,7 +63,7 @@ export default class BrokerApi {
       if(reply.data.length < limit){
         break;
       }
-      const last = _.last(reply.data) as LeveragePosition;
+      const last = _.last(reply.data);
       reply = await this.getLeveragePositions({ ...request, starting_after: last.id });
     }
     this.leveragePositionsCache = result;
@@ -97,7 +96,7 @@ export default class BrokerApi {
     const pagination = { order: "desc", limit: 20 } as Partial<Pagination>;
     let res: TransactionsResponse = await this.getTransactions(pagination);
     while(res.data.length > 0){
-      const last = _.last(res.data) as Transaction;
+      const last = _.last(res.data);
       transactions = _.concat(transactions, res.data.filter(x => from < x.created_at));
       if(from > last.created_at || res.pagination.limit > res.data.length){
         break;

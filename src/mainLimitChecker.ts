@@ -36,6 +36,7 @@ export default class MainLimitChecker implements LimitChecker {
       this.limits = [
         new MaxNetExposureLimit(configStore, positionService),
         new InvertedSpreadLimit(spreadAnalysisResult),
+        new MinTargetProfitLimit(configStore, spreadAnalysisResult),
         new MaxTargetProfitLimit(configStore, spreadAnalysisResult),
         new MaxTargetVolumeLimit(configStore, spreadAnalysisResult),
         new DemoModeLimit(configStore),
@@ -82,11 +83,17 @@ class MinExitTargetProfitLimit implements LimitChecker {
 
   private getEffectiveMinExitTargetProfit() {
     const pair = this.orderPair;
-    const { exitNetProfitRatio } = this.configStore.config;
+    const { bid, ask, targetVolume } = this.spreadAnalysisResult;
+    const targetVolumeNotional = _.mean([ask.price, bid.price]) * targetVolume;
+    const { minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio } = this.configStore.config;
     const openProfit = calcProfit(pair).profit;
-    return _.max([Number.MIN_SAFE_INTEGER,
+    return _.max([
+      minExitTargetProfit,
+      minExitTargetProfitPercent !== undefined
+        ? _.round(minExitTargetProfitPercent / 100 * targetVolumeNotional)
+        : Number.MIN_SAFE_INTEGER,
       exitNetProfitRatio !== undefined ? openProfit * (exitNetProfitRatio / 100 - 1) : Number.MIN_SAFE_INTEGER,
-    ]) as number;
+    ]);
   }
 }
 
@@ -118,6 +125,33 @@ class InvertedSpreadLimit implements LimitChecker {
   }
 }
 
+class MinTargetProfitLimit implements LimitChecker {
+  constructor(private readonly configStore: ConfigStore, private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
+
+  check() {
+    const success = this.isTargetProfitLargeEnough();
+    if(success){
+      return { success, reason: "", message: "" };
+    }
+    const reason = "Too small profit";
+    const message = t`TargetProfitIsSmallerThanMinProfit`;
+    return { success, reason, message };
+  }
+
+  private isTargetProfitLargeEnough(): boolean {
+    const config = this.configStore.config;
+    const { bid, ask, targetVolume, targetProfit } = this.spreadAnalysisResult;
+    const targetVolumeNotional = _.mean([ask.price, bid.price]) * targetVolume;
+    const effectiveMinTargetProfit = _.max([
+      config.minTargetProfit,
+      config.minTargetProfitPercent !== undefined
+        ? _.round(config.minTargetProfitPercent / 100 * targetVolumeNotional)
+        : 0,
+    ]);
+    return targetProfit >= effectiveMinTargetProfit;
+  }
+}
+
 class MaxTargetProfitLimit implements LimitChecker {
   constructor(private readonly configStore: ConfigStore, private readonly spreadAnalysisResult: SpreadAnalysisResult) {}
 
@@ -139,7 +173,7 @@ class MaxTargetProfitLimit implements LimitChecker {
       config.maxTargetProfitPercent !== undefined
         ? _.round(config.maxTargetProfitPercent / 100 * _.mean([ask.price, bid.price]) * targetVolume)
         : Number.MAX_SAFE_INTEGER,
-    ]) as number;
+    ]);
     return targetProfit <= maxTargetProfit;
   }
 }
@@ -164,7 +198,7 @@ class MaxTargetVolumeLimit implements LimitChecker {
       config.maxTargetVolumePercent !== undefined
         ? config.maxTargetVolumePercent / 100 * availableVolume
         : Number.MAX_SAFE_INTEGER,
-    ]) as number;
+    ]);
     return targetVolume <= maxTargetVolume;
   }
 }

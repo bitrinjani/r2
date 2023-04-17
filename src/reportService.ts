@@ -9,7 +9,7 @@ import { promisify } from "util";
 import { getLogger } from "@bitr/logger";
 import { injectable, inject } from "inversify";
 import { Duration, DateTime } from "luxon";
-import mkdirp from "mkdirp";
+import { mkdirp } from "mkdirp";
 
 import { reportServicePubUrl, reportServiceRepUrl } from "./constants";
 import { SnapshotResponder } from "./messages";

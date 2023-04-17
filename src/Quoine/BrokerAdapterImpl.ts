@@ -1,14 +1,15 @@
 import type { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from "./types";
-import type { FormedBrokerConfigType } from "../../config";
+import type { FormedBrokerConfigType } from "../config";
 import type {
   BrokerAdapter,
   Order,
   Execution,
   Quote
-} from "../../types";
+} from "../types";
 
 import Decimal from "decimal.js";
 import _ from "lodash";
+import "dotenv/config";
 
 import BrokerApi from "./BrokerApi";
 import CashStrategy from "./CashStrategy";
@@ -19,8 +20,8 @@ import {
   OrderSide,
   CashMarginType,
   QuoteSide
-} from "../../types";
-import { toExecution, toQuote } from "../../util";
+} from "../types";
+import { toExecution, toQuote } from "../util";
 
 function timestampToDate(n: number): Date {
   return new Date(n * 1000);
@@ -32,7 +33,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(private readonly config: FormedBrokerConfigType) {
-    this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
+    this.brokerApi = new BrokerApi(process.env.QUOINE_TOKEN, process.env.QUOINE_SECRET);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
       [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
       [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)],

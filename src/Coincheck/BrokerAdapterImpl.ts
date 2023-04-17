@@ -1,15 +1,16 @@
 import type { OrderBooksResponse, CashMarginTypeStrategy } from "./types";
-import type { FormedBrokerConfigType } from "../../config";
+import type { FormedBrokerConfigType } from "../config";
 import type {
   Order,
   Execution,
   BrokerAdapter,
   Quote
-} from "../../types";
+} from "../types";
 
 import { getLogger } from "@bitr/logger";
 import { addMinutes } from "date-fns";
 import _ from "lodash";
+import "dotenv/config";
 
 import BrokerApi from "./BrokerApi";
 import CashStrategy from "./CashStrategy";
@@ -19,8 +20,8 @@ import {
   CashMarginType,
   QuoteSide,
   OrderStatus
-} from "../../types";
-import { eRound, almostEqual, toExecution, toQuote } from "../../util";
+} from "../types";
+import { eRound, almostEqual, toExecution, toQuote } from "../util";
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly brokerApi: BrokerApi;
@@ -29,7 +30,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
   constructor(private readonly config: FormedBrokerConfigType) {
-    this.brokerApi = new BrokerApi(this.config.key, this.config.secret);
+    this.brokerApi = new BrokerApi(process.env.COINCHECK_TOKEN, process.env.COINCHECK_SECRET);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
       [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
       [CashMarginType.MarginOpen, new MarginOpenStrategy(this.brokerApi)],

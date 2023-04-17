@@ -1,5 +1,5 @@
 // tslint:disable:variable-name
-import type { Order } from "../../types";
+import type { Order } from "../types";
 
 import { Castable, cast, element } from "@bitr/castable";
 

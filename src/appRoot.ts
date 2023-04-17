@@ -62,9 +62,7 @@ export default class AppRoot {
     const brokerConfigs = configStore.config.brokers;
     const bindTasks = brokerConfigs.map(async brokerConfig => {
       const brokerName = brokerConfig.broker;
-      const brokerModule = brokerConfig.npmPath
-        ? await this.tryImport(brokerConfig.npmPath)
-        : await this.tryImport(`./${brokerName}`) || await this.tryImport(`@bitr/${brokerName}`);
+      const brokerModule = await this.tryImport(`./${brokerName}`);
       if(brokerModule === undefined){
         throw new Error(`Unable to find ${brokerName} package.`);
       }

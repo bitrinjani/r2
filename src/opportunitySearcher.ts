@@ -1,4 +1,3 @@
-import type OrderImpl from "./orderImpl";
 import type {
   SpreadAnalysisResult,
   Quote,
@@ -53,9 +52,9 @@ export default class OppotunitySearcher extends EventEmitter {
     const { closable, key: closablePairKey, exitAnalysisResult } = await this.findClosable(quotes);
     if(closable){
       this.log.info(t`FoundClosableOrders`);
-      const spreadAnalysisResult = exitAnalysisResult as SpreadAnalysisResult;
+      const spreadAnalysisResult = exitAnalysisResult;
       this.log.debug(`Deleting key ${closablePairKey}.`);
-      await this.activePairStore.del(closablePairKey as string);
+      await this.activePairStore.del(closablePairKey);
       return { found: true, spreadAnalysisResult, closable };
     }
 
@@ -84,8 +83,8 @@ export default class OppotunitySearcher extends EventEmitter {
   private async findClosable(
     quotes: Quote[]
   ): Promise<{ closable: boolean, key?: string, exitAnalysisResult?: SpreadAnalysisResult }> {
-    const { exitNetProfitRatio } = this.configStore.config;
-    if([exitNetProfitRatio].every(_.isUndefined)){
+    const { minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio } = this.configStore.config;
+    if([minExitTargetProfit, minExitTargetProfitPercent, exitNetProfitRatio].every(_.isUndefined)){
       return { closable: false };
     }
     const activePairsMap = await this.activePairStore.getAll();
@@ -111,7 +110,7 @@ export default class OppotunitySearcher extends EventEmitter {
       pairsWithSummary.forEach(x => this.log.info({ hidden: true }, this.formatPairSummary(x.pair, x.pairSummary)));
       for(const pairWithSummary of pairsWithSummary.filter(x => x.exitAnalysisResult !== undefined)){
         const limitChecker = this.limitCheckerFactory.create(
-          pairWithSummary.exitAnalysisResult as SpreadAnalysisResult,
+          pairWithSummary.exitAnalysisResult,
           pairWithSummary.pair
         );
         if(limitChecker.check().success){
@@ -124,8 +123,8 @@ export default class OppotunitySearcher extends EventEmitter {
 
   private getPairSummary(pair: OrderPair, exitAnalysisResult?: SpreadAnalysisResult): PairSummary {
     const entryProfit = calcProfit(pair).profit;
-    const buyLeg = pair.find(o => o.side === OrderSide.Buy) as OrderImpl;
-    const sellLeg = pair.find(o => o.side === OrderSide.Sell) as OrderImpl;
+    const buyLeg = pair.find(o => o.side === OrderSide.Buy);
+    const sellLeg = pair.find(o => o.side === OrderSide.Sell);
     const midNotional = _.mean([buyLeg.averageFilledPrice, sellLeg.averageFilledPrice]) * buyLeg.filledSize;
     const entryProfitRatio = _.round(entryProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
     let currentExitCost;

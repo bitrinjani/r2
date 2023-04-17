@@ -33,7 +33,6 @@ export default class LineIntegration {
         "Content-Type": "application/x-www-form-urlencoded",
         "Content-Length": body.length.toString(),
       },
-      timeout: LineIntegration.fetchTimeout,
     };
     fetch(LineIntegration.apiUrl, init)
       .then(res => {

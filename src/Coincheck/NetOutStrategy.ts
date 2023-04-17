@@ -1,11 +1,11 @@
 import type BrokerApi from "./BrokerApi";
-import type { CashMarginTypeStrategy, NewOrderRequest, LeveragePosition } from "./types";
-import type { Order } from "../../types";
+import type { CashMarginTypeStrategy, NewOrderRequest } from "./types";
+import type { Order } from "../types";
 
 import _ from "lodash";
 
-import { OrderStatus, OrderSide, CashMarginType, OrderType } from "../../types";
-import { eRound, almostEqual } from "../../util";
+import { OrderStatus, OrderSide, CashMarginType, OrderType } from "../types";
+import { eRound, almostEqual } from "../util";
 
 
 export default class NetOutStrategy implements CashMarginTypeStrategy {
@@ -53,7 +53,7 @@ export default class NetOutStrategy implements CashMarginTypeStrategy {
         amount: order.size,
       };
     }
-    const targetPosition = _.last(candidates) as LeveragePosition;
+    const targetPosition = _.last(candidates);
     return {
       ...request,
       order_type: order.side === OrderSide.Buy ? "close_short" : "close_long",

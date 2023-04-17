@@ -54,7 +54,7 @@ export default class BrokerStabilityTracker {
   }
 
   stability(broker: Broker): number {
-    return this.stabilityMap.get(broker) as number;
+    return this.stabilityMap.get(broker);
   }
 
   private increment(broker: Broker) {

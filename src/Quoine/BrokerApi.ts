@@ -15,8 +15,8 @@ import {
   ClosingTrade,
   AccountBalance
 } from "./types";
-import { nonce, safeQueryStringStringify } from "../../util";
-import WebClient from "../../webClient";
+import { nonce, safeQueryStringStringify } from "../util";
+import WebClient from "../webClient";
 
 
 export default class BrokerApi {

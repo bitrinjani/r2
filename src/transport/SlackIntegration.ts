@@ -27,7 +27,6 @@ export default class SlackIntegration {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
-      timeout: SlackIntegration.fetchTimeout,
     };
     fetch(this.config.url, init).catch(ex => console.log(ex));
   }
