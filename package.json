@@ -45,7 +45,7 @@
     "level-read-stream": "^1.1.0",
     "lodash": "^4.17.21",
     "luxon": "^3.3.0",
-    "mkdirp": "^2.1.6",
+    "mkdirp": "^3.0.0",
     "node-fetch": "^2.6.7",
     "open": "^6.0.0",
     "pino": "^8.11.0",
