@@ -10,19 +10,17 @@ import { Value } from "@sinclair/typebox/value";
 import stripJsonComments from "strip-json-comments";
 
 import { ConfigRoot } from "./type";
-import { CashMarginType } from "../types/common";
 
 export { AnalyticsConfigType } from "./type";
+export { BrokerConfigType } from "./type";
 export * from "./configStore";
 
 const DEVELOPMENT_PHASE = false;
 
-export type FormedBrokerConfigType = Omit<BrokerConfigType, "cashMarginType"> & {
-  cashMarginType: CashMarginType,
-};
 export type FormedConfigRootType = Omit<ConfigRootType, "brokers"> & {
-  brokers: FormedBrokerConfigType[],
+  brokers: BrokerConfigType[],
 };
+
 
 class ConfigLoader {
   protected static _instance: ConfigLoader = null;
@@ -47,7 +45,6 @@ class ConfigLoader {
   protected transformBrokerConfig(brokerConfig: BrokerConfigType){
     return {
       ...brokerConfig,
-      cashMarginType: CashMarginType[brokerConfig.cashMarginType] || CashMarginType.Cash,
       noTradePeriods: brokerConfig.noTradePeriods || [],
     };
   }
@@ -113,7 +110,7 @@ export function getConfig(){
   return ConfigLoader.instance.config;
 }
 
-export function findBrokerConfig(broker: Broker): FormedBrokerConfigType {
+export function findBrokerConfig(broker: Broker): BrokerConfigType {
   const found = getConfig().brokers.find(brokerConfig => brokerConfig.broker === broker);
   if(found === undefined){
     throw new Error(`Unable to find ${broker} in config.`);

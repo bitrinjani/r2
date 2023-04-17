@@ -1,11 +1,12 @@
 import type { OrderBooksResponse, CashMarginTypeStrategy } from "./types";
-import type { FormedBrokerConfigType } from "../config";
+import type { BrokerConfigType } from "../config";
 import type {
   Order,
   Execution,
   BrokerAdapter,
   Quote
 } from "../types";
+import type { CashMarginType } from "../types";
 
 import { getLogger } from "@bitr/logger";
 import { addMinutes } from "date-fns";
@@ -16,11 +17,6 @@ import BrokerApi from "./BrokerApi";
 import CashStrategy from "./CashStrategy";
 import MarginOpenStrategy from "./MarginOpenStrategy";
 import NetOutStrategy from "./NetOutStrategy";
-import {
-  CashMarginType,
-  QuoteSide,
-  OrderStatus
-} from "../types";
 import { eRound, almostEqual, toExecution, toQuote } from "../util";
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
@@ -29,12 +25,12 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   readonly broker = "Coincheck";
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
-  constructor(private readonly config: FormedBrokerConfigType) {
+  constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(process.env.COINCHECK_TOKEN, process.env.COINCHECK_SECRET);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
-      [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
-      [CashMarginType.MarginOpen, new MarginOpenStrategy(this.brokerApi)],
-      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)],
+      ["Cash", new CashStrategy(this.brokerApi)],
+      ["MarginOpen", new MarginOpenStrategy(this.brokerApi)],
+      ["NetOut", new NetOutStrategy(this.brokerApi)],
     ]);
   }
 
@@ -54,11 +50,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private mapToQuote(orderBooksResponse: OrderBooksResponse): Quote[] {
     const asks = _(orderBooksResponse.asks)
       .take(100)
-      .map(q => toQuote(this.broker, QuoteSide.Ask, q[0], q[1]))
+      .map(q => toQuote(this.broker, "Ask", q[0], q[1]))
       .value();
     const bids = _(orderBooksResponse.bids)
       .take(100)
-      .map(q => toQuote(this.broker, QuoteSide.Bid, q[0], q[1]))
+      .map(q => toQuote(this.broker, "Bid", q[0], q[1]))
       .value();
     return _.concat(asks, bids);
   }
@@ -81,7 +77,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       throw new Error(`Cancel ${orderId} failed.`);
     }
     order.lastUpdated = new Date();
-    order.status = OrderStatus.Canceled;
+    order.status = "Canceled";
   }
 
   async refresh(order: Order): Promise<void> {
@@ -93,7 +89,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       }
       order.filledSize = eRound(order.size - brokerOrder.pending_amount);
       if(order.filledSize > 0){
-        order.status = OrderStatus.PartiallyFilled;
+        order.status = "PartiallyFilled";
       }
       order.lastUpdated = new Date();
       return;
@@ -114,7 +110,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       return execution as Execution;
     });
     order.filledSize = eRound(_.sumBy(order.executions, x => x.size));
-    order.status = almostEqual(order.filledSize, order.size, 1) ? OrderStatus.Filled : OrderStatus.Canceled;
+    order.status = almostEqual(order.filledSize, order.size, 1) ? "Filled" : "Canceled";
     order.lastUpdated = new Date();
   }
 } /* istanbul ignore next */

@@ -22,8 +22,7 @@ import SpreadAnalyzer from "./spreadAnalyzer";
 import symbols from "./symbols";
 import {
   ConfigStore,
-  ActivePairStore,
-  OrderSide
+  ActivePairStore
 } from "./types";
 import { padEnd, formatQuote } from "./util";
 
@@ -123,8 +122,8 @@ export default class OppotunitySearcher extends EventEmitter {
 
   private getPairSummary(pair: OrderPair, exitAnalysisResult?: SpreadAnalysisResult): PairSummary {
     const entryProfit = calcProfit(pair).profit;
-    const buyLeg = pair.find(o => o.side === OrderSide.Buy);
-    const sellLeg = pair.find(o => o.side === OrderSide.Sell);
+    const buyLeg = pair.find(o => o.side === "Buy");
+    const sellLeg = pair.find(o => o.side === "Sell");
     const midNotional = _.mean([buyLeg.averageFilledPrice, sellLeg.averageFilledPrice]) * buyLeg.filledSize;
     const entryProfitRatio = _.round(entryProfit / midNotional * 100, LOT_MIN_DECIMAL_PLACE);
     let currentExitCost;

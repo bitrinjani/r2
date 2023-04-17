@@ -1,8 +1,8 @@
 import type {
   SpreadAnalysisResult,
   Quote,
-  OrderPair
-} from "./types";
+  OrderPair,
+  OrderType } from "./types";
 
 import { EventEmitter } from "events";
 
@@ -20,9 +20,6 @@ import SingleLegHandler from "./singleLegHandler";
 import symbols from "./symbols";
 import {
   ConfigStore,
-  OrderType,
-  QuoteSide,
-  OrderSide,
   ActivePairStore
 } from "./types";
 import { delay, formatQuote } from "./util";
@@ -46,7 +43,7 @@ export default class PairTrader extends EventEmitter {
 
   async trade(spreadAnalysisResult: SpreadAnalysisResult, closable: boolean): Promise<void> {
     const { bid, ask, targetVolume } = spreadAnalysisResult;
-    const sendTasks = [ask, bid].map(q => this.sendOrder(q, targetVolume, OrderType.Limit));
+    const sendTasks = [ask, bid].map(q => this.sendOrder(q, targetVolume, "Limit"));
     const orders = await Promise.all(sendTasks);
     this.status = "Sent";
     await this.checkOrderState(orders, closable);
@@ -90,7 +87,7 @@ export default class PairTrader extends EventEmitter {
         await Promise.all(cancelTasks);
         if(
           orders.some(o => !o.filled)
-          && _(orders).sumBy(o => o.filledSize * (o.side === OrderSide.Buy ? -1 : 1)) !== 0
+          && _(orders).sumBy(o => o.filledSize * (o.side === "Buy" ? -1 : 1)) !== 0
         ){
           const subOrders = await this.singleLegHandler.handle(orders as OrderPair, closable);
           if(subOrders.length !== 0 && subOrders.every(o => o.filled)){
@@ -107,11 +104,11 @@ export default class PairTrader extends EventEmitter {
     const brokerConfig = findBrokerConfig(quote.broker);
     const { config } = this.configStore;
     const { cashMarginType, leverageLevel } = brokerConfig;
-    const orderSide = quote.side === QuoteSide.Ask ? OrderSide.Buy : OrderSide.Sell;
+    const orderSide = quote.side === "Ask" ? "Buy" : "Sell";
     const orderPrice
-     = quote.side === QuoteSide.Ask && config.acceptablePriceRange !== undefined
+     = quote.side === "Ask" && config.acceptablePriceRange !== undefined
        ? _.round(quote.price * (1 + config.acceptablePriceRange / 100))
-       : quote.side === QuoteSide.Bid && config.acceptablePriceRange !== undefined
+       : quote.side === "Bid" && config.acceptablePriceRange !== undefined
          ? _.round(quote.price * (1 - config.acceptablePriceRange / 100))
          : quote.price;
     const order = new OrderImpl({

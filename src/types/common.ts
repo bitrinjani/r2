@@ -36,48 +36,31 @@ export interface Order {
   executions: Execution[];
 }
 
-export enum OrderSide {
-  Buy = "Buy",
-  Sell = "Sell"
-}
+export type OrderSide = "Buy" | "Sell";
 
-export enum TimeInForce {
-  None = "None",
-  Day = "Day",
-  Gtc = "Gtc",
-  Ioc = "Ioc",
-  Fok = "Fok",
-  Gtd = "Gtd"
-}
+export type TimeInForce =
+  | "None"
+  | "Day"
+  | "Gtc"
+  | "Ioc"
+  | "Fok"
+  | "Gtd";
 
-export enum CashMarginType {
-  Cash = "Cash",
-  MarginOpen = "MarginOpen",
-  NetOut = "NetOut"
-}
+export type CashMarginType = "Cash" | "MarginOpen" | "NetOut";
 
-export enum QuoteSide {
-  Ask = "Ask",
-  Bid = "Bid"
-}
+export type QuoteSide = "Ask" | "Bid";
 
-export enum OrderType {
-  Market = "Market",
-  Limit = "Limit",
-  Stop = "Stop",
-  StopLimit = "StopLimit"
-}
+export type OrderType = "Market" | "Limit" | "Stop" | "StopLimit";
 
-export enum OrderStatus {
-  New = "New",
-  PartiallyFilled = "PartiallyFilled",
-  Filled = "Filled",
-  Canceled = "Canceled",
-  PendingCancel = "PendingCancel",
-  PendingAmend = "PendingAmend",
-  PendingNew = "PendingNew",
-  Rejected = "Rejected",
-  Expired = "Expired"
-}
-
+export type OrderStatus =
+  | "New"
+  | "PartiallyFilled"
+  | "Filled"
+  | "Canceled"
+  | "PendingCancel"
+  | "PendingAmend"
+  | "PendingNew"
+  | "Rejected"
+  | "Expired";
+  
 export type Broker = string;

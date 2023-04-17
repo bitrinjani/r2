@@ -2,13 +2,11 @@ import type BrokerApi from "./BrokerApi";
 import type { CashMarginTypeStrategy } from "./types";
 import type { Order } from "../types";
 
-import { OrderStatus, OrderSide, OrderType, CashMarginType } from "../types";
-
 export default class CashStrategy implements CashMarginTypeStrategy {
   constructor(private readonly brokerApi: BrokerApi) {}
 
   async send(order: Order): Promise<void> {
-    if(order.cashMarginType !== CashMarginType.Cash){
+    if(order.cashMarginType !== "Cash"){
       throw new Error();
     }
     const request = {
@@ -22,7 +20,7 @@ export default class CashStrategy implements CashMarginTypeStrategy {
       throw new Error("Send failed.");
     }
     order.sentTime = reply.created_at;
-    order.status = OrderStatus.New;
+    order.status = "New";
     order.brokerOrderId = reply.id;
     order.lastUpdated = new Date();
   }
@@ -33,20 +31,20 @@ export default class CashStrategy implements CashMarginTypeStrategy {
 
   private getBrokerOrderType(order: Order): string {
     switch(order.side){
-      case OrderSide.Buy:
+      case "Buy":
         switch(order.type){
-          case OrderType.Market:
+          case "Market":
             return "market_buy";
-          case OrderType.Limit:
+          case "Limit":
             return "buy";
           default:
             throw new Error();
         }
-      case OrderSide.Sell:
+      case "Sell":
         switch(order.type){
-          case OrderType.Market:
+          case "Market":
             return "market_sell";
-          case OrderType.Limit:
+          case "Limit":
             return "sell";
           default:
             throw new Error();

@@ -19,11 +19,7 @@ import { LOT_MIN_DECIMAL_PLACE } from "./constants";
 import t from "./i18n";
 import { calcCommission } from "./pnl";
 import symbols from "./symbols";
-import {
-  ConfigStore,
-  QuoteSide,
-  OrderSide
-} from "./types";
+import { ConfigStore } from "./types";
 
 @injectable()
 export default class SpreadAnalyzer {
@@ -55,7 +51,7 @@ export default class SpreadAnalyzer {
       .value();
     if(closingPair){
       const isOppositeSide = (o: OrderImpl, q: Quote) =>
-        q.side === (o.side === OrderSide.Buy ? QuoteSide.Bid : QuoteSide.Ask);
+        q.side === (o.side === "Buy" ? "Bid" : "Ask");
       const isSameBroker = (o: OrderImpl, q: Quote) => o.broker === q.broker;
       filteredQuotes = _(filteredQuotes)
         .filter(
@@ -105,8 +101,8 @@ export default class SpreadAnalyzer {
       .filter(q => new Decimal(q.volume).gte(config.minSize))
       .orderBy(["price"])
       .value();
-    const asks = _(filteredQuotes).filter(q => q.side === QuoteSide.Ask);
-    const bids = _(filteredQuotes).filter(q => q.side === QuoteSide.Bid);
+    const asks = _(filteredQuotes).filter(q => q.side === "Ask");
+    const bids = _(filteredQuotes).filter(q => q.side === "Bid");
     if(asks.isEmpty() || bids.isEmpty()){
       return undefined;
     }
@@ -158,10 +154,10 @@ export default class SpreadAnalyzer {
   private getBest(quotes: Quote[]) {
     const ordered = _.orderBy(quotes, ["price"]);
     const ask = _(ordered)
-      .filter(q => q.side === QuoteSide.Ask)
+      .filter(q => q.side === "Ask")
       .first();
     const bid = _(ordered)
-      .filter(q => q.side === QuoteSide.Bid)
+      .filter(q => q.side === "Bid")
       .last();
     return { ask, bid };
   }
@@ -169,10 +165,10 @@ export default class SpreadAnalyzer {
   private getWorst(quotes: Quote[]) {
     const ordered = _.orderBy(quotes, ["price"]);
     const ask = _(ordered)
-      .filter(q => q.side === QuoteSide.Ask)
+      .filter(q => q.side === "Ask")
       .last();
     const bid = _(ordered)
-      .filter(q => q.side === QuoteSide.Bid)
+      .filter(q => q.side === "Bid")
       .first();
     return { ask, bid };
   }
@@ -185,6 +181,6 @@ export default class SpreadAnalyzer {
   }
 
   private isAllowedByCurrentPosition(q: Quote, pos: BrokerPosition): boolean {
-    return q.side === QuoteSide.Bid ? pos.shortAllowed : pos.longAllowed;
+    return q.side === "Bid" ? pos.shortAllowed : pos.longAllowed;
   }
 } /* istanbul ignore next */

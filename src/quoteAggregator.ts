@@ -1,4 +1,4 @@
-import type { FormedBrokerConfigType } from "./config";
+import type { BrokerConfigType } from "./config";
 import type { Broker, Quote } from "./types";
 
 import { AwaitableEventEmitter } from "@bitr/awaitable-event-emitter";
@@ -9,7 +9,7 @@ import { DateTime, Interval } from "luxon";
 
 import BrokerAdapterRouter from "./brokerAdapterRouter";
 import symbols from "./symbols";
-import { ConfigStore, QuoteSide } from "./types";
+import { ConfigStore } from "./types";
 
 @injectable()
 export default class QuoteAggregator extends AwaitableEventEmitter {
@@ -80,7 +80,7 @@ export default class QuoteAggregator extends AwaitableEventEmitter {
       .value();
   }
 
-  private timeFilter(brokerConfig: FormedBrokerConfigType): boolean {
+  private timeFilter(brokerConfig: BrokerConfigType): boolean {
     if(_.isEmpty(brokerConfig.noTradePeriods)){
       return true;
     }
@@ -99,8 +99,8 @@ export default class QuoteAggregator extends AwaitableEventEmitter {
   private fold(quotes: Quote[], step: number): Quote[] {
     return _(quotes)
       .groupBy((q: Quote) => {
-        const price = q.side === QuoteSide.Ask ? _.ceil(q.price / step) * step : _.floor(q.price / step) * step;
-        return _.join([price, q.broker, QuoteSide[q.side]], "#");
+        const price = q.side === "Ask" ? _.ceil(q.price / step) * step : _.floor(q.price / step) * step;
+        return _.join([price, q.broker, q.side], "#");
       })
       .map((value: Quote[], key) => ({
         broker: value[0].broker,

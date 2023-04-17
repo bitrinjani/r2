@@ -1,5 +1,5 @@
-import type { ChildOrdersParam, SendChildOrderRequest, ChildOrder, BoardResponse } from "./types";
-import type { FormedBrokerConfigType } from "../config";
+import type { ChildOrdersParam, SendChildOrderRequest, ChildOrder } from "./types";
+import type { BrokerConfigType } from "../config";
 import type {
   BrokerAdapter,
   Order,
@@ -12,14 +12,6 @@ import _ from "lodash";
 
 import "dotenv/config";
 import BrokerApi from "./BrokerApi";
-import {
-  OrderStatus,
-  OrderType,
-  TimeInForce,
-  OrderSide,
-  CashMarginType,
-  QuoteSide
-} from "../types";
 import { eRound, toExecution } from "../util";
 
 export default class BrokerAdapterImpl implements BrokerAdapter {
@@ -27,7 +19,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private readonly log = getLogger("Bitflyer.BrokerAdapter");
   readonly broker = "Bitflyer";
 
-  constructor(private readonly config: FormedBrokerConfigType) {
+  constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(process.env.BITFLYER_TOKEN, process.env.BITFLYER_SECRET);
   }
 
@@ -38,7 +30,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     const param = this.mapOrderToSendChildOrderRequest(order);
     const reply = await this.brokerApi.sendChildOrder(param);
     order.brokerOrderId = reply.child_order_acceptance_id;
-    order.status = OrderStatus.New;
+    order.status = "New";
     order.sentTime = new Date();
     order.lastUpdated = new Date();
   }
@@ -79,7 +71,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     const request = { product_code: productCode, child_order_acceptance_id: order.brokerOrderId };
     await this.brokerApi.cancelChildOrder(request);
     order.lastUpdated = new Date();
-    order.status = OrderStatus.Canceled;
+    order.status = "Canceled";
   }
 
   async getBtcPosition(): Promise<number> {
@@ -92,12 +84,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   }
 
   async fetchQuotes(): Promise<Quote[]> {
-    const response = await this.brokerApi.getBoard();
-    return this.mapToQuote(response);
+    return [];
   }
 
   private mapOrderToSendChildOrderRequest(order: Order): SendChildOrderRequest {
-    if(order.cashMarginType !== CashMarginType.Cash){
+    if(order.cashMarginType !== "Cash"){
       throw new Error("Not implemented.");
     }
 
@@ -113,11 +104,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     let price = 0;
     let childOrderType = "";
     switch(order.type){
-      case OrderType.Limit:
+      case "Limit":
         childOrderType = "LIMIT";
         price = order.price;
         break;
-      case OrderType.Market:
+      case "Market":
         childOrderType = "MARKET";
         price = 0;
         break;
@@ -127,13 +118,13 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
 
     let timeInForce;
     switch(order.timeInForce){
-      case TimeInForce.None:
+      case "None":
         timeInForce = "";
         break;
-      case TimeInForce.Fok:
+      case "Fok":
         timeInForce = "FOK";
         break;
-      case TimeInForce.Ioc:
+      case "Ioc":
         timeInForce = "IOC";
         break;
       default:
@@ -144,7 +135,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
       price,
       product_code: productCode,
       child_order_type: childOrderType,
-      side: OrderSide[order.side].toUpperCase(),
+      side: order.side.toUpperCase(),
       size: order.size,
       time_in_force: timeInForce,
     };
@@ -153,30 +144,18 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private setOrderFields(childOrder: ChildOrder, order: Order): void {
     order.filledSize = eRound(childOrder.executed_size);
     if(childOrder.child_order_state === "CANCELED"){
-      order.status = OrderStatus.Canceled;
+      order.status = "Canceled";
     }else if(childOrder.child_order_state === "EXPIRED"){
-      order.status = OrderStatus.Expired;
+      order.status = "Expired";
     }else if(order.filledSize === order.size){
-      order.status = OrderStatus.Filled;
+      order.status = "Filled";
     }else if(order.filledSize > 0){
-      order.status = OrderStatus.PartiallyFilled;
+      order.status = "PartiallyFilled";
     }
     order.lastUpdated = new Date();
   }
 
-  private mapToQuote(boardResponse: BoardResponse): Quote[] {
-    const asks = _(boardResponse.asks)
-      .take(100)
-      .map(q => {
-        return { broker: this.broker, side: QuoteSide.Ask, price: Number(q.price), volume: Number(q.size) };
-      })
-      .value();
-    const bids = _(boardResponse.bids)
-      .take(100)
-      .map(q => {
-        return { broker: this.broker, side: QuoteSide.Bid, price: Number(q.price), volume: Number(q.size) };
-      })
-      .value();
-    return _.concat(asks, bids);
+  private mapToQuote(): Quote[] {
+    return [];
   }
 } /* istanbul ignore next */

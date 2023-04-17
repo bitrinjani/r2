@@ -1,4 +1,4 @@
-import type { FormedBrokerConfigType } from "./config";
+import type { BrokerConfigType } from "./config";
 import type { BrokerMap, BrokerPosition } from "./types";
 
 import { EventEmitter } from "events";
@@ -98,7 +98,7 @@ export default class PositionService extends EventEmitter {
     }
   }
 
-  private async getBrokerPosition(brokerConfig: FormedBrokerConfigType, minSize: number): Promise<BrokerPosition> {
+  private async getBrokerPosition(brokerConfig: BrokerConfigType, minSize: number): Promise<BrokerPosition> {
     const { baseCcy } = splitSymbol(this.configStore.config.symbol);
     const positions = await this.brokerAdapterRouter.getPositions(brokerConfig.broker);
     const baseCcyPosition = positions.get(baseCcy);

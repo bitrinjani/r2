@@ -1,11 +1,12 @@
 import type { PriceLevelsResponse, SendOrderRequest, OrdersResponse, CashMarginTypeStrategy } from "./types";
-import type { FormedBrokerConfigType } from "../config";
+import type { BrokerConfigType } from "../config";
 import type {
   BrokerAdapter,
   Order,
   Execution,
   Quote
 } from "../types";
+import type { CashMarginType } from "../types";
 
 import Decimal from "decimal.js";
 import _ from "lodash";
@@ -14,13 +15,6 @@ import "dotenv/config";
 import BrokerApi from "./BrokerApi";
 import CashStrategy from "./CashStrategy";
 import NetOutStrategy from "./NetOutStrategy";
-import {
-  OrderStatus,
-  OrderType,
-  OrderSide,
-  CashMarginType,
-  QuoteSide
-} from "../types";
 import { toExecution, toQuote } from "../util";
 
 function timestampToDate(n: number): Date {
@@ -32,11 +26,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   readonly broker = "Quoine";
   readonly strategyMap: Map<CashMarginType, CashMarginTypeStrategy>;
 
-  constructor(private readonly config: FormedBrokerConfigType) {
+  constructor(private readonly config: BrokerConfigType) {
     this.brokerApi = new BrokerApi(process.env.QUOINE_TOKEN, process.env.QUOINE_SECRET);
     this.strategyMap = new Map<CashMarginType, CashMarginTypeStrategy>([
-      [CashMarginType.Cash, new CashStrategy(this.brokerApi)],
-      [CashMarginType.NetOut, new NetOutStrategy(this.brokerApi)],
+      ["Cash", new CashStrategy(this.brokerApi)],
+      ["NetOut", new NetOutStrategy(this.brokerApi)],
     ]);
   }
 
@@ -47,7 +41,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     const request = this.mapOrderToSendOrderRequest(order);
     const response = await this.brokerApi.sendOrder(request);
     order.brokerOrderId = response.id.toString();
-    order.status = OrderStatus.New;
+    order.status = "New";
     order.sentTime = new Date();
     order.lastUpdated = new Date();
   }
@@ -60,7 +54,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   async cancel(order: Order): Promise<void> {
     await this.brokerApi.cancelOrder(order.brokerOrderId);
     order.lastUpdated = new Date();
-    order.status = OrderStatus.Canceled;
+    order.status = "Canceled";
   }
 
   async getBtcPosition(): Promise<number> {
@@ -89,11 +83,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     let orderType: string;
     let price = 0;
     switch(order.type){
-      case OrderType.Limit:
+      case "Limit":
         orderType = "limit";
         price = order.price;
         break;
-      case OrderType.Market:
+      case "Market":
         orderType = "market";
         price = 0;
         break;
@@ -104,11 +98,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     let orderDirection: string | undefined;
     let leverageLevel: number | undefined;
     switch(order.cashMarginType){
-      case CashMarginType.Cash:
+      case "Cash":
         orderDirection = undefined;
         leverageLevel = undefined;
         break;
-      case CashMarginType.NetOut:
+      case "NetOut":
         orderDirection = "netout";
         leverageLevel = order.leverageLevel;
         break;
@@ -122,7 +116,7 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
         product_id: productId,
         order_direction: orderDirection,
         order_type: orderType,
-        side: OrderSide[order.side].toLowerCase(),
+        side: order.side.toLowerCase(),
         quantity: order.size,
         leverage_level: leverageLevel,
       },
@@ -134,9 +128,9 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
     order.filledSize = Number(ordersResponse.filled_quantity);
     order.creationTime = timestampToDate(ordersResponse.created_at);
     if(new Decimal(order.filledSize).eq(order.size)){
-      order.status = OrderStatus.Filled;
+      order.status = "Filled";
     }else if(order.filledSize > 0){
-      order.status = OrderStatus.PartiallyFilled;
+      order.status = "PartiallyFilled";
     }
     order.executions = _.map(ordersResponse.executions, x => {
       const e = toExecution(order);
@@ -151,11 +145,11 @@ export default class BrokerAdapterImpl implements BrokerAdapter {
   private mapToQuote(priceLevelsResponse: PriceLevelsResponse): Quote[] {
     const asks = _(priceLevelsResponse.sell_price_levels)
       .take(100)
-      .map(q => toQuote(this.broker, QuoteSide.Ask, Number(q[0]), Number(q[1])))
+      .map(q => toQuote(this.broker, "Ask", Number(q[0]), Number(q[1])))
       .value();
     const bids = _(priceLevelsResponse.buy_price_levels)
       .take(100)
-      .map(q => toQuote(this.broker, QuoteSide.Bid, Number(q[0]), Number(q[1])))
+      .map(q => toQuote(this.broker, "Bid", Number(q[0]), Number(q[1])))
       .value();
     return _.concat(asks, bids);
   }

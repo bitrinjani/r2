@@ -10,7 +10,7 @@ import t from "./i18n";
 import OrderImpl from "./orderImpl";
 import * as OrderUtil from "./orderUtil";
 import symbols from "./symbols";
-import { OrderSide, OrderType, ConfigStore } from "./types";
+import { ConfigStore } from "./types";
 import { delay, splitSymbol } from "./util";
 
 @injectable()
@@ -49,7 +49,7 @@ export default class SingleLegHandler {
   private async reverseLeg(orders: OrderPair, options): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
-    const sign = largeLeg.side === OrderSide.Buy ? -1 : 1;
+    const sign = largeLeg.side === "Buy" ? -1 : 1;
     const price = _.round(largeLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(largeLeg.filledSize - smallLeg.filledSize, LOT_MIN_DECIMAL_PLACE);
     const { baseCcy } = splitSymbol(this.symbol);
@@ -57,11 +57,11 @@ export default class SingleLegHandler {
     const reversalOrder = new OrderImpl({
       symbol: this.symbol,
       broker: largeLeg.broker,
-      side: largeLeg.side === OrderSide.Buy ? OrderSide.Sell : OrderSide.Buy,
+      side: largeLeg.side === "Buy" ? "Sell" : "Buy",
       size,
       price,
       cashMarginType: largeLeg.cashMarginType,
-      type: OrderType.Limit,
+      type: "Limit",
       leverageLevel: largeLeg.leverageLevel,
     });
     await this.sendOrderWithTtl(reversalOrder, options.ttl);
@@ -71,7 +71,7 @@ export default class SingleLegHandler {
   private async proceedLeg(orders: OrderPair, options): Promise<OrderImpl[]> {
     const smallLeg = orders[0].filledSize <= orders[1].filledSize ? orders[0] : orders[1];
     const largeLeg = orders[0].filledSize <= orders[1].filledSize ? orders[1] : orders[0];
-    const sign = smallLeg.side === OrderSide.Buy ? 1 : -1;
+    const sign = smallLeg.side === "Buy" ? 1 : -1;
     const price = _.round(smallLeg.price * (1 + sign * options.limitMovePercent / 100));
     const size = _.floor(smallLeg.pendingSize - largeLeg.pendingSize, LOT_MIN_DECIMAL_PLACE);
     const { baseCcy } = splitSymbol(this.symbol);
@@ -83,7 +83,7 @@ export default class SingleLegHandler {
       size,
       price,
       cashMarginType: smallLeg.cashMarginType,
-      type: OrderType.Limit,
+      type: "Limit",
       leverageLevel: smallLeg.leverageLevel,
     });
     await this.sendOrderWithTtl(proceedOrder, options.ttl);
