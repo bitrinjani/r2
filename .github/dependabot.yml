@@ -15,13 +15,6 @@ updates:
       - "dependencies"
     allow:
       - dependency-type: "direct"
-    ignore:
-      - dependency-name: "sodium-native"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "p-queue"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "p-event"
-        update-types: ["version-update:semver-major"]
 
   # actions (master)
   - package-ecosystem: github-actions
@@ -37,7 +30,6 @@ updates:
       - "dependencies"
       - "github_actions"
       
-updates:
   # webui
   - package-ecosystem: npm
     directory: "/webui"
@@ -53,13 +45,6 @@ updates:
       - "dependencies"
     allow:
       - dependency-type: "direct"
-    ignore:
-      - dependency-name: "sodium-native"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "p-queue"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "p-event"
-        update-types: ["version-update:semver-major"]
 
   # actions (webui)
   - package-ecosystem: github-actions
