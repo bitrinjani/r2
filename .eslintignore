@@ -4,4 +4,3 @@ plugins
 webui
 *.json
 *.js
-src/transport
