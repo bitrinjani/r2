@@ -9,6 +9,7 @@ import type {
 
 import { getLogger } from "@bitr/logger";
 import _ from "lodash";
+
 import "dotenv/config";
 import BrokerApi from "./BrokerApi";
 import {
