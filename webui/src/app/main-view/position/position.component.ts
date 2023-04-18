@@ -1,15 +1,15 @@
-import { BrokerPosition } from '../../types';
-import { OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import type { BrokerPosition } from "../../types";
+import type { OnInit, OnDestroy } from "@angular/core";
+import type { Subscription } from "rxjs/Subscription";
 
-import { Component } from '@angular/core';
-import * as _ from 'lodash';
+import { Component } from "@angular/core";
+import * as _ from "lodash";
 
-import { WsService } from '../../ws.service';
+import { WsService } from "../../ws.service";
 
 @Component({
-  selector: 'app-position',
-  templateUrl: './position.component.html',
+  selector: "app-position",
+  templateUrl: "./position.component.html",
 })
 export class PositionComponent implements OnInit, OnDestroy {
   private subscription: Subscription;

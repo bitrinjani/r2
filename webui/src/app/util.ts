@@ -1,8 +1,8 @@
-import { Order } from './types';
+import type { Order } from "./types";
 
-import * as _ from 'lodash';
+import * as _ from "lodash";
 
-import OrderImpl from './OrderImpl';
+import OrderImpl from "./OrderImpl";
 
 export function getAverageFilledPrice(order: Order) {
   return _.isEmpty(order.executions)
@@ -20,7 +20,7 @@ export function eRound(n: number): number {
 }
 
 export function splitSymbol(symbol: string): { baseCcy: string, quoteCcy: string } {
-  const [baseCcy, quoteCcy] = symbol.split('/');
+  const [baseCcy, quoteCcy] = symbol.split("/");
   return { baseCcy, quoteCcy };
 }
 

@@ -1,18 +1,19 @@
-import { OrderPair, PairWithSummary } from '../../types';
-import { OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import type { OrderPair, PairWithSummary } from "../../types";
+import type { OnInit, OnDestroy } from "@angular/core";
+import type { Subscription } from "rxjs/Subscription";
 
-import { Component } from '@angular/core';
+import { Component } from "@angular/core";
 
-import { reviveOrder } from '../../OrderImpl';
-import { OrderSide } from '../../types';
-import { getAverageFilledPrice } from '../../util';
-import { WsService } from '../../ws.service';
+
+import { reviveOrder } from "../../OrderImpl";
+import { OrderSide } from "../../types";
+import { getAverageFilledPrice } from "../../util";
+import { WsService } from "../../ws.service";
 
 
 @Component({
-  selector: 'app-active-pair',
-  templateUrl: './active-pair.component.html',
+  selector: "app-active-pair",
+  templateUrl: "./active-pair.component.html",
 })
 export class ActivePairComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
@@ -24,7 +25,7 @@ export class ActivePairComponent implements OnInit, OnDestroy {
     this.wsService.connect();
     this.subscription = this.wsService.activePair$.subscribe(pairs => {
       this.pairs = pairs;
-      for (const pairWithSummary of this.pairs) {
+      for(const pairWithSummary of this.pairs){
         pairWithSummary.pair = pairWithSummary.pair.map(o => reviveOrder(o)) as OrderPair;
       }
     });

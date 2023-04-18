@@ -1,14 +1,14 @@
-import { WsMessage, LogRecord } from './types';
-import { Observer } from 'rxjs/Observer';
+import type { WsMessage, LogRecord } from "./types";
+import type { Observer } from "rxjs/Observer";
 
-import { Injectable } from '@angular/core';
-import * as ReconnectingWebSocket from 'reconnecting-websocket';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { catchError, map, tap, filter, share } from 'rxjs/operators';
+import { Injectable } from "@angular/core";
+import * as ReconnectingWebSocket from "reconnecting-websocket";
+import { Observable } from "rxjs/Observable";
+import { Subject } from "rxjs/Subject";
+import { catchError, map, tap, filter, share } from "rxjs/operators";
 
 
-import { Quote, BrokerMap, BrokerPosition, SpreadAnalysisResult } from './types';
+import { Quote, BrokerMap, BrokerPosition, SpreadAnalysisResult } from "./types";
 
 
 @Injectable()
@@ -20,7 +20,7 @@ export class LogService {
   socket: Subject<MessageEvent>;
 
   connect() {
-    if (this.connected) {
+    if(this.connected){
       return;
     }
     const ws = new ReconnectingWebSocket(this.url);
@@ -30,14 +30,14 @@ export class LogService {
     });
     const observer = {
       next: (data: Object) => {
-        if (ws.readyState === WebSocket.OPEN) {
+        if(ws.readyState === WebSocket.OPEN){
           ws.send(JSON.stringify(data));
         }
       },
     };
     this.socket = Subject.create(observer, observable);
     const sharedObservable = this.socket.pipe(share());
-    this.log$ = this.mapMessage<LogRecord>(sharedObservable, 'log');
+    this.log$ = this.mapMessage<LogRecord>(sharedObservable, "log");
     this.connected = true;
   }
 

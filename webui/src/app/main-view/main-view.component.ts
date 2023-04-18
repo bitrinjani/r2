@@ -1,15 +1,15 @@
-import { OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs/Subscription';
+import type { OnInit, OnDestroy } from "@angular/core";
+import type { Subscription } from "rxjs/Subscription";
 
-import { Component } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import { filter, map } from 'rxjs/operators';
+import { Component } from "@angular/core";
+import { Observable } from "rxjs/Observable";
+import { filter, map } from "rxjs/operators";
 
-import { WsService } from '../ws.service';
+import { WsService } from "../ws.service";
 
 @Component({
-  selector: 'app-main-view',
-  templateUrl: './main-view.component.html',
+  selector: "app-main-view",
+  templateUrl: "./main-view.component.html",
 })
 export class MainViewComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
@@ -24,11 +24,11 @@ export class MainViewComponent implements OnInit, OnDestroy {
     let timer;
     this.subscription = this.wsService.error$.pipe(filter(x => x.code !== undefined), map(x => x.code)).subscribe(x => {
       this.errorMessage = `WebSocket connection failed. Error: ${x}`;
-      if (timer) {
+      if(timer){
         clearTimeout(timer);
       }
       timer = setTimeout(() => {
-        this.errorMessage = '';
+        this.errorMessage = "";
         timer = undefined;
       }, this.errorCacheTime);
     });
