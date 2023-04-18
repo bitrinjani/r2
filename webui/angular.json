@@ -53,20 +53,24 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ]
-            }
+            },
+            "development": {}
           },
-          "defaultConfiguration": ""
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "poc:build"
           },
           "configurations": {
             "production": {
               "browserTarget": "poc:build:production"
+            },
+            "development": {
+              "browserTarget": "poc:build:development"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
@@ -115,7 +119,8 @@
           "options": {
             "protractorConfig": "./protractor.conf.js",
             "devServerTarget": "poc:serve"
-          }
+          },
+          "configurations": {}
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
