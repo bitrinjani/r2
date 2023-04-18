@@ -1,10 +1,10 @@
-import type; { ComponentFixture; } from; '@angular/core/testing';
+import type { ComponentFixture } from "@angular/core/testing";
 
 import { TestBed } from "@angular/core/testing";
 
-import { DepthBrokerCellComponent } from './depth-broker-cell.component';
+import { DepthBrokerCellComponent } from "./depth-broker-cell.component";
 
-describe('DepthBrokerCellComponent', () => {
+describe("DepthBrokerCellComponent", () => {
   let component: DepthBrokerCellComponent;
   let fixture: ComponentFixture<DepthBrokerCellComponent>;
 
