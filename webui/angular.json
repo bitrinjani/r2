@@ -112,7 +112,6 @@
       }
     }
   },
-  "defaultProject": "poc",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
