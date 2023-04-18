@@ -16,14 +16,14 @@
     "webpack": "^5.0.0"
   },
   "dependencies": {
-    "@angular/animations": "^11.2.14",
-    "@angular/common": "^11.2.14",
-    "@angular/compiler": "^11.2.14",
-    "@angular/core": "^11.2.14",
-    "@angular/forms": "^11.2.14",
-    "@angular/platform-browser": "^11.2.14",
-    "@angular/platform-browser-dynamic": "^11.2.14",
-    "@angular/router": "^11.2.14",
+    "@angular/animations": "^12.2.17",
+    "@angular/common": "^12.2.17",
+    "@angular/compiler": "^12.2.17",
+    "@angular/core": "^12.2.17",
+    "@angular/forms": "^12.2.17",
+    "@angular/platform-browser": "^12.2.17",
+    "@angular/platform-browser-dynamic": "^12.2.17",
+    "@angular/router": "^12.2.17",
     "@bitr/castable": "^1.0.3",
     "core-js": "^2.0.0",
     "lodash": "4.17.5",
@@ -32,12 +32,12 @@
     "rxjs-compat": "^6.6.7",
     "tslib": "^2.0.0",
     "tslint": "~6.1.0",
-    "zone.js": "~0.10.2"
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "@angular/cli": "^11.2.19",
-    "@angular/compiler-cli": "^11.2.14",
-    "@angular/language-service": "^11.2.14",
+    "@angular/cli": "^12.2.18",
+    "@angular/compiler-cli": "^12.2.17",
+    "@angular/language-service": "^12.2.17",
     "@types/jasmine": "^4.3.1",
     "@types/jasminewd2": "^2.0.2",
     "@types/lodash": "4.14.104",
@@ -59,6 +59,6 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "lite-server": "^2.3.0",
     "protractor": "~7.0.0",
-    "typescript": "~4.0.8"
+    "typescript": "~4.3.5"
   }
 }
