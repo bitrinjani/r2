@@ -4,6 +4,7 @@ import type { Subscription } from "rxjs/Subscription";
 
 import { Component } from "@angular/core";
 
+
 import { reviveOrder } from "../../OrderImpl";
 import { OrderSide } from "../../types";
 import { getAverageFilledPrice } from "../../util";

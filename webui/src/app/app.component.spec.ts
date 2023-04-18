@@ -10,7 +10,7 @@ import { DepthSizeCellComponent } from "./depth-size-cell/depth-size-cell.compon
 import { LogViewComponent } from "./log-view/log-view.component";
 import { MainViewComponent } from "./main-view/main-view.component";
 describe("AppComponent", () => {
-  beforeEach((() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
         AppComponent,
@@ -23,7 +23,7 @@ describe("AppComponent", () => {
         ConfigFormComponent,
       ], imports: [AppRoutingModule],
     }).compileComponents();
-  }));
+  });
   it("should create the app", async(() => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;

@@ -15,7 +15,7 @@ export class MainViewComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   private readonly errorCacheTime = 8000;
   errorMessage: string;
-  logAutoScroll: boolean = true;
+  logAutoScroll = true;
 
   constructor(private readonly wsService: WsService) {}
 

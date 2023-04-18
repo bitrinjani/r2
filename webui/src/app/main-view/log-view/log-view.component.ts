@@ -3,7 +3,6 @@ import type { OnInit, OnDestroy } from "@angular/core";
 import type { Subscription } from "rxjs/Subscription";
 
 import { Component, ViewChild, ElementRef, Input } from "@angular/core";
-import * as _ from "lodash";
 
 import { LogService } from "../../log.service";
 import { WsService } from "../../ws.service";
@@ -15,8 +14,8 @@ import { WsService } from "../../ws.service";
 })
 export class LogViewComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
-  @ViewChild("logContent") private readonly logContent: ElementRef;
-  @Input() autoScroll: boolean = true;
+  @ViewChild("logContent", { static: true }) private readonly logContent: ElementRef;
+  @Input() autoScroll = true;
   private readonly maxLogSize = 150;
   logs: LogRecord[] = [];
 

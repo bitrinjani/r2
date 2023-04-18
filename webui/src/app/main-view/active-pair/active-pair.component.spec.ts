@@ -1,10 +1,10 @@
-import type { ComponentFixture } from "@angular/core/testing";
+import type; { ComponentFixture; } from; '@angular/core/testing';
 
-import { async, TestBed } from "@angular/core/testing";
+import { async, TestBed } from '@angular/core/testing';
 
-import { ActivePairComponent } from "./active-pair.component";
+import { ActivePairComponent } from './active-pair.component';
 
-describe("ActivePairComponent", () => {
+describe('ActivePairComponent', () => {
   let component: ActivePairComponent;
   let fixture: ComponentFixture<ActivePairComponent>;
 
@@ -21,7 +21,7 @@ describe("ActivePairComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
