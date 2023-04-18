@@ -1,20 +1,20 @@
 import { EventEmitter } from "events";
 
 import { spy } from "chai";
-import * as WebSocket from "ws";
+import WebSocket from "ws";
 
 import { delay } from "../src/util";
 import WebGateway from "../src/webGateway";
 
 describe("WebGateway", () => {
-  let quoteAggregator, positionService, opportunitySearcher, activePairStore, orderService;
+  let quoteAggregator: any, positionService: any, opportunitySearcher: any, activePairStore: any, orderService: any;
 
   beforeEach(() => {
     quoteAggregator = new EventEmitter();
     positionService = new EventEmitter();
     opportunitySearcher = new EventEmitter();
     activePairStore = new EventEmitter();
-    activePairStore.getAll = spy(() => []);
+    activePairStore.get = spy(() => []);
     orderService = new EventEmitter();
   });
 
@@ -72,7 +72,7 @@ describe("WebGateway", () => {
       // @ts-expect-error
       orderService
     );
-    let ws;
+    let ws: any;
     try{
       await wg.start();
       await delay(10);

@@ -32,7 +32,7 @@ const config = {
 
 const configStore = { config };
 const baRouter = {
-  getPositions: broker => broker === "Quoine" ? new Map([["BTC", 0.2]]) : new Map([["BTC", -0.3]]),
+  getPositions: (broker: any) => broker === "Quoine" ? new Map([["BTC", 0.2]]) : new Map([["BTC", -0.3]]),
 };
 const bst = new BrokerStabilityTracker(configStore as any);
 
@@ -75,7 +75,7 @@ describe("Position Service", () => {
 
   it("positions smaller than minSize", async () => {
     const localBaRouter = {
-      getPositions: broker => broker === "Quoine" ? new Map([["BTC", 0.000002]]) : new Map([["BTC", -0.3]]),
+      getPositions: (broker: any) => broker === "Quoine" ? new Map([["BTC", 0.000002]]) : new Map([["BTC", -0.3]]),
     };
     const ps = new PositionService(configStore as any, localBaRouter as any, bst as any);
     await ps.start();
@@ -146,7 +146,7 @@ describe("Position Service", () => {
 
     const localConfigStore = { config: localConfig };
     const localBaRouter = {
-      getPositions: broker => broker === "Quoine" ? new Map([["BTC", 0.2]]) : new Map([["BTC", -0.3]]),
+      getPositions: (broker: any) => broker === "Quoine" ? new Map([["BTC", 0.2]]) : new Map([["BTC", -0.3]]),
     };
     const localBst = new BrokerStabilityTracker(localConfigStore as any);
     const ps = new PositionService(localConfigStore as any, localBaRouter as any, localBst as any);

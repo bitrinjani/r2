@@ -2,7 +2,7 @@ import * as fs from "fs";
 
 import { expect, spy } from "chai";
 
-import { getConfigRoot } from "../src/config";
+import { getConfig } from "../src/config";
 
 let existsSyncCount = 0;
 const originalExistsSync = fs.existsSync;
@@ -16,7 +16,7 @@ fs.existsSync = spy(() => {
 fs.readFileSync = spy(() => "{\"language\": \"test\"}");
 
 it("getConfigRoot not found config.json", () => {
-  const config = getConfigRoot();
+  const config = getConfig();
   expect(existsSyncCount).to.equal(1);
   expect(config.language).to.equal("test");
 });
@@ -24,7 +24,7 @@ it("getConfigRoot not found config.json", () => {
 it("getConfigRoot with process.env mock", () => {
   process.env.NODE_ENV = "testmock";
   try{
-    const config = getConfigRoot();
+    const config = getConfig();
     expect(config.language).to.equal("test");
   } finally{
     process.env.NODE_ENV = "test";

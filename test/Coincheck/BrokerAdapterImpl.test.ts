@@ -1,5 +1,6 @@
 // tslint:disable
-import type { ConfigRoot, BrokerConfigType } from "../../src/config";
+import type { FormedConfigRootType, BrokerConfigType } from "../../src/config";
+import type { CashMarginType } from "../../src/types";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
@@ -7,7 +8,6 @@ import * as nock from "nock";
 
 import nocksetup from "./nocksetup";
 import BrokerAdapterImpl from "../../src/Coincheck/BrokerAdapterImpl";
-import { OrderStatus, CashMarginType, OrderSide, OrderType } from "../../src/types";
 import { createOrder } from "../helper";
 
 options.enabled = false;
@@ -16,9 +16,13 @@ nocksetup();
 
 const brokerConfig = {
   broker: "Coincheck",
+  enabled: true,
   key: "",
   secret: "",
-  cashMarginType: CashMarginType.MarginOpen,
+  maxLongPosition: 0.5,
+  maxShortPosition: 0.5,
+  commissionPercent: 0,
+  cashMarginType: "MarginOpen",
 } as BrokerConfigType;
 
 describe("Coincheck BrokerAdapter", function(){
@@ -26,13 +30,12 @@ describe("Coincheck BrokerAdapter", function(){
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = createOrder(
       "Coincheck",
-      OrderSide.Buy,
+      "Buy",
       0.005,
       300000,
       "Invalid" as CashMarginType,
-      OrderType.Limit,
-      // @ts-expect-error
-      undefined
+      "Limit",
+      undefined as any
     );
     try{
       await target.send(order);
@@ -47,23 +50,19 @@ describe("Coincheck BrokerAdapter", function(){
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = createOrder(
       "Coincheck",
-      OrderSide.Buy,
+      "Buy",
       0.005,
       300000,
-      CashMarginType.MarginOpen,
-      OrderType.Limit,
-      // @ts-expect-error
-      undefined
+      "MarginOpen",
+      "Limit",
+      undefined as any
     );
     await target.send(order);
-    expect(order.status).to.equal(OrderStatus.New);
+    expect(order.status).to.equal("New");
     expect(order.brokerOrderId).to.equal("340622252");
   });
 
   it("getBtcPosition with invalid cashMarginType", async () => {
-    const config = {
-      brokers: [{ broker: "Coincheck", key: "", secret: "", cashMarginType: "Invalid" as CashMarginType }],
-    } as ConfigRoot;
     const target = new BrokerAdapterImpl(brokerConfig);
     try{
       await target.getBtcPosition();
@@ -89,7 +88,7 @@ describe("Coincheck BrokerAdapter", function(){
       id: "28f5d9f1-5e13-4bb7-845c-b1b7f02f5e64",
       status: "New",
       creationTime: "2017-10-28T01:20:39.320Z",
-      executions: [],
+      executions: [] as any,
       broker: "Coincheck",
       size: 0.01,
       side: "Buy",
@@ -100,7 +99,7 @@ describe("Coincheck BrokerAdapter", function(){
       lastUpdated: "2017-10-28T01:20:39.416Z",
     };
     await target.refresh(order as any);
-    expect(order.status).to.equal(OrderStatus.Filled);
+    expect(order.status).to.equal("Filled");
   });
 
   it("refresh partial fill", async () => {
@@ -112,7 +111,7 @@ describe("Coincheck BrokerAdapter", function(){
       id: "28f5d9f1-5e13-4bb7-845c-b1b7f02f5e64",
       status: "New",
       creationTime: "2017-10-28T01:20:39.320Z",
-      executions: [],
+      executions: [] as any,
       broker: "Coincheck",
       size: 0.01,
       side: "Buy",
@@ -123,7 +122,7 @@ describe("Coincheck BrokerAdapter", function(){
       lastUpdated: "2017-10-28T01:20:39.416Z",
     };
     await target.refresh(order as any);
-    expect(order.status).to.equal(OrderStatus.PartiallyFilled);
+    expect(order.status).to.equal("PartiallyFilled");
   });
 
   it("refresh partial fill", async () => {
@@ -135,7 +134,7 @@ describe("Coincheck BrokerAdapter", function(){
       id: "28f5d9f1-5e13-4bb7-845c-b1b7f02f5e64",
       status: "New",
       creationTime: "2017-10-28T01:20:39.320Z",
-      executions: [],
+      executions: [] as any,
       broker: "Coincheck",
       size: 0.01,
       side: "Buy",
@@ -175,7 +174,7 @@ describe("Coincheck BrokerAdapter", function(){
     const target = new BrokerAdapterImpl(brokerConfig);
     const order = { brokerOrderId: "340809935" };
     await target.cancel(order as any);
-    expect((order as any).status).to.equal(OrderStatus.Canceled);
+    expect((order as any).status).to.equal("Canceled");
   });
 
   it("cancel failed", async () => {

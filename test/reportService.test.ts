@@ -2,14 +2,13 @@ import type QuoteAggregator from "../src/quoteAggregator";
 
 import { AwaitableEventEmitter } from "@bitr/awaitable-event-emitter";
 import { expect, spy } from "chai";
-import * as mkdirp from "mkdirp";
-import * as rimraf from "rimraf";
+import mkdirp from "mkdirp";
+import rimraf from "rimraf";
 
 import { reportServiceRepUrl } from "../src/constants";
 import { SnapshotRequester } from "../src/messages";
 import ReportService from "../src/reportService";
 import SpreadAnalyzer from "../src/spreadAnalyzer";
-import { QuoteSide } from "../src/types";
 import { toQuote } from "../src/util";
 
 
@@ -81,10 +80,10 @@ describe("ReportService", () =>{
     await rs.start();
     expect(quoteAggregator.listenerCount("quoteUpdated")).to.equal(1);
     await quoteAggregator.emitParallel("quoteUpdated", [
-      toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 2, 2),
-      toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
-      toQuote("Quoine", QuoteSide.Bid, 2.5, 4),
+      toQuote("Coincheck", "Ask", 3, 1),
+      toQuote("Coincheck", "Bid", 2, 2),
+      toQuote("Quoine", "Ask", 3.5, 3),
+      toQuote("Quoine", "Bid", 2.5, 4),
     ]);
     await rs.stop();
     expect(quoteAggregator.listenerCount("quoteUpdated")).to.equal(0);
@@ -136,10 +135,10 @@ describe("ReportService", () =>{
       await rs.start();
       expect(quoteAggregator.listenerCount("quoteUpdated")).to.equal(1);
       await quoteAggregator.emitParallel("quoteUpdated", [
-        toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-        toQuote("Coincheck", QuoteSide.Bid, 2, 2),
-        toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
-        toQuote("Quoine", QuoteSide.Bid, 2.5, 4),
+        toQuote("Coincheck", "Ask", 3, 1),
+        toQuote("Coincheck", "Bid", 2, 2),
+        toQuote("Quoine", "Ask", 3.5, 3),
+        toQuote("Quoine", "Bid", 2.5, 4),
       ]);
       await rs.stop();
       expect(quoteAggregator.listenerCount("quoteUpdated")).to.equal(0);
@@ -195,15 +194,15 @@ describe("ReportService", () =>{
     };
     const quoteAggregator = createQuoteAggregatorMock();
     const spreadAnalyzer = new SpreadAnalyzer({ config } as any);
-    const timeSeries = { put: spy(), query: () => [] };
+    const timeSeries = { put: spy(), query: () => [] as any };
 
     const rs = new ReportService(quoteAggregator, spreadAnalyzer, timeSeries as any, { config } as any);
     mkdirp.mkdirpManualSync(rs["reportDir"]);
-    let client;
+    let client: any;
     try{
       await rs.start();
       client = new SnapshotRequester(reportServiceRepUrl);
-      const reply = await client.request("invalid");
+      const reply = await client.request(client);
       expect(reply.success).to.equal(false);
       await rs.stop();
     } catch(ex){

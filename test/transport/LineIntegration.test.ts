@@ -1,6 +1,4 @@
-import type { LineConfig } from "../../src/config";
-
-import * as nock from "nock";
+import nock from "nock";
 
 import LineIntegration from "../../src/transport/LineIntegration";
 import { delay } from "../../src/util";
@@ -17,7 +15,7 @@ describe("LineIntegration", function(){
       enabled: true,
       token: "TOKEN",
       keywords: ["error", "profit"],
-    } as LineConfig;
+    } as object;
     const line = new LineIntegration(config);
     line.handler("test message");
     line.handler("with keyword: profit");
@@ -27,7 +25,7 @@ describe("LineIntegration", function(){
     const config = {
       enabled: true,
       token: "TOKEN",
-    } as LineConfig;
+    } as object;
     const line = new LineIntegration(config);
     line.handler("test message");
     line.handler("with keyword: profit");
@@ -38,7 +36,7 @@ describe("LineIntegration", function(){
       enabled: true,
       token: "TOKEN",
       keywords: ["error", "profit"],
-    } as LineConfig;
+    } as object;
     const line = new LineIntegration(config);
     line.handler("with keyword: profit");
   });
@@ -48,7 +46,7 @@ describe("LineIntegration", function(){
       enabled: true,
       token: "TOKEN",
       keywords: ["error", "profit"],
-    } as LineConfig;
+    } as object;
     const line = new LineIntegration(config);
     line.handler("with keyword: profit");
     await delay(0);

@@ -20,9 +20,13 @@ describe("BrokerAdapterImpl", function() {
 
   const brokerConfig = {
     broker: "Bitflyer",
+    enabled: true,
     key: "",
     secret: "",
-    cashMarginType: CashMarginType.Cash,
+    maxLongPosition: 0.5,
+    maxShortPosition: 0.5,
+    commissionPercent: 0,
+    cashMarginType: "Cash",
   } as BrokerConfigType;
 
   describe("Bitflyer BrokerAdapter", () => {
@@ -73,7 +77,7 @@ describe("BrokerAdapterImpl", function() {
 
     it("send wrong cashMarginType", async () => {
       const target = new BrokerAdapterImpl(brokerConfig);
-      const order = { broker: "Bitflyer", cashMarginType: CashMarginType.MarginOpen, symbol: "ZZZ" };
+      const order = { broker: "Bitflyer", cashMarginType: "MarginOpen", symbol: "ZZZ" };
       try{
         await target.send(order as any);
       } catch(ex){
@@ -84,7 +88,7 @@ describe("BrokerAdapterImpl", function() {
 
     it("send wrong symbol order", async () => {
       const target = new BrokerAdapterImpl(brokerConfig);
-      const order = { broker: "Bitflyer", cashMarginType: CashMarginType.Cash, symbol: "ZZZ" };
+      const order = { broker: "Bitflyer", cashMarginType: "Cash", symbol: "ZZZ" };
       try{
         await target.send(order as any);
       } catch(ex){
@@ -97,9 +101,9 @@ describe("BrokerAdapterImpl", function() {
       const target = new BrokerAdapterImpl(brokerConfig);
       const order = {
         broker: "Bitflyer",
-        cashMarginType: CashMarginType.Cash,
+        cashMarginType: "Cash",
         symbol: "BTC/JPY",
-        type: OrderType.StopLimit,
+        type: "StopLimit",
       };
       try{
         await target.send(order as any);
@@ -113,9 +117,9 @@ describe("BrokerAdapterImpl", function() {
       const target = new BrokerAdapterImpl(brokerConfig);
       const order = {
         broker: "Bitflyer",
-        cashMarginType: CashMarginType.Cash,
+        cashMarginType: "Cash",
         symbol: "BTC/JPY",
-        type: OrderType.Market,
+        type: "Market",
         timeInForce: "MOCK",
       };
       try{
@@ -130,7 +134,7 @@ describe("BrokerAdapterImpl", function() {
       const target = new BrokerAdapterImpl(brokerConfig);
       const order = { symbol: "BTC/JPY", brokerOrderId: "JRF20150707-033333-099999" };
       await target.cancel(order as any);
-      expect((order as any).status).to.equal(OrderStatus.Canceled);
+      expect((order as any).status).to.equal("Canceled");
     });
 
     it("cancel wrong symbol", async () => {
@@ -146,27 +150,27 @@ describe("BrokerAdapterImpl", function() {
 
     it("send buy limit", async () => {
       const target = new BrokerAdapterImpl(brokerConfig);
-      const order = createOrder("Bitflyer", OrderSide.Buy, 0.1, 30000, CashMarginType.Cash, OrderType.Limit, undefined as any);
+      const order = createOrder("Bitflyer", "Buy", 0.1, 30000, "Cash", "Limit", undefined as any);
       await target.send(order);
-      expect(order.status).to.equal(OrderStatus.New);
+      expect(order.status).to.equal("New");
       expect(order.brokerOrderId).to.equal("JRF20150707-050237-639234");
     });
 
     it("send buy limit Fok", async () => {
       const target = new BrokerAdapterImpl(brokerConfig);
-      const order = createOrder("Bitflyer", OrderSide.Buy, 0.1, 30000, CashMarginType.Cash, OrderType.Limit, undefined as any);
-      order.timeInForce = TimeInForce.Fok;
+      const order = createOrder("Bitflyer", "Buy", 0.1, 30000, "Cash", "Limit", undefined as any);
+      order.timeInForce = "Fok";
       await target.send(order);
-      expect(order.status).to.equal(OrderStatus.New);
+      expect(order.status).to.equal("New");
       expect(order.brokerOrderId).to.equal("JRF20150707-050237-639234");
     });
 
     it("send buy limit Ioc", async () => {
       const target = new BrokerAdapterImpl(brokerConfig);
-      const order = createOrder("Bitflyer", OrderSide.Buy, 0.1, 30000, CashMarginType.Cash, OrderType.Limit, undefined as any);
-      order.timeInForce = TimeInForce.Ioc;
+      const order = createOrder("Bitflyer", "Buy", 0.1, 30000, "Cash", "Limit", undefined as any);
+      order.timeInForce = "Ioc";
       await target.send(order);
-      expect(order.status).to.equal(OrderStatus.New);
+      expect(order.status).to.equal("New");
       expect(order.brokerOrderId).to.equal("JRF20150707-050237-639234");
     });
 
@@ -179,7 +183,7 @@ describe("BrokerAdapterImpl", function() {
         id: "438f7c7b-ed72-4719-935f-477ea043e2b0",
         status: "New",
         creationTime: "2017-11-03T09:20:06.687Z",
-        executions: [],
+        executions: [] as any,
         broker: "Bitflyer",
         size: 0.01,
         side: "Sell",
@@ -190,7 +194,7 @@ describe("BrokerAdapterImpl", function() {
         lastUpdated: "2017-11-03T09:20:07.292Z",
       };
       await target.refresh(order as any);
-      expect(order.status).to.equal(OrderStatus.Filled);
+      expect(order.status).to.equal("Filled");
     });
 
     it("refresh Expired", async () => {
@@ -202,7 +206,7 @@ describe("BrokerAdapterImpl", function() {
         id: "438f7c7b-ed72-4719-935f-477ea043e2b0",
         status: "New",
         creationTime: "2017-11-03T09:20:06.687Z",
-        executions: [],
+        executions: [] as any,
         broker: "Bitflyer",
         size: 0.01,
         side: "Sell",
@@ -213,7 +217,7 @@ describe("BrokerAdapterImpl", function() {
         lastUpdated: "2017-11-03T09:20:07.292Z",
       };
       await target.refresh(order as any);
-      expect(order.status).to.equal(OrderStatus.Expired);
+      expect(order.status).to.equal("Expired");
     });
 
     it("refresh Canceled", async () => {
@@ -225,7 +229,7 @@ describe("BrokerAdapterImpl", function() {
         id: "438f7c7b-ed72-4719-935f-477ea043e2b0",
         status: "New",
         creationTime: "2017-11-03T09:20:06.687Z",
-        executions: [],
+        executions: [] as any,
         broker: "Bitflyer",
         size: 0.01,
         side: "Sell",
@@ -236,7 +240,7 @@ describe("BrokerAdapterImpl", function() {
         lastUpdated: "2017-11-03T09:20:07.292Z",
       };
       await target.refresh(order as any);
-      expect(order.status).to.equal(OrderStatus.Canceled);
+      expect(order.status).to.equal("Canceled");
     });
 
     it("refresh Partially filled", async () => {
@@ -248,7 +252,7 @@ describe("BrokerAdapterImpl", function() {
         id: "438f7c7b-ed72-4719-935f-477ea043e2b0",
         status: "New",
         creationTime: "2017-11-03T09:20:06.687Z",
-        executions: [],
+        executions: [] as any,
         broker: "Bitflyer",
         size: 0.01,
         side: "Sell",
@@ -259,7 +263,7 @@ describe("BrokerAdapterImpl", function() {
         lastUpdated: "2017-11-03T09:20:07.292Z",
       };
       await target.refresh(order as any);
-      expect(order.status).to.equal(OrderStatus.PartiallyFilled);
+      expect(order.status).to.equal("PartiallyFilled");
     });
 
     it("refresh unknown order id", async () => {
@@ -271,7 +275,7 @@ describe("BrokerAdapterImpl", function() {
         id: "438f7c7b-ed72-4719-935f-477ea043e2b0",
         status: "New",
         creationTime: "2017-11-03T09:20:06.687Z",
-        executions: [],
+        executions: [] as any,
         broker: "Bitflyer",
         size: 0.01,
         side: "Sell",
@@ -282,7 +286,7 @@ describe("BrokerAdapterImpl", function() {
         lastUpdated: "2017-11-03T09:20:07.292Z",
       };
       await target.refresh(order as any);
-      expect(order.status).to.equal(OrderStatus.New);
+      expect(order.status).to.equal("New");
     });
   });
 });

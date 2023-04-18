@@ -104,3 +104,4 @@ export const ConfigRoot = Type.Object({
 export type BrokerConfigType = Static<typeof BrokerConfig>;
 export type ConfigRootType = Static<typeof ConfigRoot>;
 export type AnalyticsConfigType = Static<typeof AnalyticsConfig>;
+export type OnSingleLegConfigType = Static<typeof OnSingleLegConfig>;

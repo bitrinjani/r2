@@ -7,7 +7,6 @@ import * as nock from "nock";
 import nocksetup from "./nocksetup";
 import BrokerApi from "../../src/Coincheck/BrokerApi";
 import NetOutStrategy from "../../src/Coincheck/NetOutStrategy";
-import { CashMarginType, OrderSide, OrderType, OrderStatus } from "../../src/types";
 import { createOrder } from "../helper";
 
 options.enabled = false;
@@ -25,10 +24,13 @@ describe("NetOutStrategy", function(){
     const strategy = new NetOutStrategy(new BrokerApi("", ""));
     const order = createOrder(
       "Coincheck",
-      OrderSide.Buy,
+      "Buy",
       0.005,
       300000,
-      CashMarginType.MarginOpen, OrderType.Limit, undefined as any);
+      "MarginOpen",
+      "Limit",
+      undefined as any
+    );
     try{
       await strategy.send(order);
     } catch(ex){
@@ -41,20 +43,19 @@ describe("NetOutStrategy", function(){
     const strategy = new NetOutStrategy(new BrokerApi("", ""));
     const order = createOrder(
       "Coincheck",
-      OrderSide.Buy,
+      "Buy",
       0.01,
       840000,
-      CashMarginType.NetOut,
-      OrderType.Limit,
-      // @ts-expect-error
-      undefined
+      "NetOut",
+      "Limit",
+      undefined as any
     );
     const request: NewOrderRequest = await strategy["getNetOutRequest"](order);
     expect(request.order_type).to.equal("close_short");
     expect(request.amount).to.equal(0.010005);
     expect(request.position_id).to.equal(2389078);
     await strategy.send(order);
-    expect(order.status).to.equal(OrderStatus.New);
+    expect(order.status).to.equal("New");
     expect(order.brokerOrderId).to.equal("391699747");
   });
 
@@ -62,13 +63,12 @@ describe("NetOutStrategy", function(){
     const strategy = new NetOutStrategy(new BrokerApi("", ""));
     const order = createOrder(
       "Coincheck",
-      OrderSide.Buy,
+      "Buy",
       0.02,
       840000,
-      CashMarginType.NetOut,
-      OrderType.Limit,
-      // @ts-expect-error
-      undefined
+      "NetOut",
+      "Limit",
+      undefined as any
     );
     const request: NewOrderRequest = await strategy["getNetOutRequest"](order);
     expect(request.order_type).to.equal("leverage_buy");
@@ -80,20 +80,19 @@ describe("NetOutStrategy", function(){
     const strategy = new NetOutStrategy(new BrokerApi("", ""));
     const order = createOrder(
       "Coincheck",
-      OrderSide.Sell,
+      "Sell",
       0.01,
       830000,
-      CashMarginType.NetOut,
-      OrderType.Limit,
-      // @ts-expect-error
-      undefined
+      "NetOut",
+      "Limit",
+      undefined as any
     );
     const request: NewOrderRequest = await strategy["getNetOutRequest"](order);
     expect(request.order_type).to.equal("leverage_sell");
     expect(request.amount).to.equal(0.01);
     expect(request.position_id).to.equal(undefined);
     await strategy.send(order);
-    expect(order.status).to.equal(OrderStatus.New);
+    expect(order.status).to.equal("New");
     expect(order.brokerOrderId).to.equal("391697892");
   });
 
@@ -101,13 +100,12 @@ describe("NetOutStrategy", function(){
     const strategy = new NetOutStrategy(new BrokerApi("", ""));
     const order = createOrder(
       "Coincheck",
-      OrderSide.Sell,
+      "Sell",
       0.01,
       830000,
-      CashMarginType.NetOut,
-      OrderType.Market,
-      // @ts-expect-error
-      undefined
+      "NetOut",
+      "Market",
+      undefined as any
     );
     const request: NewOrderRequest = await strategy["getNetOutRequest"](order);
     expect(request.order_type).to.equal("leverage_sell");
@@ -120,13 +118,12 @@ describe("NetOutStrategy", function(){
     const strategy = new NetOutStrategy(new BrokerApi("", ""));
     const order = createOrder(
       "Coincheck",
-      OrderSide.Sell,
+      "Sell",
       0.01,
       830000,
-      CashMarginType.NetOut,
-      OrderType.Limit,
-      // @ts-expect-error
-      undefined
+      "NetOut",
+      "Limit",
+      undefined as any
     );
     order.symbol = "ZZZJPY";
     let fnCount = 0;
