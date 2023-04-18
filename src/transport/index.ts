@@ -13,7 +13,6 @@ import { pretty, splitToJson } from "./transform";
 import { getConfig } from "../config";
 import { wssLogPort } from "../constants";
 
-
 let wss: WebSocket.Server;
 let app: express.Express;
 let server: httpServer;

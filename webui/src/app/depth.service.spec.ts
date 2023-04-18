@@ -9,7 +9,7 @@ describe("DepthService", () => {
     });
   });
 
-  it("should be created", inject([DepthService], (service: DepthService) => {
-    expect(service).toBeTruthy();
+  it("should be created", inject([DepthService], async (service: DepthService) => {
+    await expect(service).toBeTruthy();
   }));
 });

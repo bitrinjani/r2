@@ -5,8 +5,6 @@ import type { Subscription } from "rxjs/Subscription";
 import { Component, ViewChild, ElementRef, Input } from "@angular/core";
 
 import { LogService } from "../../log.service";
-import { WsService } from "../../ws.service";
-
 
 @Component({
   selector: "app-log-view",

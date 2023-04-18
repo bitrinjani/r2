@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist/ && tsc",
-    "onlystart": "node ./dist",
+    "onlystart": "node ./dist && node ./dist/transport",
     "start": "npm run build && npm run onlystart",
     "test": "mocha --exit -- -r ts-node/register -r ./test/importSpy.ts ./test/**/*.test.ts",
     "lint": "eslint ./src/**/*.ts",

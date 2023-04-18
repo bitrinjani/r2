@@ -1,19 +1,19 @@
-import type; { ComponentFixture; } from; '@angular/core/testing';
+import type { ComponentFixture } from "@angular/core/testing";
 
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { PositionComponent } from './position.component';
+import { PositionComponent } from "./position.component";
 
-describe('PositionComponent', () => {
+describe("PositionComponent", () => {
   let component: PositionComponent;
   let fixture: ComponentFixture<PositionComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ PositionComponent ],
-    })
-      .compileComponents();
-  }));
+    }).compileComponents()
+      .catch(e => console.log(e));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PositionComponent);
@@ -21,7 +21,7 @@ describe('PositionComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it("should create", async () => {
+    await expect(component).toBeTruthy();
   });
 });

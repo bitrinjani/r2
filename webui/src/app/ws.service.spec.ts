@@ -9,7 +9,7 @@ describe("WsService", () => {
     });
   });
 
-  it("should be created", inject([WsService], (service: WsService) => {
-    expect(service).toBeTruthy();
+  it("should be created", inject([WsService], async (service: WsService) => {
+    await expect(service).toBeTruthy();
   }));
 });

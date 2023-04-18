@@ -2,8 +2,6 @@ import type { Order } from "./types";
 
 import * as _ from "lodash";
 
-import OrderImpl from "./OrderImpl";
-
 export function getAverageFilledPrice(order: Order) {
   return _.isEmpty(order.executions)
     ? 0

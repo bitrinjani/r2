@@ -9,7 +9,7 @@ describe("LogService", () => {
     });
   });
 
-  it("should be created", inject([LogService], (service: LogService) => {
-    expect(service).toBeTruthy();
+  it("should be created", inject([LogService], async (service: LogService) => {
+    await expect(service).toBeTruthy();
   }));
 });

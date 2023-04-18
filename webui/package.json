@@ -6,8 +6,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --configuration production",
-    "test": "eslint /src/**/.ts",
-    "lint": "ng lint",
+    "test": "ng test",
+    "lint": "eslint /src/**/.ts",
     "e2e": "ng e2e",
     "serv": "lite-server"
   },

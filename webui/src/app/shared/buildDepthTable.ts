@@ -2,8 +2,6 @@ import type { Quote, DepthLine, BrokerPosition, BrokerMap, ConfigRoot } from "..
 
 import * as _ from "lodash";
 
-import { QuoteSide } from "../types";
-
 class DepthTable {
   private readonly depthSize = 100;
   private bestTradableBid: Quote;
@@ -16,8 +14,8 @@ class DepthTable {
   ) {}
 
   build(): DepthLine[] {
-    const asks = this.quotes.filter(q => q.side === QuoteSide.Ask);
-    const bids = this.quotes.filter(q => q.side === QuoteSide.Bid);
+    const asks = this.quotes.filter(q => q.side === "Ask");
+    const bids = this.quotes.filter(q => q.side === "Bid");
     this.bestTradableAsk = _(asks)
       .filter(q => this.isTradable(q))
       .minBy("price");
@@ -63,13 +61,13 @@ class DepthTable {
 
   private allowedByPosition(quote: Quote) {
     const position = this.positionMap[quote.broker];
-    return quote.side === QuoteSide.Ask ? position.longAllowed : position.shortAllowed;
+    return quote.side === "Ask" ? position.longAllowed : position.shortAllowed;
   }
 
   private depthReducer(depthLine: DepthLine, q: Quote): DepthLine {
     depthLine.priceCell.value = q.price;
     const tradable = this.isTradable(q);
-    if(q.side === QuoteSide.Ask){
+    if(q.side === "Ask"){
       depthLine.askBrokerCells.push({ value: q.broker, tradable });
       depthLine.askSizeCells.push({ value: q.volume, tradable });
       depthLine.isBestAsk = depthLine.isBestAsk || q === this.bestTradableAsk;
