@@ -16,14 +16,14 @@
     "webpack": "^5.0.0"
   },
   "dependencies": {
-    "@angular/animations": "^12.2.17",
-    "@angular/common": "^12.2.17",
-    "@angular/compiler": "^12.2.17",
-    "@angular/core": "^12.2.17",
-    "@angular/forms": "^12.2.17",
-    "@angular/platform-browser": "^12.2.17",
-    "@angular/platform-browser-dynamic": "^12.2.17",
-    "@angular/router": "^12.2.17",
+    "@angular/animations": "^13.4.0",
+    "@angular/common": "^13.4.0",
+    "@angular/compiler": "^13.4.0",
+    "@angular/core": "^13.4.0",
+    "@angular/forms": "^13.4.0",
+    "@angular/platform-browser": "^13.4.0",
+    "@angular/platform-browser-dynamic": "^13.4.0",
+    "@angular/router": "^13.4.0",
     "@bitr/castable": "^1.0.3",
     "core-js": "^2.0.0",
     "lodash": "4.17.5",
@@ -35,9 +35,9 @@
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "@angular/cli": "^12.2.18",
-    "@angular/compiler-cli": "^12.2.17",
-    "@angular/language-service": "^12.2.17",
+    "@angular/cli": "^13.3.11",
+    "@angular/compiler-cli": "^13.4.0",
+    "@angular/language-service": "^13.4.0",
     "@types/jasmine": "^4.3.1",
     "@types/jasminewd2": "^2.0.2",
     "@types/lodash": "4.14.104",
@@ -59,6 +59,6 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "lite-server": "^2.3.0",
     "protractor": "~7.0.0",
-    "typescript": "~4.3.5"
+    "typescript": "~4.6.4"
   }
 }
