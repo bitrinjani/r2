@@ -1,12 +1,12 @@
-import type { ConfigRoot } from "../src/config";
+import type { FormedConfigRootType } from "../src/config";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
 
-import { ConfigValidator } from "../src/config";
+import { ConfigValidator } from "../src/config/validator";
 options.enabled = false;
 
-const config: ConfigRoot = require("./config_test.json");
+const config: FormedConfigRootType = require("./config_test.json");
 
 describe("ConfigValidator", () => {
   it("validate valid config", () => {

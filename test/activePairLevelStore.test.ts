@@ -6,12 +6,10 @@ import { createOrder } from "./helper";
 import { getActivePairStore } from "../src/activePairLevelStore";
 import { ChronoDB } from "../src/chrono";
 import * as OrderUtil from "../src/orderUtil";
-import { OrderStatus, OrderSide, CashMarginType, OrderType } from "../src/types";
-
 
 describe("ActivePairLevelStore", function(){
-  let store;
-  let chronoDB;
+  let store: any;
+  let chronoDB: any;
   this.beforeAll(async () => {
     chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
     store = getActivePairStore(chronoDB);
@@ -24,12 +22,12 @@ describe("ActivePairLevelStore", function(){
   });
 
   it("put, get, getAll", async () => {
-    const buyLeg = createOrder("Dummy1" as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
+    const buyLeg = createOrder("Dummy1" as Broker, "Buy", 0.1, 100, "Cash", "Limit", 10);
     buyLeg.filledSize = 0.1;
-    buyLeg.status = OrderStatus.Filled;
-    const sellLeg = createOrder("Dummy2" as Broker, OrderSide.Sell, 0.1, 110, CashMarginType.Cash, OrderType.Limit, 10);
+    buyLeg.status = "Filled";
+    const sellLeg = createOrder("Dummy2" as Broker, "Sell", 0.1, 110, "Cash", "Limit", 10);
     sellLeg.filledSize = 0.1;
-    sellLeg.status = OrderStatus.Filled;
+    sellLeg.status = "Filled";
     const pair: OrderPair = [buyLeg, sellLeg];
     const key = await store.put(pair);
     const result = await store.get(key);
@@ -40,12 +38,12 @@ describe("ActivePairLevelStore", function(){
   });
 
   it("del", async () => {
-    const buyLeg = createOrder("Dummy1" as Broker, OrderSide.Buy, 0.1, 100, CashMarginType.Cash, OrderType.Limit, 10);
+    const buyLeg = createOrder("Dummy1" as Broker, "Buy", 0.1, 100, "Cash", "Limit", 10);
     buyLeg.filledSize = 0.1;
-    buyLeg.status = OrderStatus.Filled;
-    const sellLeg = createOrder("Dummy2" as Broker, OrderSide.Sell, 0.1, 110, CashMarginType.Cash, OrderType.Limit, 10);
+    buyLeg.status = "Filled";
+    const sellLeg = createOrder("Dummy2" as Broker, "Sell", 0.1, 110, "Cash", "Limit", 10);
     sellLeg.filledSize = 0.1;
-    sellLeg.status = OrderStatus.Filled;
+    sellLeg.status = "Filled";
     const pair: OrderPair = [buyLeg, sellLeg];
     const key = await store.put(pair);
     const result = await store.get(key);

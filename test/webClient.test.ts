@@ -3,7 +3,7 @@ import type { RequestInit } from "node-fetch";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
-import * as nock from "nock";
+import nock from "nock";
 
 import WebClient from "../src/webClient";
 options.enabled = false;

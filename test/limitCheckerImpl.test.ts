@@ -28,7 +28,7 @@ describe("MainLimitChecker", () => {
   });
 
   it("MaxTargetVolumeLimit - undefined", () => {
-    const config = { maxTargetVolumePercent: undefined };
+    const config = { maxTargetVolumePercent: undefined as any };
     const ps = {};
     const analysisResult = { availableVolume: 1.0, targetVolume: 0.3 };
     const checker = new MainLimitChecker({ config } as any, ps as any, analysisResult as any, analysisResult as any);

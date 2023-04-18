@@ -1,7 +1,7 @@
 import { options } from "@bitr/logger";
 import { expect, spy } from "chai";
 
-import AppRoot from "../src/appRoot";
+import AppRoot from "../src/";
 import symbols from "../src/symbols";
 
 options.enabled = false;
@@ -10,7 +10,7 @@ describe("AppRoot", () => {
   it("start and stop", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
-    container.get = symbol => {
+    container.get = (symbol: any) => {
       if(symbol === symbols.ConfigStore){
         return { config: { brokers: [{ broker: "Bitflyer" }, { broker: "Coincheck" }, { broker: "Quoine" }] } };
       }
@@ -29,7 +29,7 @@ describe("AppRoot", () => {
   it("unknown broker", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
-    container.get = symbol => {
+    container.get = (symbol: any) => {
       if(symbol === symbols.ConfigStore){
         return { config: { brokers: [{ broker: "Unknown" }, { broker: "Coincheck" }, { broker: "Quoine" }] } };
       }
@@ -46,7 +46,7 @@ describe("AppRoot", () => {
   it("unknown broker with npmPath", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
-    container.get = symbol => {
+    container.get = (symbol: any) => {
       if(symbol === symbols.ConfigStore){
         return {
           config: {
@@ -67,7 +67,7 @@ describe("AppRoot", () => {
   it("unknown broker with wrong npmPath", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
-    container.get = symbol => {
+    container.get = (symbol: any) => {
       if(symbol === symbols.ConfigStore){
         return {
           config: {
@@ -93,7 +93,7 @@ describe("AppRoot", () => {
       stop: spy(),
     };
     const container = {} as any;
-    container.get = symbol => {
+    container.get = (symbol: any) => {
       if(symbol === symbols.ConfigStore){
         return { config: { brokers: [{ broker: "Bitflyer" }] } };
       }
@@ -114,7 +114,7 @@ describe("AppRoot", () => {
       },
     };
     const container = {} as any;
-    container.get = symbol => {
+    container.get = (symbol: any) => {
       if(symbol === symbols.ConfigStore){
         return { config: { brokers: [{ broker: "Bitflyer" }] } };
       }
@@ -131,7 +131,7 @@ describe("AppRoot", () => {
   it("stop with undefined arbitrager", async () => {
     const service = { start: spy(), stop: spy() };
     const container = {} as any;
-    container.get = symbol => {
+    container.get = (symbol: any) => {
       if(symbol === symbols.ConfigStore){
         return { config: { brokers: [{ broker: "Bitflyer" }] } };
       }

@@ -1,10 +1,10 @@
 import "reflect-metadata";
-import type { ConfigRoot } from "../src/config";
+import type { FormedConfigRootType } from "../src/config";
 import type { Socket } from "zeromq";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
-import * as _ from "lodash";
+import _ from "lodash";
 import { socket } from "zeromq";
 
 import { JsonConfigStore } from "../src/config";
@@ -25,7 +25,7 @@ function parseBuffer<T>(buffer: Buffer): T | undefined {
 
 describe("JsonConfigStore", () => {
   it("JsonConfigStore", async () => {
-    const validator = { validate: (config: ConfigRoot) => true };
+    const validator = { validate: (config: FormedConfigRootType) => true };
     const store = new JsonConfigStore(validator as any);
     // @ts-expect-error
     store.TTL = 5;
@@ -47,7 +47,7 @@ describe("JsonConfigStore", () => {
   it("set", async () => {
     let store: JsonConfigStore;
     try{
-      const validator = { validate: (config: ConfigRoot) => true };
+      const validator = { validate: (config: FormedConfigRootType) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
       store.TTL = 5;
@@ -60,7 +60,6 @@ describe("JsonConfigStore", () => {
       console.log(ex);
       expect(true).to.equal(false);
     } finally{
-      // @ts-expect-error
       if(store){
         store.close();
       }
@@ -71,7 +70,7 @@ describe("JsonConfigStore", () => {
     let store: JsonConfigStore;
     let client: ConfigRequester;
     try{
-      const validator = { validate: (config: ConfigRoot) => true };
+      const validator = { validate: (config: FormedConfigRootType) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
       store.TTL = 5;
@@ -88,9 +87,7 @@ describe("JsonConfigStore", () => {
       if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
     } finally{
-      // @ts-expect-error
       store.close();
-      // @ts-expect-error
       client.dispose();
     }
   });
@@ -99,7 +96,7 @@ describe("JsonConfigStore", () => {
     let store: JsonConfigStore;
     let client: Socket;
     try{
-      const validator = { validate: (config: ConfigRoot) => true };
+      const validator = { validate: (config: FormedConfigRootType) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
       store.TTL = 5;
@@ -120,9 +117,7 @@ describe("JsonConfigStore", () => {
       if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
     } finally{
-      // @ts-expect-error
       store.close();
-      // @ts-expect-error
       client.close();
     }
   });
@@ -132,7 +127,7 @@ describe("JsonConfigStore", () => {
     let client: ConfigRequester;
     try{
       const validator = {
-        validate: (config: ConfigRoot) => {
+        validate: (config: FormedConfigRootType) => {
           if(config.maxNetExposure <= 0){
             throw new Error();
           }
@@ -155,9 +150,7 @@ describe("JsonConfigStore", () => {
       if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
     } finally{
-      // @ts-expect-error
       store.close();
-      // @ts-expect-error
       client.dispose();
     }
   });
@@ -166,7 +159,7 @@ describe("JsonConfigStore", () => {
     let store: JsonConfigStore;
     let client: ConfigRequester;
     try{
-      const validator = { validate: (config: ConfigRoot) => true };
+      const validator = { validate: (config: FormedConfigRootType) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
       store.TTL = 5;
@@ -183,9 +176,7 @@ describe("JsonConfigStore", () => {
       if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
     } finally{
-      // @ts-expect-error
       if(store) store.close();
-      // @ts-expect-error
       if(client) client.dispose();
     }
   });
@@ -194,7 +185,7 @@ describe("JsonConfigStore", () => {
     let store: JsonConfigStore;
     let client: ConfigRequester;
     try{
-      const validator = { validate: (config: ConfigRoot) => true };
+      const validator = { validate: (config: FormedConfigRootType) => true };
       store = new JsonConfigStore(validator as any);
       // @ts-expect-error
       store.TTL = 5;
@@ -211,9 +202,7 @@ describe("JsonConfigStore", () => {
       if(process.env.CI && ex.message === "Address already in use") return;
       expect(true).to.equal(false);
     } finally{
-      // @ts-expect-error
       if(store) store.close();
-      // @ts-expect-error
       if(client) client.dispose();
     }
   });

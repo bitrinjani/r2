@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true
+  },
+  "include": [
+    "./test/**/*.ts",
+    "./webui/**/*.ts",
+    "./tools/**/*.ts"
+  ],
+  "exclude": [
+    "./src/**/*.ts"
+  ]
+}

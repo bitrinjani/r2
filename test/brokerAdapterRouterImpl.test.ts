@@ -5,7 +5,6 @@ import { expect, spy } from "chai";
 import { createOrder } from "./helper";
 import BrokerAdapterRouter from "../src/brokerAdapterRouter";
 import BrokerStabilityTracker from "../src/brokerStabilityTracker";
-import { CashMarginType, OrderType, OrderSide } from "../src/types";
 options.enabled = false;
 
 const baBitflyer = {
@@ -46,7 +45,7 @@ const baRouter = new BrokerAdapterRouter(brokerAdapters as any, bst, { config } 
 
 describe("BrokerAdapterRouter", () => {
   it("send", async () => {
-    const order = createOrder("Bitflyer", OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
+    const order = createOrder("Bitflyer", "Buy", 0.001, 500000, "Cash", "Limit", 0);
     await baRouter.send(order);
     expect(baBitflyer.send).to.be.called.exactly(1);
     expect(baQuoine.send).to.be.called.exactly(0);
@@ -59,7 +58,7 @@ describe("BrokerAdapterRouter", () => {
   });
 
   it("cancel", async () => {
-    const order = createOrder("Bitflyer", OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
+    const order = createOrder("Bitflyer", "Buy", 0.001, 500000, "Cash", "Limit", 0);
     await baRouter.cancel(order);
     expect(baBitflyer.cancel).to.be.called.exactly(1);
     expect(baQuoine.cancel).to.be.called.exactly(0);
@@ -72,7 +71,7 @@ describe("BrokerAdapterRouter", () => {
   });
 
   it("refresh", async () => {
-    const order = createOrder("Quoine", OrderSide.Buy, 0.001, 500000, CashMarginType.Cash, OrderType.Limit, 0);
+    const order = createOrder("Quoine", "Buy", 0.001, 500000, "Cash", "Limit", 0);
     await baRouter.refresh(order);
     expect(baBitflyer.refresh).to.be.called.exactly(0);
     expect(baQuoine.refresh).to.be.called.exactly(1);

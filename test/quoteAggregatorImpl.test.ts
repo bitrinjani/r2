@@ -5,7 +5,6 @@ import { DateTime } from "luxon";
 
 import BrokerAdapterRouter from "../src/brokerAdapterRouter";
 import QuoteAggregator from "../src/quoteAggregator";
-import { QuoteSide } from "../src/types";
 import { delay } from "../src/util";
 
 options.enabled = false;
@@ -41,16 +40,16 @@ describe("Quote Aggregator", () => {
       broker: "Bitflyer",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500001, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500000, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500001, volume: 0.1 },
         ]),
     };
     const coincheckBa = {
       broker: "Coincheck",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490001, volume: 0.02 },
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490000, volume: 0.2 },
+          { broker: "Coincheck", side: "Bid", price: 490001, volume: 0.02 },
+          { broker: "Coincheck", side: "Bid", price: 490000, volume: 0.2 },
         ]),
     };
     const quoineBa = {
@@ -94,16 +93,16 @@ describe("Quote Aggregator", () => {
       broker: "Bitflyer",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500001, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500000, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500001, volume: 0.1 },
         ]),
     };
     const coincheckBa = {
       broker: "Coincheck",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490001, volume: 0.02 },
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490000, volume: 0.2 },
+          { broker: "Coincheck", side: "Bid", price: 490001, volume: 0.02 },
+          { broker: "Coincheck", side: "Bid", price: 490000, volume: 0.2 },
         ]),
     };
     const quoineBa = {
@@ -138,16 +137,16 @@ describe("Quote Aggregator", () => {
       broker: "Bitflyer",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500001, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500000, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500001, volume: 0.1 },
         ]),
     };
     const coincheckBa = {
       broker: "Coincheck",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490001, volume: 0.02 },
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490000, volume: 0.2 },
+          { broker: "Coincheck", side: "Bid", price: 490001, volume: 0.02 },
+          { broker: "Coincheck", side: "Bid", price: 490000, volume: 0.2 },
         ]),
     };
     const quoineBa = {
@@ -177,16 +176,16 @@ describe("Quote Aggregator", () => {
       broker: "Bitflyer",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500001, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500000, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500001, volume: 0.1 },
         ]),
     };
     const coincheckBa = {
       broker: "Coincheck",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490001, volume: 0.02 },
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490000, volume: 0.2 },
+          { broker: "Coincheck", side: "Bid", price: 490001, volume: 0.02 },
+          { broker: "Coincheck", side: "Bid", price: 490000, volume: 0.2 },
         ]),
     };
     const quoineBa = {
@@ -215,16 +214,16 @@ describe("Quote Aggregator", () => {
       broker: "Bitflyer",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500001, volume: 0.01 },
+          { broker: "Bitflyer", side: "Ask", price: 500000, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500001, volume: 0.01 },
         ]),
     };
     const coincheckBa = {
       broker: "Coincheck",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490001, volume: 0.02 },
-          { broker: "Coincheck", side: QuoteSide.Bid, price: 490000, volume: 0.2 },
+          { broker: "Coincheck", side: "Bid", price: 490001, volume: 0.02 },
+          { broker: "Coincheck", side: "Bid", price: 490000, volume: 0.2 },
         ]),
     };
     const quoineBa = {
@@ -252,8 +251,8 @@ describe("Quote Aggregator", () => {
       broker: "Bitflyer",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500001, volume: 0.01 },
+          { broker: "Bitflyer", side: "Ask", price: 500000, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500001, volume: 0.01 },
         ]),
     };
     const quoineBa = {
@@ -283,8 +282,8 @@ describe("Quote Aggregator", () => {
       broker: "Bitflyer",
       fetchQuotes: () =>
         Promise.resolve([
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500000, volume: 0.1 },
-          { broker: "Bitflyer", side: QuoteSide.Ask, price: 500001, volume: 0.01 },
+          { broker: "Bitflyer", side: "Ask", price: 500000, volume: 0.1 },
+          { broker: "Bitflyer", side: "Ask", price: 500001, volume: 0.01 },
         ]),
     };
     const quoineBa = {

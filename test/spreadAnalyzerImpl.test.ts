@@ -3,10 +3,9 @@ import type { ConfigStore } from "../src/types";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
-import * as _ from "lodash";
+import _ from "lodash";
 
 import SpreadAnalyzer from "../src/spreadAnalyzer";
-import { QuoteSide } from "../src/types";
 import { toQuote } from "../src/util";
 
 options.enabled = false;
@@ -32,10 +31,10 @@ const positionMap = {
 describe("Spread Analyzer", () => {
   it("analyze", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 2, 2),
-      toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
-      toQuote("Quoine", QuoteSide.Bid, 2.5, 4),
+      toQuote("Coincheck", "Ask", 3, 1),
+      toQuote("Coincheck", "Bid", 2, 2),
+      toQuote("Quoine", "Ask", 3.5, 3),
+      toQuote("Quoine", "Bid", 2.5, 4),
     ];
     const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap as any);
@@ -52,10 +51,10 @@ describe("Spread Analyzer", () => {
 
   it("analyze positive profit", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 300000, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 200000, 2),
-      toQuote("Quoine", QuoteSide.Ask, 350000, 3),
-      toQuote("Quoine", QuoteSide.Bid, 360000, 4),
+      toQuote("Coincheck", "Ask", 300000, 1),
+      toQuote("Coincheck", "Bid", 200000, 2),
+      toQuote("Quoine", "Ask", 350000, 3),
+      toQuote("Quoine", "Bid", 360000, 4),
     ];
     const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap as any);
@@ -72,11 +71,11 @@ describe("Spread Analyzer", () => {
 
   it("analyze positive profit with too small quotes", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 300000, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 200000, 2),
-      toQuote("Coincheck", QuoteSide.Ask, 100000, 0.0099),
-      toQuote("Quoine", QuoteSide.Ask, 350000, 3),
-      toQuote("Quoine", QuoteSide.Bid, 360000, 4),
+      toQuote("Coincheck", "Ask", 300000, 1),
+      toQuote("Coincheck", "Bid", 200000, 2),
+      toQuote("Coincheck", "Ask", 100000, 0.0099),
+      toQuote("Quoine", "Ask", 350000, 3),
+      toQuote("Quoine", "Bid", 360000, 4),
     ];
     const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap as any);
@@ -94,10 +93,10 @@ describe("Spread Analyzer", () => {
   it("analyze positive profit with commission", async () => {
     config.brokers[2].commissionPercent = 0.05;
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 300000, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 200000, 2),
-      toQuote("Quoine", QuoteSide.Ask, 350000, 3),
-      toQuote("Quoine", QuoteSide.Bid, 360000, 4),
+      toQuote("Coincheck", "Ask", 300000, 1),
+      toQuote("Coincheck", "Bid", 200000, 2),
+      toQuote("Quoine", "Ask", 350000, 3),
+      toQuote("Quoine", "Bid", 360000, 4),
     ];
     const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap as any);
@@ -114,10 +113,10 @@ describe("Spread Analyzer", () => {
 
   it("analyze with no position map", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 300000, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 200000, 2),
-      toQuote("Quoine", QuoteSide.Ask, 350000, 3),
-      toQuote("Quoine", QuoteSide.Bid, 360000, 4),
+      toQuote("Coincheck", "Ask", 300000, 1),
+      toQuote("Coincheck", "Bid", 200000, 2),
+      toQuote("Quoine", "Ask", 350000, 3),
+      toQuote("Quoine", "Bid", 360000, 4),
     ];
     const target = new SpreadAnalyzer(configStore);
     try{
@@ -131,8 +130,8 @@ describe("Spread Analyzer", () => {
 
   it("analyze with no best bid", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-      toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
+      toQuote("Coincheck", "Ask", 3, 1),
+      toQuote("Quoine", "Ask", 3.5, 3),
     ];
     const target = new SpreadAnalyzer(configStore);
     try{
@@ -146,8 +145,8 @@ describe("Spread Analyzer", () => {
 
   it("analyze with no best ask", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Bid, 3, 1),
-      toQuote("Quoine", QuoteSide.Bid, 3.5, 3),
+      toQuote("Coincheck", "Bid", 3, 1),
+      toQuote("Quoine", "Bid", 3.5, 3),
     ];
     const target = new SpreadAnalyzer(configStore);
     try{
@@ -161,8 +160,8 @@ describe("Spread Analyzer", () => {
 
   it("invalid closingPairs", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Bid, 3, 1),
-      toQuote("Quoine", QuoteSide.Bid, 3.5, 3),
+      toQuote("Coincheck", "Bid", 3, 1),
+      toQuote("Quoine", "Bid", 3.5, 3),
     ];
     const target = new SpreadAnalyzer(configStore);
     try{
@@ -176,13 +175,15 @@ describe("Spread Analyzer", () => {
 
   it("getSpreadStat", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 2, 2),
-      toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
-      toQuote("Quoine", QuoteSide.Bid, 2.5, 4),
+      toQuote("Coincheck", "Ask", 3, 1),
+      toQuote("Coincheck", "Bid", 2, 2),
+      toQuote("Quoine", "Ask", 3.5, 3),
+      toQuote("Quoine", "Bid", 2.5, 4),
     ];
     const target = new SpreadAnalyzer(configStore);
     const spreadStat = await target.getSpreadStat(quotes);
+    
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const bestCase = spreadStat!.bestCase;
     expect(bestCase.ask.broker).to.equal("Coincheck");
     expect(bestCase.ask.price).to.equal(3);
@@ -193,6 +194,7 @@ describe("Spread Analyzer", () => {
     expect(bestCase.invertedSpread).to.equal(-0.5);
     expect(bestCase.targetVolume).to.equal(0.5);
     expect(bestCase.targetProfit).to.be.closeTo(0, 0.1);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const worstCase = spreadStat!.worstCase;
     expect(worstCase.ask.broker).to.equal("Quoine");
     expect(worstCase.ask.price).to.equal(3.5);
@@ -207,8 +209,8 @@ describe("Spread Analyzer", () => {
 
   it("getSpreadStat no bid", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-      toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
+      toQuote("Coincheck", "Ask", 3, 1),
+      toQuote("Quoine", "Ask", 3.5, 3),
     ];
     const target = new SpreadAnalyzer(configStore);
     const spreadStat = await target.getSpreadStat(quotes);
@@ -217,9 +219,9 @@ describe("Spread Analyzer", () => {
 
   it("getSpreadStat no bid in one broker", async () => {
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 2, 2),
-      toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
+      toQuote("Coincheck", "Ask", 3, 1),
+      toQuote("Coincheck", "Bid", 2, 2),
+      toQuote("Quoine", "Ask", 3.5, 3),
     ];
     const target = new SpreadAnalyzer(configStore);
     const spreadStat = await target.getSpreadStat(quotes);
@@ -231,10 +233,10 @@ describe("Spread Analyzer", () => {
     config.maxTargetVolumePercent = 25.0;
     config.brokers[2].commissionPercent = 0.0;
     const quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 300000, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 200000, 2),
-      toQuote("Quoine", QuoteSide.Ask, 350000, 3),
-      toQuote("Quoine", QuoteSide.Bid, 360000, 4),
+      toQuote("Coincheck", "Ask", 300000, 1),
+      toQuote("Coincheck", "Bid", 200000, 2),
+      toQuote("Quoine", "Ask", 350000, 3),
+      toQuote("Quoine", "Bid", 360000, 4),
     ];
     const target = new SpreadAnalyzer(configStore);
     const result = await target.analyze(quotes, positionMap as any);

@@ -1,6 +1,4 @@
-import type { SlackConfig } from "../../src/config";
-
-import * as nock from "nock";
+import nock from "nock";
 
 import SlackIntegration from "../../src/transport/SlackIntegration";
 import * as util from "../../src/util";
@@ -18,7 +16,7 @@ describe("SlackIntegration", function(){
       channel: "#ch1",
       username: "abc",
       keywords: ["error", "profit"],
-    } as SlackConfig;
+    } as object;
     const slack = new SlackIntegration(config);
     slack.handler("test message");
     slack.handler("with keyword: profit");
@@ -31,7 +29,7 @@ describe("SlackIntegration", function(){
       channel: "#ch1",
       username: "abc",
       keywords: ["error", "profit"],
-    } as SlackConfig;
+    } as object;
     const slack = new SlackIntegration(config);
     slack.handler("test message");
     slack.handler("with keyword: profit");
@@ -44,7 +42,7 @@ describe("SlackIntegration", function(){
       url: "https://hooks.slack.com/services/xxxxxx",
       channel: "#ch1",
       username: "abc",
-    } as SlackConfig;
+    } as object;
     const slack = new SlackIntegration(config);
     slack.handler("test message");
     slack.handler("with keyword: profit");

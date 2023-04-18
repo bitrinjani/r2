@@ -1,4 +1,4 @@
-import * as chai from "chai";
-import * as spies from "chai-spies";
+import chai from "chai";
+import spies from "chai-spies";
 
 chai.use(spies);

@@ -1,6 +1,6 @@
 // tslint:disable:object-literal-key-quotes
 // tslint:disable:max-line-length
-import * as nock from "nock";
+import nock from "nock";
 
 function nocksetup() {
   const quoine = nock("https://api.quoine.com");

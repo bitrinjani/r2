@@ -19,7 +19,7 @@ describe("AnalyticsService", () => {
       },
     };
 
-    let configServer, rsPub, rsRep, as;
+    let configServer: any, rsPub: any, rsRep: any, as: any;
     try{
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
         respond({ success: true, data: config } as any);
@@ -57,7 +57,7 @@ describe("AnalyticsService", () => {
       },
     };
 
-    let configServer, rsPub, rsRep, as;
+    let configServer: any, rsPub: any, rsRep: any, as: any;
     try{
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
         respond({ success: true, data: config } as any);
@@ -92,7 +92,7 @@ describe("AnalyticsService", () => {
         initHistory: { minutes: 3 },
       },
     };
-    let configServer, rsPub, rsRep, as;
+    let configServer: any, rsPub: any, rsRep: any, as: any;
 
     try{
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
@@ -130,7 +130,7 @@ describe("AnalyticsService", () => {
       },
     };
 
-    let configServer, rsPub, rsRep, as;
+    let configServer: any, rsPub: any, rsRep: any, as: any;
     try{
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
         respond({ success: true, data: config } as any);
@@ -168,7 +168,7 @@ describe("AnalyticsService", () => {
         initHistory: { minutes: 3 },
       },
     };
-    let configServer, rsPub, rsRep, as;
+    let configServer: any, rsPub: any, rsRep: any, as: any;
     try{
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
         respond({ success: true, data: config } as any);
@@ -183,7 +183,7 @@ describe("AnalyticsService", () => {
   
       as = new AnalyticsService();
       await as.start();
-      as.streamSubscriber.subscribe("sometopic", message => console.log(message));
+      as.streamSubscriber.subscribe("sometopic", (message: any) => console.log(message));
       await delay(100);
       rsPub.send(["spreadStat", JSON.stringify({ pattern: 1 })]);
       rsPub.send(["spreadStat", "handling"]);
@@ -220,7 +220,7 @@ describe("AnalyticsService", () => {
       },
     };
 
-    let configServer, rsPub, rsRep, as;
+    let configServer: any, rsPub: any, rsRep: any, as: any;
     try{
       configServer = new ConfigResponder(configStoreSocketUrl, (request, respond) => {
         respond({ success: true, data: config } as any);

@@ -1,4 +1,4 @@
-import type { ConfigRoot } from "../src/config";
+import type { FormedConfigRootType } from "../src/config";
 import type QuoteAggregator from "../src/quoteAggregator";
 import type {
   ConfigStore,
@@ -17,11 +17,6 @@ import OppotunitySearcher from "../src/opportunitySearcher";
 import PairTrader from "../src/pairTrader";
 import SingleLegHandler from "../src/singleLegHandler";
 import SpreadAnalyzer from "../src/spreadAnalyzer";
-import {
-  QuoteSide,
-  CashMarginType,
-  OrderStatus,
-  OrderSide } from "../src/types";
 import { toQuote } from "../src/util";
 
 options.enabled = false;
@@ -29,16 +24,16 @@ options.enabled = false;
 const chronoDB = new ChronoDB(`${__dirname}/datastore/1`);
 const activePairStore = getActivePairStore(chronoDB);
 
-let quoteAggregator,
-  config: ConfigRoot,
-  configStore,
-  positionMap,
-  positionService,
-  baRouter,
-  spreadAnalyzer,
+let quoteAggregator: any,
+  config: FormedConfigRootType,
+  configStore: any,
+  positionMap: any,
+  positionService: any,
+  baRouter: any,
+  spreadAnalyzer: any,
   // @ts-ignore
-  quotes,
-  limitCheckerFactory;
+  quotes: any,
+  limitCheckerFactory: any;
 
 describe("Arbitrager", function(){
   this.beforeEach(async () => {
@@ -55,7 +50,7 @@ describe("Arbitrager", function(){
       brokers: [
         {
           broker: "Bitflyer",
-          cashMarginType: CashMarginType.Cash,
+          cashMarginType: "Cash",
           leverageLevel: 1,
           maxLongPosition: 100,
           maxShortPosition: 100,
@@ -63,7 +58,7 @@ describe("Arbitrager", function(){
         },
         {
           broker: "Coincheck",
-          cashMarginType: CashMarginType.MarginOpen,
+          cashMarginType: "MarginOpen",
           leverageLevel: 8,
           maxLongPosition: 100,
           maxShortPosition: 100,
@@ -71,14 +66,14 @@ describe("Arbitrager", function(){
         },
         {
           broker: "Quoine",
-          cashMarginType: CashMarginType.NetOut,
+          cashMarginType: "NetOut",
           leverageLevel: 9,
           maxLongPosition: 100,
           maxShortPosition: 100,
           commissionPercent: 0,
         },
       ],
-    } as ConfigRoot;
+    } as FormedConfigRootType;
     configStore = { config } as ConfigStore;
     positionMap = {
       Coincheck: {
@@ -120,10 +115,10 @@ describe("Arbitrager", function(){
     limitCheckerFactory = new LimitCheckerFactory(configStore, positionService);
 
     quotes = [
-      toQuote("Coincheck", QuoteSide.Ask, 3, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 2, 2),
-      toQuote("Quoine", QuoteSide.Ask, 3.5, 3),
-      toQuote("Quoine", QuoteSide.Bid, 2.5, 4),
+      toQuote("Coincheck", "Ask", 3, 1),
+      toQuote("Coincheck", "Bid", 2, 2),
+      toQuote("Quoine", "Ask", 3.5, 3),
+      toQuote("Quoine", "Bid", 2.5, 4),
     ];
 
     await activePairStore.delAll();
@@ -192,8 +187,8 @@ describe("Arbitrager", function(){
   it("violate maxNetExposure", async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 400, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 400, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: -100,
         targetVolume: 1,
         targetProfit: -100,
@@ -220,8 +215,8 @@ describe("Arbitrager", function(){
   it("Spread not inverted", async () => {
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 400, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 400, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: -100,
         targetVolume: 1,
         targetProfit: -100,
@@ -248,8 +243,8 @@ describe("Arbitrager", function(){
     config.minTargetProfit = 1000;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -277,8 +272,8 @@ describe("Arbitrager", function(){
     config.minTargetProfitPercent = 18.4;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -306,8 +301,8 @@ describe("Arbitrager", function(){
     config.minTargetProfitPercent = 10;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -334,8 +329,8 @@ describe("Arbitrager", function(){
     config.maxTargetProfit = 99;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -362,8 +357,8 @@ describe("Arbitrager", function(){
     config.maxTargetProfitPercent = 15;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -391,8 +386,8 @@ describe("Arbitrager", function(){
     config.demoMode = true;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -416,14 +411,14 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders filled", async () => {
-    baRouter.refresh = spy(order => {
-      order.status = OrderStatus.Filled;
+    baRouter.refresh = spy((order: any) => {
+      order.status = "Filled";
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -451,19 +446,19 @@ describe("Arbitrager", function(){
   it("Send and both orders filled with different send size", async () => {
     const localChronoDB = new ChronoDB(`${__dirname}/datastore/diff_size`);
     const localActivePairStore = getActivePairStore(localChronoDB);
-    baRouter.refresh = spy(order => {
-      order.status = OrderStatus.Filled;
+    baRouter.refresh = spy((order: Order) => {
+      order.status = "Filled";
     });
-    baRouter.send = spy(order => {
-      if(order.side === OrderSide.Sell){
+    baRouter.send = spy((order: Order) => {
+      if(order.side === "Sell"){
         order.size += 0.0015;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -493,16 +488,16 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only buy order filled", async () => {
-    baRouter.refresh = order => {
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+    baRouter.refresh = (order: Order) => {
+      if(order.side === "Buy"){
+        order.status = "Filled";
       }
     };
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -525,16 +520,16 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only sell order filled", async () => {
-    baRouter.refresh = spy(order => {
-      if(order.side === OrderSide.Sell){
-        order.status = OrderStatus.Filled;
+    baRouter.refresh = spy((order: Order) => {
+      if(order.side === "Sell"){
+        order.status = "Filled";
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -560,20 +555,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only sell order filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Sell){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Sell"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -599,20 +593,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and sell order filled and buy order partial filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.3;
-      if(order.side === OrderSide.Sell){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Sell"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -638,19 +631,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and sell order unfilled and buy order partial filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.3;
-      if(order.side === OrderSide.Sell){
+      if(order.side === "Sell"){
         order.filledSize = 0;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -676,20 +668,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only buy order filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Buy"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -715,20 +706,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and buy order filled and sel order partial filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.3;
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Buy"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -754,19 +744,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and buy order unfilled and sel order partial filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.3;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -792,19 +781,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders partial filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.7;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0.2;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -830,19 +818,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders same quantity partial filled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.8;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0.8;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -868,19 +855,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders unfilled -> reverse", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -906,12 +892,11 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only buy order filled -> reverse -> fill", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    const fillBuy = async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    const fillBuy = async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Buy"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     };
@@ -922,14 +907,14 @@ describe("Arbitrager", function(){
         // @ts-ignore
         fillBuy.apply(this, args);
       }else{
-        args[0].status = OrderStatus.Filled;
+        args[0].status = "Filled";
       }
     });
     config.maxRetryCount = 1;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -956,12 +941,11 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only buy order filled -> reverse -> send throws", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Reverse", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Reverse", actionOnExit: "Reverse", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Buy"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
@@ -972,8 +956,8 @@ describe("Arbitrager", function(){
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockReturnValue({
-      bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+      bid: toQuote("Quoine", "Bid", 600, 4),
+      ask: toQuote("Coincheck", "Ask", 500, 1),
       invertedSpread: 100,
       availableVolume: 1,
       targetVolume: 1,
@@ -999,20 +983,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only sell order filled -> proceed", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Proceed", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Proceed", actionOnExit: "Proceed", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Sell){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Sell"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1038,20 +1021,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only buy order filled -> proceed", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Proceed", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Proceed", actionOnExit: "Proceed", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Buy"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1077,20 +1059,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and buy order filled and sell order partial filled -> proceed", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Proceed", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Proceed", actionOnExit: "Proceed", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.3;
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Buy"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1116,19 +1097,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and buy order unfilled and sell order partial filled -> proceed", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Proceed", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Proceed", actionOnExit: "Proceed", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.3;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1154,19 +1134,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders partial filled -> proceed", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Proceed", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Proceed", actionOnExit: "Proceed", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.7;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0.2;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1192,19 +1171,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders same quantity partial filled -> proceed", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Proceed", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Proceed", actionOnExit: "Proceed", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0.8;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0.8;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1230,19 +1208,18 @@ describe("Arbitrager", function(){
   });
 
   it("Send and both orders unfilled -> proceed", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Proceed", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Proceed", actionOnExit: "Proceed", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Buy){
+      if(order.side === "Buy"){
         order.filledSize = 0;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1268,20 +1245,19 @@ describe("Arbitrager", function(){
   });
 
   it("Send and only buy order filled -> invalid action", async () => {
-    // @ts-expect-error
-    config.onSingleLeg = { action: "Invalid", options: { limitMovePercent: 10 } };
-    baRouter.refresh = spy(async order => {
+    config.onSingleLeg = { action: "Cancel", actionOnExit: "Cancel", options: { limitMovePercent: 10, ttl: 3000 } };
+    baRouter.refresh = spy(async (order: Order) => {
       order.filledSize = 0;
-      if(order.side === OrderSide.Buy){
-        order.status = OrderStatus.Filled;
+      if(order.side === "Buy"){
+        order.status = "Filled";
         order.filledSize = 1;
       }
     });
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1310,8 +1286,8 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1337,8 +1313,8 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1367,8 +1343,8 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1398,8 +1374,8 @@ describe("Arbitrager", function(){
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1425,12 +1401,12 @@ describe("Arbitrager", function(){
   });
 
   it("Send and filled", async () => {
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1453,15 +1429,15 @@ describe("Arbitrager", function(){
   });
 
   it("Send and filled with commission", async () => {
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.brokers[0].commissionPercent = 0.1;
     config.brokers[1].commissionPercent = 0.2;
     config.brokers[2].commissionPercent = 0.3;
     spreadAnalyzer.analyze.mockImplementation(() => {
       return {
-        bid: toQuote("Quoine", QuoteSide.Bid, 600, 4),
-        ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+        bid: toQuote("Quoine", "Bid", 600, 4),
+        ask: toQuote("Coincheck", "Ask", 500, 1),
         invertedSpread: 100,
         availableVolume: 1,
         targetVolume: 1,
@@ -1485,12 +1461,12 @@ describe("Arbitrager", function(){
 
   it("Close filled orders", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
@@ -1517,16 +1493,16 @@ describe("Arbitrager", function(){
 
   it("Close two sets of filled orders", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
     const localQuotes2 = [
-      toQuote("Quoine", QuoteSide.Bid, 601, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 501, 1),
+      toQuote("Quoine", "Bid", 601, 4),
+      toQuote("Coincheck", "Ask", 501, 1),
     ];
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
@@ -1565,12 +1541,12 @@ describe("Arbitrager", function(){
 
   it("Close filled orders with minExitTargetProfitPercent", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfitPercent = -80;
@@ -1597,12 +1573,12 @@ describe("Arbitrager", function(){
 
   it("Not close filled orders with minExitTargetProfitPercent", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfitPercent = -20;
@@ -1629,12 +1605,12 @@ describe("Arbitrager", function(){
 
   it("Close two filled orders", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -200;
@@ -1659,10 +1635,10 @@ describe("Arbitrager", function(){
 
     //closing
     const localQuotes2 = [
-      toQuote("Quoine", QuoteSide.Ask, 620, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 450, 1),
+      toQuote("Quoine", "Ask", 620, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 450, 1),
     ];
     await quoteAggregator.emitParallel("quoteUpdated", localQuotes2);
     expect(arbitrager.status).to.equal("Closed");
@@ -1674,12 +1650,12 @@ describe("Arbitrager", function(){
 
   it("Closing filled orders with no lastResult in spread analyzer", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
@@ -1706,12 +1682,12 @@ describe("Arbitrager", function(){
 
   it("Closing filled orders when spread analyzer throws", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
-    baRouter.refresh.mockImplementation(order => order.status = OrderStatus.Filled);
+    baRouter.refresh.mockImplementation((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
@@ -1738,7 +1714,7 @@ describe("Arbitrager", function(){
 
   it("Not close filled orders with maxTargetVolumePercent", async () => {
     const originalRefresh = baRouter.refresh;
-    baRouter.refresh = spy(order => order.status = OrderStatus.Filled);
+    baRouter.refresh = spy((order: Order) => order.status = "Filled");
     config.maxRetryCount = 3;
     config.minTargetProfit = 50;
     config.minExitTargetProfit = -1000;
@@ -1748,8 +1724,8 @@ describe("Arbitrager", function(){
       count++;
       if(count === 1){
         return {
-          bid: toQuote("Quoine", QuoteSide.Bid, 600, 3),
-          ask: toQuote("Coincheck", QuoteSide.Ask, 500, 1),
+          bid: toQuote("Quoine", "Bid", 600, 3),
+          ask: toQuote("Coincheck", "Ask", 500, 1),
           invertedSpread: 100,
           availableVolume: 2,
           targetVolume: 1,
@@ -1757,8 +1733,8 @@ describe("Arbitrager", function(){
         };
       }else{
         return {
-          bid: toQuote("Quoine", QuoteSide.Bid, 700, 2),
-          ask: toQuote("Coincheck", QuoteSide.Ask, 400, 1),
+          bid: toQuote("Quoine", "Bid", 700, 2),
+          ask: toQuote("Coincheck", "Ask", 400, 1),
           invertedSpread: 300,
           availableVolume: 1,
           targetVolume: 1,
@@ -1790,13 +1766,13 @@ describe("Arbitrager", function(){
 
   it("Close filled orders with exitNetProfitRatio", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
     baRouter.refresh.mockImplementation((order: Order) => {
-      order.status = OrderStatus.Filled;
+      order.status = "Filled";
       order.filledSize = order.size;
       order.executions = [{ price: order.price, size: order.size } as Execution];
     });
@@ -1826,13 +1802,13 @@ describe("Arbitrager", function(){
 
   it("Not close filled orders with exitNetProfitRatio", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
     baRouter.refresh.mockImplementation((order: Order) => {
-      order.status = OrderStatus.Filled;
+      order.status = "Filled";
       order.filledSize = order.size;
       order.executions = [{ price: order.price, size: order.size } as Execution];
     });
@@ -1862,13 +1838,13 @@ describe("Arbitrager", function(){
 
   it("Not close filled orders with exitNetProfitRatio and commission", async () => {
     const localQuotes = [
-      toQuote("Quoine", QuoteSide.Ask, 700, 4),
-      toQuote("Quoine", QuoteSide.Bid, 600, 4),
-      toQuote("Coincheck", QuoteSide.Ask, 500, 1),
-      toQuote("Coincheck", QuoteSide.Bid, 400, 1),
+      toQuote("Quoine", "Ask", 700, 4),
+      toQuote("Quoine", "Bid", 600, 4),
+      toQuote("Coincheck", "Ask", 500, 1),
+      toQuote("Coincheck", "Bid", 400, 1),
     ];
     baRouter.refresh.mockImplementation((order: Order) => {
-      order.status = OrderStatus.Filled;
+      order.status = "Filled";
       order.filledSize = order.size;
       order.executions = [{ price: order.price, size: order.size } as Execution];
     });

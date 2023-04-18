@@ -1,5 +1,4 @@
-// tslint:disable
-import * as nock from "nock";
+import nock from "nock";
 
 function nocksetup() {
   const api = nock("https://api.bitflyer.jp");

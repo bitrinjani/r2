@@ -3,12 +3,11 @@ import type { Execution } from "../src/types";
 import { expect } from "chai";
 
 import { createOrder } from "./helper";
-import { OrderSide, OrderType, CashMarginType } from "../src/types";
 import { toExecution } from "../src/util";
 
 describe("Order", () => {
   it("averageFilledPrice", () => {
-    const target = createOrder("Bitflyer", OrderSide.Buy, 0.01, 1000, CashMarginType.Cash, OrderType.Limit, 1);
+    const target = createOrder("Bitflyer", "Buy", 0.01, 1000, "Cash", "Limit", 1);
     const ex1 = toExecution(target);
     ex1.price = 1100;
     ex1.size = 0.004;

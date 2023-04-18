@@ -3,21 +3,24 @@ import type { BrokerConfigType } from "../../src/config";
 
 import { options } from "@bitr/logger";
 import { expect } from "chai";
-import * as _ from "lodash";
-import * as nock from "nock";
+import _ from "lodash";
+import nock from "nock";
 
 import nocksetup from "./nocksetup";
 import BrokerAdapterImpl from "../../src/Quoine/BrokerAdapterImpl";
-import { OrderStatus, CashMarginType, OrderSide, OrderType } from "../../src/types";
 import { createOrder } from "../helper";
 
 options.enabled = false;
 
 const brokerConfig = {
   broker: "Quoine",
+  enabled: true,
   key: "key",
   secret: "secret",
-  cashMarginType: CashMarginType.NetOut,
+  maxLongPosition: 0.5,
+  maxShortPosition: 0.5,
+  commissionPercent: 0,
+  cashMarginType: "NetOut",
 } as BrokerConfigType;
 
 describe("Quoine BrokerAdapter", function(){
@@ -31,20 +34,20 @@ describe("Quoine BrokerAdapter", function(){
 
   it("send leverage buy limit", async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = createOrder("Quoine", OrderSide.Buy, 0.01, 783000, CashMarginType.NetOut, OrderType.Limit, 10);
+    const order = createOrder("Quoine", "Buy", 0.01, 783000, "NetOut", "Limit", 10);
     await target.send(order);
-    expect(order.status).to.equal(OrderStatus.New);
+    expect(order.status).to.equal("New");
     expect(order.brokerOrderId).to.equal("118573146");
   });
 
   it("send cash buy limit", async () => {
     const config = {
-      brokers: [{ broker: "Quoine", key: "key", secret: "secret", cashMarginType: CashMarginType.Cash }],
+      brokers: [{ broker: "Quoine", key: "key", secret: "secret", cashMarginType: "Cash" }],
     };
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = createOrder("Quoine", OrderSide.Buy, 0.01, 783000, CashMarginType.Cash, OrderType.Limit, 10);
+    const order = createOrder("Quoine", "Buy", 0.01, 783000, "Cash", "Limit", 10);
     await target.send(order);
-    expect(order.status).to.equal(OrderStatus.New);
+    expect(order.status).to.equal("New");
     expect(order.brokerOrderId).to.equal("118573146");
   });
 
@@ -72,7 +75,7 @@ describe("Quoine BrokerAdapter", function(){
 
   it("send wrong order type", async () => {
     const target = new BrokerAdapterImpl(brokerConfig);
-    const order = { broker: "Quoine", symbol: "BTC/JPY", type: OrderType.StopLimit };
+    const order = { broker: "Quoine", symbol: "BTC/JPY", type: "StopLimit" };
     try{
       await target.send(order as any);
     } catch(ex){
@@ -86,8 +89,8 @@ describe("Quoine BrokerAdapter", function(){
     const order = {
       broker: "Quoine",
       symbol: "BTC/JPY",
-      type: OrderType.Market,
-      cashMarginType: CashMarginType.MarginOpen,
+      type: "Market",
+      cashMarginType: "MarginOpen",
     };
     try{
       await target.send(order as any);
@@ -113,9 +116,13 @@ describe("Quoine BrokerAdapter", function(){
   it("getBtcPosition Cash", async () => {
     const cashConfig = {
       broker: "Quoine",
+      enabled: true,
       key: "key",
       secret: "secret",
-      cashMarginType: CashMarginType.Cash,
+      maxLongPosition: 0.5,
+      maxShortPosition: 0.5,
+      commissionPercent: 0,
+      cashMarginType: "Cash",
     } as BrokerConfigType;
     const target = new BrokerAdapterImpl(cashConfig);
     const result = await target.getBtcPosition();
@@ -125,9 +132,13 @@ describe("Quoine BrokerAdapter", function(){
   it("getBtcPosition strategy not found", async () => {
     const wrongConfig = {
       broker: "Quoine",
+      enabled: true,
       key: "key",
       secret: "secret",
-      cashMarginType: CashMarginType.MarginOpen,
+      maxLongPosition: 0.5,
+      maxShortPosition: 0.5,
+      commissionPercent: 0,
+      cashMarginType: "MarginOpen",
     } as BrokerConfigType;
     const target = new BrokerAdapterImpl(wrongConfig);
     try{
@@ -158,7 +169,7 @@ describe("Quoine BrokerAdapter", function(){
       id: "b28eaefe-84d8-4110-9917-0e9d5793d7eb",
       status: "New",
       creationTime: "2017-11-06T23:46:56.635Z",
-      executions: [],
+      executions: [] as any,
       broker: "Quoine",
       size: 0.01,
       side: "Buy",
@@ -170,7 +181,7 @@ describe("Quoine BrokerAdapter", function(){
       lastUpdated: "2017-11-06T23:46:56.692Z",
     };
     await target.refresh(order as any);
-    expect(order.status).to.equal(OrderStatus.New);
+    expect(order.status).to.equal("New");
   });
 
   it("refresh partially filled", async () => {
@@ -182,7 +193,7 @@ describe("Quoine BrokerAdapter", function(){
       id: "b28eaefe-84d8-4110-9917-0e9d5793d7eb",
       status: "New",
       creationTime: "2017-11-06T23:46:56.635Z",
-      executions: [],
+      executions: [] as any,
       broker: "Quoine",
       size: 0.01,
       side: "Buy",
@@ -194,7 +205,7 @@ describe("Quoine BrokerAdapter", function(){
       lastUpdated: "2017-11-06T23:46:56.692Z",
     };
     await target.refresh(order as any);
-    expect(order.status).to.equal(OrderStatus.PartiallyFilled);
+    expect(order.status).to.equal("PartiallyFilled");
   });
 
   it("refresh", async () => {
@@ -206,7 +217,7 @@ describe("Quoine BrokerAdapter", function(){
       id: "b28eaefe-84d8-4110-9917-0e9d5793d7eb",
       status: "New",
       creationTime: "2017-11-06T23:46:56.635Z",
-      executions: [],
+      executions: [] as any,
       broker: "Quoine",
       size: 0.01,
       side: "Buy",
@@ -218,7 +229,7 @@ describe("Quoine BrokerAdapter", function(){
       lastUpdated: "2017-11-06T23:46:56.692Z",
     };
     await target.refresh(order as any);
-    expect(order.status).to.equal(OrderStatus.Filled);
+    expect(order.status).to.equal("Filled");
   });
 
   it("cancel", async () => {
@@ -230,7 +241,7 @@ describe("Quoine BrokerAdapter", function(){
       id: "b28eaefe-84d8-4110-9917-0e9d5793d7eb",
       status: "New",
       creationTime: "2017-11-06T23:46:56.635Z",
-      executions: [],
+      executions: [] as any,
       broker: "Quoine",
       size: 0.01,
       side: "Buy",
@@ -242,6 +253,6 @@ describe("Quoine BrokerAdapter", function(){
       lastUpdated: "2017-11-06T23:46:56.692Z",
     };
     await target.cancel(order as any);
-    expect(order.status).to.equal(OrderStatus.Canceled);
+    expect(order.status).to.equal("Canceled");
   });
 });

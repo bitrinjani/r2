@@ -32,11 +32,11 @@ it("almostEqual", () => {
 });
 
 it("findBrokerConfig with no config", () => {
-  expect(() => findBrokerConfig({ brokers: [] } as any, "Bitflyer")).to.throw();
+  expect(() => findBrokerConfig("Bitflyer")).to.throw();
 });
 
 it("safeQueryStringStringify", () => {
-  const o = { a: 1, b: undefined };
+  const o = { a: 1, b: undefined as any };
   const result = util.safeQueryStringStringify(o);
   expect(result).to.equal("a=1");
 });

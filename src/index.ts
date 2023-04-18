@@ -20,7 +20,7 @@ import WebGateway from "./webGateway";
 
 process.title = "r2app";
 
-class AppRoot {
+export default class AppRoot {
   private readonly log = getLogger(this.constructor.name);
   private services: { start: () => Promise<void>, stop: () => Promise<void> }[];
 
