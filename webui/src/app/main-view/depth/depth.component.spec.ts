@@ -1,10 +1,10 @@
-import type { ComponentFixture } from "@angular/core/testing";
+import type; { ComponentFixture; } from; '@angular/core/testing';
 
-import { async, TestBed } from "@angular/core/testing";
+import { async, TestBed } from '@angular/core/testing';
 
-import { DepthComponent } from "./depth.component";
+import { DepthComponent } from './depth.component';
 
-describe("DepthComponent", () => {
+describe('DepthComponent', () => {
   let component: DepthComponent;
   let fixture: ComponentFixture<DepthComponent>;
 
@@ -21,7 +21,7 @@ describe("DepthComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

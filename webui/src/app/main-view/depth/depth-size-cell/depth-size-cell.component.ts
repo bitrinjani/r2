@@ -1,13 +1,13 @@
-import type { DepthSizeCell } from "../../../types";
-import type { OnInit } from "@angular/core";
+import { DepthSizeCell } from '../../../types';
+import { OnInit } from '@angular/core';
 
-import { Component, Input } from "@angular/core";
-import * as _ from "lodash";
+import { Component, Input } from '@angular/core';
+import * as _ from 'lodash';
 
 
 @Component({
-  selector: "app-depth-size-cell",
-  templateUrl: "./depth-size-cell.component.html",
+  selector: 'app-depth-size-cell',
+  templateUrl: './depth-size-cell.component.html',
 })
 export class DepthSizeCellComponent implements OnInit {
   tradable: boolean;
@@ -20,8 +20,8 @@ export class DepthSizeCellComponent implements OnInit {
 
   ngOnInit() {
     this.sizeCellsWithContrast = this.sizeCells.map(sizeCell => {
-      const sizeString = sizeCell.value.toLocaleString("ja-JP", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
-      const lowPart = _.takeRightWhile(sizeString, c => c === "0").join("");
+      const sizeString = sizeCell.value.toLocaleString('ja-JP', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+      const lowPart = _.takeRightWhile(sizeString, c => c === '0').join('');
       const highPart = sizeString.slice(0, sizeString.length - lowPart.length);
       return { highPart, lowPart, tradable: sizeCell.tradable, size: sizeCell.value };
     });
@@ -35,8 +35,8 @@ export class DepthSizeCellComponent implements OnInit {
   }
 
   plot(s) {
-    const background = this.side === "ask" ? "#405b44" : "#54404b";
-    const direction = this.side === "ask" ? "rtl" : "ltr";
+    const background = this.side === 'ask' ? '#405b44' : '#54404b';
+    const direction = this.side === 'ask' ? 'rtl' : 'ltr';
     return {
       background,
       width: `${_.min([s.size * 50, 100])}%`,

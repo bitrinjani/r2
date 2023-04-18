@@ -1,12 +1,12 @@
-import type { DepthBrokerCell } from "../../../types";
-import type { OnInit } from "@angular/core";
+import { DepthBrokerCell } from '../../../types';
+import { OnInit } from '@angular/core';
 
-import { Component, Input } from "@angular/core";
+import { Component, Input } from '@angular/core';
 
 
 @Component({
-  selector: "app-depth-broker-cell",
-  templateUrl: "./depth-broker-cell.component.html",
+  selector: 'app-depth-broker-cell',
+  templateUrl: './depth-broker-cell.component.html',
 })
 export class DepthBrokerCellComponent implements OnInit {
   @Input() brokerCells: DepthBrokerCell[];

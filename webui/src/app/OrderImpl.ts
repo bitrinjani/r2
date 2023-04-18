@@ -1,10 +1,10 @@
-import type { OrderSide, CashMarginType, OrderType, Broker, Order, Execution } from "./types";
+import { OrderSide, CashMarginType, OrderType, Broker, Order, Execution } from './types';
 
-import * as _ from "lodash";
-import { v4 as uuid } from "uuid";
+import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 
-import { TimeInForce, OrderStatus } from "./types";
-import { eRound, revive } from "./util";
+import { TimeInForce, OrderStatus } from './types';
+import { eRound, revive } from './util';
 
 export interface OrderInit {
   symbol: string;

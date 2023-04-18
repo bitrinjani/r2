@@ -1,11 +1,11 @@
-import type { ComponentFixture } from "@angular/core/testing";
+import type { ComponentFixture  } from '@angular/core/testing';
 
-import { async, TestBed } from "@angular/core/testing";
-import { FormsModule } from "@angular/forms";
+import { async, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 
-import { ConfigFormComponent } from "./config-form.component";
+import { ConfigFormComponent } from './config-form.component';
 
-describe("ConfigFormComponent", () => {
+describe('ConfigFormComponent', () => {
   let component: ConfigFormComponent;
   let fixture: ComponentFixture<ConfigFormComponent>;
 
@@ -23,7 +23,7 @@ describe("ConfigFormComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

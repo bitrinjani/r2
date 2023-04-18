@@ -1,4 +1,4 @@
-import type {
+import {
   Quote,
   WsMessage,
   BrokerMap,
@@ -7,19 +7,19 @@ import type {
   ConfigRoot,
   PairWithSummary,
   LimitCheckResult
-} from "./types";
-import type { Observer } from "rxjs/Observer";
+} from './types';
+import { Observer } from 'rxjs/Observer';
 
-import { Injectable } from "@angular/core";
-import * as ReconnectingWebSocket from "reconnecting-websocket";
-import { Observable } from "rxjs/Observable";
-import { Subject } from "rxjs/Subject";
-import { catchError, map, tap, filter, share } from "rxjs/operators";
+import { Injectable } from '@angular/core';
+import * as ReconnectingWebSocket from 'reconnecting-websocket';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { catchError, map, tap, filter, share } from 'rxjs/operators';
 
 
 import {
   OrderPair
-} from "./types";
+} from './types';
 
 
 @Injectable()
@@ -38,34 +38,34 @@ export class WsService {
   socket: Subject<MessageEvent>;
 
   connect() {
-    if(this.connected){
+    if (this.connected) {
       return;
     }
     const ws = new ReconnectingWebSocket(this.url);
     const observable = Observable.create((obs: Observer<MessageEvent>) => {
       ws.onmessage = obs.next.bind(obs);
       ws.onerror = e => {
-        obs.next.bind(obs)({ data: JSON.stringify({ type: "error", body: e }) });
+        obs.next.bind(obs)({ data: JSON.stringify({ type: 'error', body: e }) });
       };
       return ws.close.bind(ws);
     });
     const observer = {
       next: (data: Object) => {
-        if(ws.readyState === WebSocket.OPEN){
+        if (ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify(data));
         }
       },
     };
     this.socket = Subject.create(observer, observable);
     const sharedObservable = this.socket.pipe(share());
-    this.quote$ = this.mapMessage<Quote[]>(sharedObservable, "quoteUpdated");
-    this.position$ = this.mapMessage<BrokerMap<BrokerPosition>>(sharedObservable, "positionUpdated");
-    this.spread$ = this.mapMessage<SpreadAnalysisResult>(sharedObservable, "spreadAnalysisDone");
-    this.limitCheck$ = this.mapMessage<LimitCheckResult>(sharedObservable, "limitCheckDone");
-    this.log$ = this.mapMessage<string>(sharedObservable, "log");
-    this.activePair$ = this.mapMessage<PairWithSummary[]>(sharedObservable, "activePairRefresh");
-    this.config$ = this.mapMessage<ConfigRoot>(sharedObservable, "configUpdated");
-    this.error$ = this.mapMessage<{ code: string }>(sharedObservable, "error");
+    this.quote$ = this.mapMessage<Quote[]>(sharedObservable, 'quoteUpdated');
+    this.position$ = this.mapMessage<BrokerMap<BrokerPosition>>(sharedObservable, 'positionUpdated');
+    this.spread$ = this.mapMessage<SpreadAnalysisResult>(sharedObservable, 'spreadAnalysisDone');
+    this.limitCheck$ = this.mapMessage<LimitCheckResult>(sharedObservable, 'limitCheckDone');
+    this.log$ = this.mapMessage<string>(sharedObservable, 'log');
+    this.activePair$ = this.mapMessage<PairWithSummary[]>(sharedObservable, 'activePairRefresh');
+    this.config$ = this.mapMessage<ConfigRoot>(sharedObservable, 'configUpdated');
+    this.error$ = this.mapMessage<{ code: string }>(sharedObservable, 'error');
     this.connected = true;
   }
 

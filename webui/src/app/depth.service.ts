@@ -1,11 +1,11 @@
-import type { DepthLine } from "./types";
-import type { Observable } from "rxjs/Observable";
+import { DepthLine } from './types';
+import { Observable } from 'rxjs/Observable';
 
-import { Injectable } from "@angular/core";
-import { withLatestFrom, map } from "rxjs/operators";
+import { Injectable } from '@angular/core';
+import { withLatestFrom, map } from 'rxjs/operators';
 
-import { buildDepthTable } from "./shared/buildDepthTable";
-import { WsService } from "./ws.service";
+import { buildDepthTable } from './shared/buildDepthTable';
+import { WsService } from './ws.service';
 
 @Injectable()
 export class DepthService {

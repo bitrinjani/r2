@@ -1,26 +1,26 @@
-import type { DepthLine } from "../../types";
-import type { OnInit, OnDestroy } from "@angular/core";
+import { DepthLine } from '../../types';
+import { OnInit, OnDestroy } from '@angular/core';
 
-import { Component, ElementRef, ViewChild, Input } from "@angular/core";
+import { Component, ElementRef, ViewChild, Input } from '@angular/core';
 
 
-import "rxjs/add/observable/interval";
-import { Observable } from "rxjs/Observable";
+import 'rxjs/add/observable/interval';
+import { Observable } from 'rxjs/Observable';
 
-import type { Subscription } from "rxjs/Subscription";
+import  { Subscription } from 'rxjs/Subscription';
 
-import { combineLatest, withLatestFrom } from "rxjs/operators";
+import { combineLatest, withLatestFrom } from 'rxjs/operators';
 
-import { DepthService } from "../../depth.service";
+import { DepthService } from '../../depth.service';
 
 @Component({
-  selector: "app-depth",
-  templateUrl: "./depth.component.html",
+  selector: 'app-depth',
+  templateUrl: './depth.component.html',
 })
 export class DepthComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   depthLines: DepthLine[] = [];
-  @ViewChild("depthBody") private readonly depthBody: ElementRef;
+  @ViewChild('depthBody') private readonly depthBody: ElementRef;
   private scrolled = false;
 
   constructor(private readonly depthService: DepthService) {}
@@ -28,7 +28,7 @@ export class DepthComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.depthService.depth$.subscribe(depthLines => {
       this.depthLines = depthLines;
-      if(!this.scrolled){
+      if (!this.scrolled) {
         setTimeout(() => this.scrollToMiddle(), 0);
       }
     });
