@@ -6,10 +6,7 @@ import { Component } from "@angular/core";
 
 
 import { reviveOrder } from "../../OrderImpl";
-import { OrderSide } from "../../types";
-import { getAverageFilledPrice } from "../../util";
 import { WsService } from "../../ws.service";
-
 
 @Component({
   selector: "app-active-pair",

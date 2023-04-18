@@ -1,9 +1,17 @@
-import type { OrderSide, CashMarginType, OrderType, Broker, Order, Execution } from "./types";
+import type {
+  OrderSide,
+  CashMarginType,
+  OrderType,
+  Broker,
+  Order,
+  Execution,
+  TimeInForce,
+  OrderStatus
+} from "./types";
 
 import * as _ from "lodash";
 import { v4 as uuid } from "uuid";
 
-import { TimeInForce, OrderStatus } from "./types";
 import { eRound, revive } from "./util";
 
 export interface OrderInit {
@@ -31,9 +39,9 @@ export default class OrderImpl implements Order {
   leverageLevel: number;
   id: string = uuid();
   symbol: string;
-  timeInForce: TimeInForce = TimeInForce.None;
+  timeInForce: TimeInForce = "None";
   brokerOrderId: string;
-  status: OrderStatus = OrderStatus.PendingNew;
+  status: OrderStatus = "PendingNew";
   filledSize = 0;
   creationTime: Date = new Date();
   sentTime: Date;
@@ -51,7 +59,7 @@ export default class OrderImpl implements Order {
   }
 
   get filled(): boolean {
-    return this.status === OrderStatus.Filled;
+    return this.status === "Filled";
   }
 
   get filledNotional(): number {

@@ -1,15 +1,9 @@
 import type { DepthLine } from "../../types";
 import type { OnInit, OnDestroy } from "@angular/core";
-
-import { Component, ElementRef, ViewChild, Input } from "@angular/core";
-
-
-import "rxjs/add/observable/interval";
-import { Observable } from "rxjs/Observable";
-
 import type { Subscription } from "rxjs/Subscription";
 
-import { combineLatest, withLatestFrom } from "rxjs/operators";
+import { Component, ElementRef, ViewChild } from "@angular/core";
+import "rxjs/add/observable/interval";
 
 import { DepthService } from "../../depth.service";
 

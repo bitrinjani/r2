@@ -14,13 +14,7 @@ import { Injectable } from "@angular/core";
 import * as ReconnectingWebSocket from "reconnecting-websocket";
 import { Observable } from "rxjs/Observable";
 import { Subject } from "rxjs/Subject";
-import { catchError, map, tap, filter, share } from "rxjs/operators";
-
-
-import {
-  OrderPair
-} from "./types";
-
+import { map, filter, share } from "rxjs/operators";
 
 @Injectable()
 export class WsService {
@@ -50,7 +44,7 @@ export class WsService {
       return ws.close.bind(ws);
     });
     const observer = {
-      next: (data: Object) => {
+      next: (data: object) => {
         if(ws.readyState === WebSocket.OPEN){
           ws.send(JSON.stringify(data));
         }

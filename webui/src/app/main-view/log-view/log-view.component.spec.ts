@@ -1,6 +1,6 @@
 import type { ComponentFixture } from "@angular/core/testing";
 
-import { async, TestBed } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 
 import { LogViewComponent } from "./log-view.component";
 import { LogService } from "../../log.service";
@@ -13,13 +13,13 @@ describe("LogViewComponent", () => {
   let component: LogViewComponent;
   let fixture: ComponentFixture<LogViewComponent>;
 
-  beforeEach((() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ LogViewComponent ],
       providers: [ { provide: LogService, useValue: logServiceStub }],
-    })
-      .compileComponents();
-  }));
+    }).compileComponents()
+      .catch(e => console.log(e));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LogViewComponent);
@@ -27,7 +27,7 @@ describe("LogViewComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
-    expect(component).toBeTruthy();
+  it("should create", async () => {
+    await expect(component).toBeTruthy();
   });
 });

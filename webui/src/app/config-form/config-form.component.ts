@@ -2,9 +2,7 @@ import type { OnInit, OnDestroy } from "@angular/core";
 import type { Subscription } from "rxjs/Subscription";
 
 import { Component } from "@angular/core";
-import { Observable } from "rxjs/Observable";
 
-import { ConfigRoot } from "../types";
 import { WsService } from "../ws.service";
 
 @Component({

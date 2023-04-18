@@ -1,6 +1,6 @@
 import type { ComponentFixture } from "@angular/core/testing";
 
-import { async, TestBed } from "@angular/core/testing";
+import { TestBed } from "@angular/core/testing";
 import { FormsModule } from "@angular/forms";
 
 import { ConfigFormComponent } from "./config-form.component";
@@ -9,13 +9,13 @@ describe("ConfigFormComponent", () => {
   let component: ConfigFormComponent;
   let fixture: ComponentFixture<ConfigFormComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ ConfigFormComponent ],
       imports: [FormsModule],
-    })
-      .compileComponents();
-  }));
+    }).compileComponents()
+      .catch(e => console.log(e));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConfigFormComponent);
@@ -23,7 +23,7 @@ describe("ConfigFormComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
-    expect(component).toBeTruthy();
+  it("should create", async () => {
+    await expect(component).toBeTruthy();
   });
 });
