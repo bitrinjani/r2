@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: '18.x'
+          node-version: '20.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -37,7 +37,7 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-18.x-${{ hashFiles('package-lock.json') }}
+          key: npm-20.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
@@ -58,7 +58,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: '18.x'
+          node-version: '20.x'
 
       - name: Get npm cache directory
         id: npm-cache
@@ -69,7 +69,38 @@ jobs:
         with:
           path: |
             ${{ steps.npm-cache.outputs.dir }}
-          key: npm-18.x-${{ hashFiles('package-lock.json') }}
+          key: npm-20.x-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        
+  build-webui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: cd to webui
+        run: |
+          cd ./webui      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: '20.x'
+
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+      - name: Check npm cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ steps.npm-cache.outputs.dir }}
+          key: npm-20.x-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
       - name: Install dependencies
@@ -128,6 +159,7 @@ jobs:
     needs:
       - lint
       - build
+      - build-webui
 #       - test
     steps:
       - uses: technote-space/workflow-conclusion-action@v3
