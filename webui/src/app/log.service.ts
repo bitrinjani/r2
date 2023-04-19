@@ -20,7 +20,7 @@ export class LogService {
       return;
     }
     const ws = new ReconnectingWebSocket(this.url);
-    const observable = Observable.create((obs: Observer<MessageEvent>) => {
+    const observable = new Observable((obs: Observer<MessageEvent>) => {
       ws.onmessage = obs.next.bind(obs);
       return ws.close.bind(ws);
     });
